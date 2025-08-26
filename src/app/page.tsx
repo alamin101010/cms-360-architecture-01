@@ -1,7 +1,7 @@
 'use client';
 
 import type { DragEvent } from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Question, QuestionSet, Exam } from '@/types';
 import { allQuestions, allQuestionSets } from '@/data/mock-data';
@@ -27,6 +27,12 @@ export default function Home() {
   const [savedExams, setSavedExams] = useLocalStorage<Exam[]>('savedExams', []);
   const { toast } = useToast();
   const router = useRouter();
+  
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -117,6 +123,10 @@ export default function Home() {
       windowEnd: '',
     });
     toast({ title: 'Exam cleared.' });
+  }
+
+  if (!isClient) {
+    return null;
   }
 
   return (
