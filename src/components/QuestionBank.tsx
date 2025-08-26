@@ -64,6 +64,7 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
   const [questionToDelete, setQuestionToDelete] = useState<string | null>(null);
   const [questionsToDelete, setQuestionsToDelete] = useState<string[]>([]);
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const { toast } = useToast();
 
   const sortedQuestions = useMemo(() => {
@@ -95,8 +96,22 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
   }, [sortedQuestions, searchTerm, vertical, program, subject, paper, chapter, examSet, topic, difficulty, board]);
 
   const getUniqueOptions = (key: keyof Question) => {
-      const allValues = questions.map(q => q[key]).filter(Boolean) as string[];
+      const allValues = questions.map(q => q[key]).filter((v): v is string => typeof v === 'string' && v.trim() !== '');
       return [...new Set(allValues)];
+  }
+  
+  const resetFilters = () => {
+    setSearchTerm('');
+    setVertical(null);
+    setProgram(null);
+    setSubject(null);
+    setPaper(null);
+    setChapter(null);
+    setExamSet(null);
+    setTopic(null);
+    setDifficulty(null);
+    setBoard(null);
+    toast({ title: 'Filters cleared.' });
   }
 
   const allVerticals = useMemo(() => getUniqueOptions('vertical'), [questions]);
@@ -213,14 +228,14 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Search questions by text or topic..." className="pl-10" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
             </div>
-            <Collapsible>
+            <Collapsible open={isFilterOpen} onOpenChange={setIsFilterOpen}>
                 <CollapsibleTrigger asChild>
                   <Button variant="outline" size="sm" className="w-full">
                     <Filter className="mr-2 h-4 w-4"/>
                     Advanced Filters
                   </Button>
                 </CollapsibleTrigger>
-                <CollapsibleContent className="pt-4">
+                <CollapsibleContent className="pt-4 space-y-4">
                   <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
                     <FilterableSelect value={vertical} onValueChange={setVertical} options={allVerticals} placeholder="Select Vertical" />
                     <FilterableSelect value={program} onValueChange={setProgram} options={allPrograms} placeholder="Select Program" />
@@ -232,6 +247,10 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
                     <FilterableSelect value={board} onValueChange={setBoard} options={allBoards} placeholder="Select Board/School" />
                     <FilterableSelect value={difficulty} onValueChange={setDifficulty} options={allDifficulties} placeholder="Select Difficulty"/>
                   </div>
+                  <Button variant="ghost" size="sm" onClick={resetFilters} className="w-full text-destructive hover:bg-destructive/10 hover:text-destructive">
+                    <X className="mr-2 h-4 w-4"/>
+                    Clear All Filters
+                  </Button>
                 </CollapsibleContent>
             </Collapsible>
              {selectedQuestions.length > 0 && (
@@ -322,5 +341,3 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
     </>
   );
 }
-
-    
