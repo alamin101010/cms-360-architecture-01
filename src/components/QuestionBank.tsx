@@ -86,22 +86,11 @@ const FilterableSelect = ({ value, onValueChange, options, placeholder }: { valu
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
-               <CommandItem
-                onSelect={() => onValueChange(null)}
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    !value ? "opacity-100" : "opacity-0"
-                  )}
-                />
-                All
-              </CommandItem>
               {options.map((option) => (
                 <CommandItem
                   key={option}
                   value={option}
-                  onSelect={() => handleSelect(option)}
+                  onSelect={(currentValue) => handleSelect(currentValue)}
                 >
                   <Check
                     className={cn(
@@ -269,15 +258,15 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
                 </CollapsibleTrigger>
                 <CollapsibleContent className="pt-4">
                   <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
-                    <FilterableSelect value={vertical} onValueChange={setVertical} options={allVerticals} placeholder="All Verticals" />
-                    <FilterableSelect value={program} onValueChange={setProgram} options={allPrograms} placeholder="All Programs" />
-                    <FilterableSelect value={subject} onValueChange={setSubject} options={allSubjects} placeholder="All Subjects" />
-                    <FilterableSelect value={paper} onValueChange={setPaper} options={allPapers} placeholder="All Papers" />
-                    <FilterableSelect value={chapter} onValueChange={setChapter} options={allChapters} placeholder="All Chapters" />
-                    <FilterableSelect value={examSet} onValueChange={setExamSet} options={allExamSets} placeholder="All Exam Sets" />
-                    <FilterableSelect value={topic} onValueChange={setTopic} options={allTopics} placeholder="All Topics" />
-                    <FilterableSelect value={board} onValueChange={setBoard} options={allBoards} placeholder="All Boards/Schools" />
-                    <FilterableSelect value={difficulty} onValueChange={setDifficulty} options={allDifficulties} placeholder="All Difficulties"/>
+                    <FilterableSelect value={vertical} onValueChange={setVertical} options={allVerticals} placeholder="Select Vertical" />
+                    <FilterableSelect value={program} onValueChange={setProgram} options={allPrograms} placeholder="Select Program" />
+                    <FilterableSelect value={subject} onValueChange={setSubject} options={allSubjects} placeholder="Select Subject" />
+                    <FilterableSelect value={paper} onValueChange={setPaper} options={allPapers} placeholder="Select Paper" />
+                    <FilterableSelect value={chapter} onValueChange={setChapter} options={allChapters} placeholder="Select Chapter" />
+                    <FilterableSelect value={examSet} onValueChange={setExamSet} options={allExamSets} placeholder="Select Exam Set" />
+                    <FilterableSelect value={topic} onValueChange={setTopic} options={allTopics} placeholder="Select Topic" />
+                    <FilterableSelect value={board} onValueChange={setBoard} options={allBoards} placeholder="Select Board/School" />
+                    <FilterableSelect value={difficulty} onValueChange={setDifficulty} options={allDifficulties} placeholder="Select Difficulty"/>
                   </div>
                 </CollapsibleContent>
             </Collapsible>
