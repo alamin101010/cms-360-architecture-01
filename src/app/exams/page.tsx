@@ -52,6 +52,7 @@ export default function ExamsPage() {
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body">
       <Header savedExams={savedExams} />
       <main className="flex-1 p-4 md:p-6">
+        <AlertDialog open={!!examToDelete} onOpenChange={(open) => !open && setExamToDelete(null)}>
         <Card>
           <CardHeader>
             <CardTitle>Saved Exams</CardTitle>
@@ -114,8 +115,6 @@ export default function ExamsPage() {
             </Table>
           </CardContent>
         </Card>
-      </main>
-       <AlertDialog open={!!examToDelete} onOpenChange={(open) => !open && setExamToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -131,6 +130,7 @@ export default function ExamsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      </main>
     </div>
   );
 }
