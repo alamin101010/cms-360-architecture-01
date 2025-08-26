@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, Wand2, Plus } from 'lucide-react';
+import { Loader2, Wand2, Plus, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -17,10 +17,11 @@ import {
 } from '@/components/ui/dialog';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { suggestBalancedQuestionSet, SuggestBalancedQuestionSetOutput, SuggestBalancedQuestionSetInput } from '@/ai/flows/suggest-balanced-question-set';
+import { suggestBalancedQuestionSet, SuggestBalancedQuestionSetOutput } from '@/ai/flows/suggest-balanced-question-set';
 import type { Question } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -32,14 +33,16 @@ const formSchema = z.object({
   bloomsTaxonomyLevels: z.array(z.string()).refine(value => value.some(item => item), {
     message: 'You have to select at least one level.',
   }),
+  prompt: z.string().optional(),
 });
 
 type AiQuestionSuggesterProps = {
   children: React.ReactNode;
   addSuggestedQuestions: (newQuestions: Omit<Question, 'id'>[]) => Question[];
+  existingQuestions: Question[];
 };
 
-export function AiQuestionSuggester({ children, addSuggestedQuestions }: AiQuestionSuggesterProps) {
+export function AiQuestionSuggester({ children, addSuggestedQuestions, existingQuestions }: AiQuestionSuggesterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<SuggestBalancedQuestionSetOutput['suggestedQuestions']>([]);
@@ -51,6 +54,7 @@ export function AiQuestionSuggester({ children, addSuggestedQuestions }: AiQuest
       topic: '',
       numberOfQuestions: 5,
       bloomsTaxonomyLevels: ['Remembering', 'Understanding', 'Applying'],
+      prompt: '',
     },
   });
 
@@ -58,7 +62,10 @@ export function AiQuestionSuggester({ children, addSuggestedQuestions }: AiQuest
     setIsLoading(true);
     setSuggestions([]);
     try {
-      const result = await suggestBalancedQuestionSet(values as SuggestBalancedQuestionSetInput);
+      const result = await suggestBalancedQuestionSet({
+        ...values,
+        existingQuestions: existingQuestions.slice(0, 20) // Pass a subset of questions for context
+      });
       setSuggestions(result.suggestedQuestions);
     } catch (error) {
       console.error('AI suggestion failed:', error);
@@ -75,11 +82,12 @@ export function AiQuestionSuggester({ children, addSuggestedQuestions }: AiQuest
     const questionsToAdd = suggestions.map(s => ({
       text: s.question,
       bloomsTaxonomyLevel: s.bloomsTaxonomyLevel as Question['bloomsTaxonomyLevel'],
-      // Mocking other fields for the demo
+      options: s.options,
       subject: form.getValues('topic'),
       topic: form.getValues('topic'),
       class: 'Mixed',
-      difficulty: 'Medium',
+      difficulty: 'Medium' as const,
+      type: 'm1',
     }));
     addSuggestedQuestions(questionsToAdd);
     setIsOpen(false);
@@ -90,82 +98,98 @@ export function AiQuestionSuggester({ children, addSuggestedQuestions }: AiQuest
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>AI-Powered Question Suggester</DialogTitle>
           <DialogDescription>
-            Generate a balanced set of questions on any topic using AI.
+            Generate a balanced set of questions on any topic using AI. The AI will analyze your existing question bank for context.
           </DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-hidden flex-1">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="topic"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Topic</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., Cell Biology" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="numberOfQuestions"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Number of Questions</FormLabel>
-                    <FormControl>
-                      <Input type="number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="bloomsTaxonomyLevels"
-                render={() => (
-                  <FormItem>
-                    <FormLabel>Bloom's Taxonomy Levels</FormLabel>
-                    <div className="grid grid-cols-2 gap-2">
-                    {bloomsLevels.map((item) => (
-                      <FormField
-                        key={item}
-                        control={form.control}
-                        name="bloomsTaxonomyLevels"
-                        render={({ field }) => (
-                          <FormItem key={item} className="flex flex-row items-start space-x-3 space-y-0">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(item)}
-                                onCheckedChange={(checked) => {
-                                  return checked
-                                    ? field.onChange([...field.value, item])
-                                    : field.onChange(field.value?.filter((value) => value !== item));
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="font-normal">{item}</FormLabel>
-                          </FormItem>
-                        )}
-                      />
-                    ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={isLoading} className="w-full">
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
-                Generate Questions
-              </Button>
-            </form>
-          </Form>
+          <div className="flex flex-col gap-4">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="topic"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Topic</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Cell Biology" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="prompt"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Custom Prompt (Optional)</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="e.g., 'Focus on the differences between plant and animal cells.'" {...field} />
+                      </FormControl>
+                       <FormDescription>Provide specific instructions for the AI.</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="numberOfQuestions"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Number of Questions</FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="bloomsTaxonomyLevels"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Bloom's Taxonomy Levels</FormLabel>
+                      <div className="grid grid-cols-3 gap-2">
+                      {bloomsLevels.map((item) => (
+                        <FormField
+                          key={item}
+                          control={form.control}
+                          name="bloomsTaxonomyLevels"
+                          render={({ field }) => (
+                            <FormItem key={item} className="flex flex-row items-start space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(item)}
+                                  onCheckedChange={(checked) => {
+                                    return checked
+                                      ? field.onChange([...field.value, item])
+                                      : field.onChange(field.value?.filter((value) => value !== item));
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="font-normal">{item}</FormLabel>
+                            </FormItem>
+                          )}
+                        />
+                      ))}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" disabled={isLoading} className="w-full">
+                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
+                  Generate Questions
+                </Button>
+              </form>
+            </Form>
+          </div>
           <div className="bg-muted/50 rounded-lg p-4 flex flex-col">
             <h4 className="font-semibold mb-2">Suggested Questions</h4>
             <ScrollArea className="flex-1 -mx-4">
@@ -181,10 +205,18 @@ export function AiQuestionSuggester({ children, addSuggestedQuestions }: AiQuest
                 </div>
               )}
               {suggestions.length > 0 && (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {suggestions.map((s, i) => (
                     <div key={i} className="bg-card p-3 rounded-md border text-sm">
-                      <p>{s.question}</p>
+                      <p className='font-medium'>{i + 1}. {s.question}</p>
+                      <div className="mt-2 space-y-1">
+                        {s.options?.map((opt, index) => (
+                           <div key={index} className="flex items-center gap-2 text-xs">
+                             {opt.isCorrect ? <CheckCircle className="h-3 w-3 text-green-500" /> : <XCircle className="h-3 w-3 text-red-500" />}
+                             <span>{opt.text}</span>
+                           </div>
+                        ))}
+                      </div>
                       <Badge variant="outline" className="mt-2">{s.bloomsTaxonomyLevel}</Badge>
                     </div>
                   ))}

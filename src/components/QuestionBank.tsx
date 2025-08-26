@@ -232,7 +232,7 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
                 Import CSV
               </Button>
           </CsvUploader>
-          <AiQuestionSuggester addSuggestedQuestions={addSuggestedQuestions}>
+          <AiQuestionSuggester addSuggestedQuestions={addSuggestedQuestions} existingQuestions={questions}>
             <Button variant="outline" size="sm">
               <Bot className="mr-2 h-4 w-4" />
               AI Suggestions
