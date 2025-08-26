@@ -141,7 +141,7 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
   const allExamSets = useMemo(() => getUniqueOptions('exam_set'), [questions]);
   const allTopics = useMemo(() => getUniqueOptions('topic'), [questions]);
   const allBoards = useMemo(() => getUniqueOptions('board'), [questions]);
-  const allDifficulties = ['Easy', 'Medium', 'Hard'];
+  const allDifficulties = useMemo(() => ['Easy', 'Medium', 'Hard'], []);
   
   const FilterableSelect = ({ value, onValueChange, options, placeholder }: { value: FilterValue, onValueChange: (value: FilterValue) => void, options: string[], placeholder: string }) => {
     if (options.length === 0) return null;
@@ -218,7 +218,7 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
     setQuestionsToDelete([]);
   }
 
-  const hasAnyFilterOptions = [allVerticals, allPrograms, allSubjects, allPapers, allChapters, allExamSets, allTopics, allBoards, allDifficulties].some(options => options.length > 0);
+  const hasAnyFilterOptions = useMemo(() => [allVerticals, allPrograms, allSubjects, allPapers, allChapters, allExamSets, allTopics, allBoards, allDifficulties].some(options => options.length > 0), [allVerticals, allPrograms, allSubjects, allPapers, allChapters, allExamSets, allTopics, allBoards, allDifficulties]);
 
   return (
     <>
