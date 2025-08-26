@@ -55,17 +55,17 @@ type QuestionBankProps = {
   deleteMultipleQuestions: (questionIds: string[]) => void;
 };
 
-type FilterValue = string | 'all';
+type FilterValue = string | null;
 
 const FilterableSelect = ({ value, onValueChange, options, placeholder }: { value: FilterValue, onValueChange: (value: FilterValue) => void, options: string[], placeholder: string }) => {
   const [open, setOpen] = useState(false);
 
   const handleSelect = (currentValue: string) => {
-    onValueChange(currentValue);
+    onValueChange(currentValue === value ? null : currentValue);
     setOpen(false)
   }
   
-  const displayValue = value !== 'all' ? value : placeholder;
+  const displayValue = value ? value : placeholder;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -86,13 +86,13 @@ const FilterableSelect = ({ value, onValueChange, options, placeholder }: { valu
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
-              <CommandItem
-                onSelect={() => handleSelect('all')}
+               <CommandItem
+                onSelect={() => onValueChange(null)}
               >
                 <Check
                   className={cn(
                     "mr-2 h-4 w-4",
-                    value === 'all' ? "opacity-100" : "opacity-0"
+                    !value ? "opacity-100" : "opacity-0"
                   )}
                 />
                 All
@@ -101,9 +101,7 @@ const FilterableSelect = ({ value, onValueChange, options, placeholder }: { valu
                 <CommandItem
                   key={option}
                   value={option}
-                  onSelect={(currentValue) => {
-                    handleSelect(currentValue === option.toLowerCase() ? 'all' : option)
-                  }}
+                  onSelect={() => handleSelect(option)}
                 >
                   <Check
                     className={cn(
@@ -129,15 +127,15 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
   }, []);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [vertical, setVertical] = useState<FilterValue>('all');
-  const [program, setProgram] = useState<FilterValue>('all');
-  const [subject, setSubject] = useState<FilterValue>('all');
-  const [paper, setPaper] = useState<FilterValue>('all');
-  const [chapter, setChapter] = useState<FilterValue>('all');
-  const [examSet, setExamSet] = useState<FilterValue>('all');
-  const [topic, setTopic] = useState<FilterValue>('all');
-  const [difficulty, setDifficulty] = useState<FilterValue>('all');
-  const [board, setBoard] = useState<FilterValue>('all');
+  const [vertical, setVertical] = useState<FilterValue>(null);
+  const [program, setProgram] = useState<FilterValue>(null);
+  const [subject, setSubject] = useState<FilterValue>(null);
+  const [paper, setPaper] = useState<FilterValue>(null);
+  const [chapter, setChapter] = useState<FilterValue>(null);
+  const [examSet, setExamSet] = useState<FilterValue>(null);
+  const [topic, setTopic] = useState<FilterValue>(null);
+  const [difficulty, setDifficulty] = useState<FilterValue>(null);
+  const [board, setBoard] = useState<FilterValue>(null);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [questionToDelete, setQuestionToDelete] = useState<string | null>(null);
   const [questionsToDelete, setQuestionsToDelete] = useState<string[]>([]);
@@ -160,15 +158,15 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
     return sortedQuestions.filter(q =>
       q &&
       ((q.text && q.text.toLowerCase().includes(searchTerm.toLowerCase())) || (q.topic && q.topic.toLowerCase().includes(searchTerm.toLowerCase()))) &&
-      (vertical === 'all' || q.vertical === vertical) &&
-      (program === 'all' || q.program === program) &&
-      (subject === 'all' || q.subject === subject) &&
-      (paper === 'all' || q.paper === paper) &&
-      (chapter === 'all' || q.chapter === chapter) &&
-      (examSet === 'all' || q.exam_set === examSet) &&
-      (topic === 'all' || q.topic === topic) &&
-      (difficulty === 'all' || q.difficulty === difficulty) &&
-      (board === 'all' || q.board === board)
+      (!vertical || q.vertical === vertical) &&
+      (!program || q.program === program) &&
+      (!subject || q.subject === subject) &&
+      (!paper || q.paper === paper) &&
+      (!chapter || q.chapter === chapter) &&
+      (!examSet || q.exam_set === examSet) &&
+      (!topic || q.topic === topic) &&
+      (!difficulty || q.difficulty === difficulty) &&
+      (!board || q.board === board)
     );
   }, [sortedQuestions, searchTerm, vertical, program, subject, paper, chapter, examSet, topic, difficulty, board]);
 
@@ -279,13 +277,7 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
                     <FilterableSelect value={examSet} onValueChange={setExamSet} options={allExamSets} placeholder="All Exam Sets" />
                     <FilterableSelect value={topic} onValueChange={setTopic} options={allTopics} placeholder="All Topics" />
                     <FilterableSelect value={board} onValueChange={setBoard} options={allBoards} placeholder="All Boards/Schools" />
-                    <Select value={difficulty} onValueChange={setDifficulty}>
-                      <SelectTrigger><SelectValue placeholder="Filter by difficulty" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Difficulties</SelectItem>
-                        {allDifficulties.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
+                    <FilterableSelect value={difficulty} onValueChange={setDifficulty} options={allDifficulties} placeholder="All Difficulties"/>
                   </div>
                 </CollapsibleContent>
             </Collapsible>
