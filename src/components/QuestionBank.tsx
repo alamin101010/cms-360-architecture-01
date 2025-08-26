@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, Bot, Upload } from 'lucide-react';
+import { Search, Bot, Upload, Trash2, PlusCircle } from 'lucide-react';
 import { AiQuestionSuggester } from './AiQuestionSuggester';
 import { QuestionCard } from './QuestionCard';
 import { QuestionSetCard } from './QuestionSetCard';
@@ -26,14 +26,27 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 type QuestionBankProps = {
   questions: Question[];
   questionSets: QuestionSet[];
   addSuggestedQuestions: (newQuestions: Omit<Question, 'id'>[]) => Question[];
   addImportedQuestions: (newQuestions: Omit<Question, 'id'>[]) => void;
+  addMultipleQuestionsToExam: (questionIds: string[]) => void;
+  deleteQuestion: (questionId: string) => void;
 };
 
 type FilterValue = string | 'all';
@@ -99,18 +112,21 @@ const FilterableSelect = ({ value, onValueChange, options, placeholder }: { valu
   )
 }
 
-export function QuestionBank({ questions, questionSets, addSuggestedQuestions, addImportedQuestions }: QuestionBankProps) {
+export function QuestionBank({ questions, questionSets, addSuggestedQuestions, addImportedQuestions, addMultipleQuestionsToExam, deleteQuestion }: QuestionBankProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [program, setProgram] = useState<FilterValue>('all');
   const [subject, setSubject] = useState<FilterValue>('all');
   const [paper, setPaper] = useState<FilterValue>('all');
   const [chapter, setChapter] = useState<FilterValue>('all');
   const [examSet, setExamSet] = useState<FilterValue>('all');
+  const [topic, setTopic] = useState<FilterValue>('all');
   const [difficulty, setDifficulty] = useState<FilterValue>('all');
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
+  const [questionToDelete, setQuestionToDelete] = useState<string | null>(null);
+  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+  const { toast } = useToast();
 
   const sortedQuestions = useMemo(() => {
-    // Sorting by createdAt first, then by ID for a stable sort order
     return [...questions].sort((a, b) => {
         const dateA = new Date(a.createdAt || 0).getTime();
         const dateB = new Date(b.createdAt || 0).getTime();
@@ -130,16 +146,49 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
       (paper === 'all' || q.paper === paper) &&
       (chapter === 'all' || q.chapter === chapter) &&
       (examSet === 'all' || q.exam_set === examSet) &&
+      (topic === 'all' || q.topic === topic) &&
       (difficulty === 'all' || q.difficulty === difficulty)
     );
-  }, [sortedQuestions, searchTerm, program, subject, paper, chapter, examSet, difficulty]);
+  }, [sortedQuestions, searchTerm, program, subject, paper, chapter, examSet, topic, difficulty]);
 
   const allPrograms = useMemo(() => [...Array.from(new Set(questions.map(q => q.program).filter(Boolean))) as string[]], [questions]);
   const allSubjects = useMemo(() => [...Array.from(new Set(questions.map(q => q.subject).filter(Boolean))) as string[]], [questions]);
   const allPapers = useMemo(() => [...Array.from(new Set(questions.map(q => q.paper).filter(Boolean))) as string[]], [questions]);
   const allChapters = useMemo(() => [...Array.from(new Set(questions.map(q => q.chapter).filter(Boolean))) as string[]], [questions]);
   const allExamSets = useMemo(() => [...Array.from(new Set(questions.map(q => q.exam_set).filter(Boolean))) as string[]], [questions]);
+  const allTopics = useMemo(() => [...Array.from(new Set(questions.map(q => q.topic).filter(Boolean))) as string[]], [questions]);
   const allDifficulties = ['Easy', 'Medium', 'Hard'];
+
+  const handleToggleSelectQuestion = (questionId: string) => {
+    setSelectedQuestions(prev => 
+      prev.includes(questionId) 
+        ? prev.filter(id => id !== questionId)
+        : [...prev, questionId]
+    );
+  };
+  
+  const handleSelectAllVisible = () => {
+    const allVisibleIds = filteredQuestions.map(q => q.id);
+    const allSelected = allVisibleIds.every(id => selectedQuestions.includes(id));
+    if (allSelected) {
+      setSelectedQuestions(prev => prev.filter(id => !allVisibleIds.includes(id)));
+    } else {
+      setSelectedQuestions(prev => [...new Set([...prev, ...allVisibleIds])]);
+    }
+  }
+
+  const handleAddSelectedToExam = () => {
+    if (selectedQuestions.length === 0) {
+      toast({
+        variant: 'destructive',
+        title: "No questions selected",
+        description: "Please select questions to add to the exam."
+      })
+      return;
+    }
+    addMultipleQuestionsToExam(selectedQuestions);
+    setSelectedQuestions([]);
+  }
 
   return (
     <>
@@ -163,7 +212,7 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
       </CardHeader>
       <CardContent className="flex-1 flex flex-col gap-4 overflow-hidden">
         <Tabs defaultValue="questions" className="flex flex-col flex-1 overflow-hidden">
-          <TabsList>
+          <TabsList className="w-full grid grid-cols-2">
             <TabsTrigger value="questions">All Questions ({filteredQuestions.length})</TabsTrigger>
             <TabsTrigger value="sets">Question Sets ({questionSets.length})</TabsTrigger>
           </TabsList>
@@ -172,12 +221,13 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Search questions by text or topic..." className="pl-10" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
             </div>
-            <div className="grid sm:grid-cols-3 lg:grid-cols-3 gap-2">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
               <FilterableSelect value={program} onValueChange={setProgram} options={allPrograms} placeholder="All Programs" />
               <FilterableSelect value={subject} onValueChange={setSubject} options={allSubjects} placeholder="All Subjects" />
               <FilterableSelect value={paper} onValueChange={setPaper} options={allPapers} placeholder="All Papers" />
               <FilterableSelect value={chapter} onValueChange={setChapter} options={allChapters} placeholder="All Chapters" />
               <FilterableSelect value={examSet} onValueChange={setExamSet} options={allExamSets} placeholder="All Exam Sets" />
+              <FilterableSelect value={topic} onValueChange={setTopic} options={allTopics} placeholder="All Topics" />
               <Select value={difficulty} onValueChange={setDifficulty}>
                 <SelectTrigger><SelectValue placeholder="Filter by difficulty" /></SelectTrigger>
                 <SelectContent>
@@ -186,10 +236,30 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
                 </SelectContent>
               </Select>
             </div>
+             {selectedQuestions.length > 0 && (
+                <div className="flex items-center justify-between bg-muted p-2 rounded-md">
+                    <span className="text-sm font-medium">{selectedQuestions.length} questions selected</span>
+                    <Button size="sm" onClick={handleAddSelectedToExam}><PlusCircle/> Add to Exam</Button>
+                </div>
+            )}
             <ScrollArea className="flex-1 -mx-6 px-6">
               <div className="space-y-3 pb-4">
+                 <div className="flex items-center">
+                    <Button variant="link" size="sm" onClick={handleSelectAllVisible} className="p-0 h-auto">
+                        Select all visible
+                    </Button>
+                </div>
                 {filteredQuestions.length > 0 ? (
-                  filteredQuestions.map(q => <QuestionCard key={q.id} question={q} onClick={() => setSelectedQuestion(q)} />)
+                  filteredQuestions.map(q => 
+                    <QuestionCard 
+                      key={q.id} 
+                      question={q} 
+                      onCardClick={() => setSelectedQuestion(q)}
+                      onDeleteClick={(e) => { e.stopPropagation(); setQuestionToDelete(q.id);}}
+                      onSelectToggle={(e) => { e.stopPropagation(); handleToggleSelectQuestion(q.id);}}
+                      isSelected={selectedQuestions.includes(q.id)}
+                    />
+                  )
                 ) : (
                     <div className="text-center text-muted-foreground py-10">
                         <p>No questions found.</p>
@@ -216,6 +286,22 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
             onOpenChange={(open) => !open && setSelectedQuestion(null)} 
         />
     )}
+     <AlertDialog open={!!questionToDelete} onOpenChange={(open) => !open && setQuestionToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the question from the bank.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setQuestionToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => {if (questionToDelete) { deleteQuestion(questionToDelete); setQuestionToDelete(null);}}}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

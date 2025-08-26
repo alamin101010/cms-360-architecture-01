@@ -81,6 +81,20 @@ export default function Home() {
     setCurrentExamQuestions(prev => prev.filter(q => q.id !== questionId));
   };
   
+  const addMultipleQuestionsToExam = (questionIds: string[]) => {
+    const questionsToAdd = questions.filter(q => questionIds.includes(q.id));
+    const newQuestions = questionsToAdd.filter(q => !currentExamQuestions.some(examQ => examQ.id === q.id));
+    setCurrentExamQuestions(prev => [...prev, ...newQuestions]);
+    toast({ title: `Added ${newQuestions.length} questions to the exam.` });
+  };
+
+  const deleteQuestion = (questionId: string) => {
+    setQuestions(prev => prev.filter(q => q.id !== questionId));
+    setCurrentExamQuestions(prev => prev.filter(q => q.id !== questionId));
+    toast({ title: "Question deleted." });
+  };
+
+
   const saveExam = () => {
     if (examDetails.name.trim() === '' || currentExamQuestions.length === 0) {
       toast({
@@ -138,6 +152,8 @@ export default function Home() {
           questionSets={questionSets}
           addSuggestedQuestions={addSuggestedQuestions}
           addImportedQuestions={addImportedQuestions}
+          addMultipleQuestionsToExam={addMultipleQuestionsToExam}
+          deleteQuestion={deleteQuestion}
         />
         <ExamBuilder
           examDetails={examDetails}
