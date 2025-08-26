@@ -24,6 +24,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { decodeAttributes } from '@/data/attribute-mapping';
 import { CheckCircle, XCircle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 
 type CsvUploaderProps = {
@@ -39,6 +40,9 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
   const [textData, setTextData] = useState<string>('');
   const [isParsing, setIsParsing] = useState(false);
   const [manualTopic, setManualTopic] = useState('');
+  const [manualBoardType, setManualBoardType] = useState('Board');
+  const [manualBoardName, setManualBoardName] = useState('');
+
   const [previewQuestions, setPreviewQuestions] = useState<ParsedQuestion[]>([]);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -62,6 +66,8 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
     setTextData('');
     setPreviewQuestions([]);
     setManualTopic('');
+    setManualBoardName('');
+    setManualBoardType('Board');
     setIsParsing(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -105,7 +111,7 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
               paper: decodedAttrs.paper,
               chapter: decodedAttrs.chapter,
               exam_set: decodedAttrs.exam_set,
-              board: decodedAttrs.board,
+              board: manualBoardName ? `${manualBoardType}: ${manualBoardName}` : decodedAttrs.board,
               explanation: row.explanation,
               category: decodedAttrs.category,
               modules: decodedAttrs.modules,
@@ -169,7 +175,7 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
         <DialogHeader>
           <DialogTitle>Upload Questions via CSV</DialogTitle>
           <DialogDescription>
-            Select a CSV file or paste data. You can manually assign a topic to all imported questions.
+            Select a CSV file or paste data. You can manually assign a topic or board/school/college to all imported questions.
           </DialogDescription>
         </DialogHeader>
 
@@ -187,10 +193,29 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
                         <Textarea placeholder='Paste your CSV data here...' className='h-32' value={textData} onChange={handleTextChange}/>
                     </TabsContent>
                 </Tabs>
-                 <div>
-                    <Label htmlFor="manual-topic">Manual Topic (Optional)</Label>
-                    <Input id="manual-topic" placeholder="e.g., Final Exam Batch A" value={manualTopic} onChange={(e) => setManualTopic(e.target.value)} />
-                    <p className="text-xs text-muted-foreground mt-1">This topic will override any topic from the CSV for this batch.</p>
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <Label htmlFor="manual-topic">Manual Topic (Optional)</Label>
+                        <Input id="manual-topic" placeholder="e.g., Final Exam Batch A" value={manualTopic} onChange={(e) => setManualTopic(e.target.value)} />
+                        <p className="text-xs text-muted-foreground mt-1">This topic will override any topic from the CSV.</p>
+                    </div>
+                    <div>
+                        <Label>Manual Board/School/College (Optional)</Label>
+                        <div className='flex gap-2'>
+                            <Select value={manualBoardType} onValueChange={setManualBoardType}>
+                                <SelectTrigger className='w-[120px]'>
+                                    <SelectValue/>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Board">Board</SelectItem>
+                                    <SelectItem value="School">School</SelectItem>
+                                    <SelectItem value="College">College</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Input placeholder="Enter name" value={manualBoardName} onChange={(e) => setManualBoardName(e.target.value)} />
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">This will override any board from the CSV.</p>
+                    </div>
                 </div>
             </div>
         

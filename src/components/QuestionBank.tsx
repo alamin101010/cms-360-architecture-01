@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { Question, QuestionSet } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -113,6 +113,11 @@ const FilterableSelect = ({ value, onValueChange, options, placeholder }: { valu
 }
 
 export function QuestionBank({ questions, questionSets, addSuggestedQuestions, addImportedQuestions, addMultipleQuestionsToExam, deleteQuestion }: QuestionBankProps) {
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [program, setProgram] = useState<FilterValue>('all');
   const [subject, setSubject] = useState<FilterValue>('all');
@@ -127,6 +132,7 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
   const { toast } = useToast();
 
   const sortedQuestions = useMemo(() => {
+    if (!isClient) return [];
     return [...questions].sort((a, b) => {
         const dateA = new Date(a.createdAt || 0).getTime();
         const dateB = new Date(b.createdAt || 0).getTime();
@@ -135,7 +141,7 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
         }
         return a.id.localeCompare(b.id);
     });
-  }, [questions]);
+  }, [questions, isClient]);
 
   const filteredQuestions = useMemo(() => {
     return sortedQuestions.filter(q =>
