@@ -265,7 +265,7 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
                 <TableBody>
                   {previewQuestions.map((q, i) => (
                     <TableRow key={i}>
-                      <TableCell className="max-w-xs align-top whitespace-pre-wrap">
+                      <TableCell className="align-top whitespace-pre-wrap">
                         <p className="font-medium">{q.text}</p>
                       </TableCell>
                       <TableCell className="align-top whitespace-pre-wrap">
@@ -278,7 +278,7 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
                           ))}
                         </ul>
                       </TableCell>
-                      <TableCell className="max-w-xs align-top">
+                      <TableCell className="align-top">
                          <div className="flex flex-wrap gap-1">
                             {q.vertical && <Badge>Vertical: {q.vertical}</Badge>}
                             {q.class && <Badge variant="outline">Class: {q.class}</Badge>}
