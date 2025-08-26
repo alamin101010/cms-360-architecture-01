@@ -10,6 +10,7 @@ import { QuestionBank } from '@/components/QuestionBank';
 import { ExamBuilder } from '@/components/ExamBuilder';
 import { useToast } from '@/hooks/use-toast';
 import useLocalStorage from '@/hooks/useLocalStorage';
+import { Button } from '@/components/ui/button';
 
 export default function Home() {
   const [questions, setQuestions] = useLocalStorage<Question[]>('allQuestions', allQuestions);
