@@ -54,6 +54,11 @@ type FilterValue = string | 'all';
 
 const FilterableSelect = ({ value, onValueChange, options, placeholder }: { value: FilterValue, onValueChange: (value: FilterValue) => void, options: string[], placeholder: string }) => {
   const [open, setOpen] = useState(false);
+  const [currentValue, setCurrentValue] = useState(value);
+
+  useEffect(() => {
+    setCurrentValue(value);
+  }, [value]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -64,7 +69,7 @@ const FilterableSelect = ({ value, onValueChange, options, placeholder }: { valu
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {value !== 'all' ? options.find(o => o === value) || placeholder : placeholder}
+          {currentValue !== 'all' ? options.find(o => o === currentValue) || placeholder : placeholder}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -75,15 +80,17 @@ const FilterableSelect = ({ value, onValueChange, options, placeholder }: { valu
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
               <CommandItem
-                onSelect={() => {
-                  onValueChange('all');
+                value='all'
+                onSelect={(v) => {
+                  onValueChange(v);
+                  setCurrentValue(v);
                   setOpen(false);
                 }}
               >
                 <Check
                   className={cn(
                     "mr-2 h-4 w-4",
-                    value === 'all' ? "opacity-100" : "opacity-0"
+                    currentValue === 'all' ? "opacity-100" : "opacity-0"
                   )}
                 />
                 All
@@ -91,15 +98,17 @@ const FilterableSelect = ({ value, onValueChange, options, placeholder }: { valu
               {options.map((option) => (
                 <CommandItem
                   key={option}
-                  onSelect={() => {
-                    onValueChange(option);
+                  value={option}
+                  onSelect={(v) => {
+                    onValueChange(v);
+                    setCurrentValue(v);
                     setOpen(false);
                   }}
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === option ? "opacity-100" : "opacity-0"
+                      currentValue === option ? "opacity-100" : "opacity-0"
                     )}
                   />
                   {option}
@@ -128,6 +137,7 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
   const [examSet, setExamSet] = useState<FilterValue>('all');
   const [topic, setTopic] = useState<FilterValue>('all');
   const [difficulty, setDifficulty] = useState<FilterValue>('all');
+  const [board, setBoard] = useState<FilterValue>('all');
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [questionToDelete, setQuestionToDelete] = useState<string | null>(null);
   const [questionsToDelete, setQuestionsToDelete] = useState<string[]>([]);
@@ -157,9 +167,10 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
       (chapter === 'all' || q.chapter === chapter) &&
       (examSet === 'all' || q.exam_set === examSet) &&
       (topic === 'all' || q.topic === topic) &&
-      (difficulty === 'all' || q.difficulty === difficulty)
+      (difficulty === 'all' || q.difficulty === difficulty) &&
+      (board === 'all' || q.board === board)
     );
-  }, [sortedQuestions, searchTerm, vertical, program, subject, paper, chapter, examSet, topic, difficulty]);
+  }, [sortedQuestions, searchTerm, vertical, program, subject, paper, chapter, examSet, topic, difficulty, board]);
 
   const allVerticals = useMemo(() => [...Array.from(new Set(questions.map(q => q.vertical).filter(Boolean))) as string[]], [questions]);
   const allPrograms = useMemo(() => [...Array.from(new Set(questions.map(q => q.program).filter(Boolean))) as string[]], [questions]);
@@ -168,6 +179,7 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
   const allChapters = useMemo(() => [...Array.from(new Set(questions.map(q => q.chapter).filter(Boolean))) as string[]], [questions]);
   const allExamSets = useMemo(() => [...Array.from(new Set(questions.map(q => q.exam_set).filter(Boolean))) as string[]], [questions]);
   const allTopics = useMemo(() => [...Array.from(new Set(questions.map(q => q.topic).filter(Boolean))) as string[]], [questions]);
+  const allBoards = useMemo(() => [...Array.from(new Set(questions.map(q => q.board).filter(Boolean))) as string[]], [questions]);
   const allDifficulties = ['Easy', 'Medium', 'Hard'];
 
   const handleToggleSelectQuestion = (questionId: string) => {
@@ -258,6 +270,7 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
               <FilterableSelect value={chapter} onValueChange={setChapter} options={allChapters} placeholder="All Chapters" />
               <FilterableSelect value={examSet} onValueChange={setExamSet} options={allExamSets} placeholder="All Exam Sets" />
               <FilterableSelect value={topic} onValueChange={setTopic} options={allTopics} placeholder="All Topics" />
+              <FilterableSelect value={board} onValueChange={setBoard} options={allBoards} placeholder="All Boards/Schools" />
               <Select value={difficulty} onValueChange={setDifficulty}>
                 <SelectTrigger><SelectValue placeholder="Filter by difficulty" /></SelectTrigger>
                 <SelectContent>
