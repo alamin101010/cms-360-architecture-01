@@ -203,8 +203,8 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
             <div className="space-y-4">
                 <Tabs defaultValue="file" className='w-full'>
                     <TabsList className='grid w-full grid-cols-2'>
-                        <TabsTrigger value="file">Upload File</TabsTrigger>
-                        <TabsTrigger value="paste">Paste Text</TabsTrigger>
+                        <TabsTrigger value="file" className="data-[state=inactive]:bg-black data-[state=inactive]:text-white">Upload File</TabsTrigger>
+                        <TabsTrigger value="paste" className="data-[state=inactive]:bg-black data-[state=inactive]:text-white">Paste Text</TabsTrigger>
                     </TabsList>
                     <TabsContent value="file" className="py-4">
                         <Input type="file" accept=".csv" onChange={handleFileChange} ref={fileInputRef} className="flex-1" />
@@ -250,51 +250,53 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
                 {previewQuestions.length > 0 ? (
                     <div className="border rounded-md flex-1 flex flex-col min-h-0">
                         <h3 className="text-lg font-semibold p-4 border-b shrink-0">Question Preview ({previewQuestions.length})</h3>
-                        <ScrollArea className="flex-1 min-h-0">
-                        <Table>
-                            <TableHeader>
-                            <TableRow>
-                                <TableHead>Question</TableHead>
-                                <TableHead>Options</TableHead>
-                                <TableHead>Attributes</TableHead>
-                            </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                            {previewQuestions.map((q, i) => (
-                                <TableRow key={i}>
-                                <TableCell className="align-top whitespace-pre-wrap">
-                                    <p className="font-medium">{q.text}</p>
-                                </TableCell>
-                                <TableCell className="align-top whitespace-pre-wrap">
-                                    <ul className="space-y-1">
-                                    {q.options?.map((opt, index) => (
-                                        <li key={index} className="flex items-start text-sm">
-                                        {opt.isCorrect ? <CheckCircle className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-1" /> : <XCircle className="h-4 w-4 mr-2 text-red-500 flex-shrink-0 mt-1" />}
-                                        <span>{opt.text}</span>
-                                        </li>
-                                    ))}
-                                    </ul>
-                                </TableCell>
-                                <TableCell className="align-top">
-                                    <div className="flex flex-wrap gap-1">
-                                        {q.vertical && <Badge>Vertical: {q.vertical}</Badge>}
-                                        {q.class && <Badge variant="outline">Class: {q.class}</Badge>}
-                                        {q.subject && <Badge variant="outline">Subject: {q.subject}</Badge>}
-                                        {q.topic && <Badge variant="outline">Topic: {q.topic}</Badge>}
-                                        {q.difficulty && <Badge variant="outline">Difficulty: {q.difficulty}</Badge>}
-                                        {q.program && <Badge variant="outline">Program: {q.program}</Badge>}
-                                        {q.paper && <Badge variant="outline">Paper: {q.paper}</Badge>}
-                                        {q.chapter && <Badge variant="outline">Chapter: {q.chapter}</Badge>}
-                                        {q.exam_set && <Badge variant="outline">Exam Set: {q.exam_set}</Badge>}
-                                        {q.board && <Badge variant="outline">Board: {q.board}</Badge>}
-                                        {q.bloomsTaxonomyLevel && <Badge variant="outline">Bloom's: {q.bloomsTaxonomyLevel}</Badge>}
-                                    </div>
-                                </TableCell>
+                        <div className="flex-1 min-h-0">
+                            <ScrollArea className="h-full">
+                            <Table>
+                                <TableHeader>
+                                <TableRow>
+                                    <TableHead>Question</TableHead>
+                                    <TableHead>Options</TableHead>
+                                    <TableHead>Attributes</TableHead>
                                 </TableRow>
-                            ))}
-                            </TableBody>
-                        </Table>
-                        </ScrollArea>
+                                </TableHeader>
+                                <TableBody>
+                                {previewQuestions.map((q, i) => (
+                                    <TableRow key={i}>
+                                    <TableCell className="align-top whitespace-pre-wrap">
+                                        <p className="font-medium">{q.text}</p>
+                                    </TableCell>
+                                    <TableCell className="align-top whitespace-pre-wrap">
+                                        <ul className="space-y-1">
+                                        {q.options?.map((opt, index) => (
+                                            <li key={index} className="flex items-start text-sm">
+                                            {opt.isCorrect ? <CheckCircle className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-1" /> : <XCircle className="h-4 w-4 mr-2 text-red-500 flex-shrink-0 mt-1" />}
+                                            <span>{opt.text}</span>
+                                            </li>
+                                        ))}
+                                        </ul>
+                                    </TableCell>
+                                    <TableCell className="align-top">
+                                        <div className="flex flex-wrap gap-1">
+                                            {q.vertical && <Badge>Vertical: {q.vertical}</Badge>}
+                                            {q.class && <Badge variant="outline">Class: {q.class}</Badge>}
+                                            {q.subject && <Badge variant="outline">Subject: {q.subject}</Badge>}
+                                            {q.topic && <Badge variant="outline">Topic: {q.topic}</Badge>}
+                                            {q.difficulty && <Badge variant="outline">Difficulty: {q.difficulty}</Badge>}
+                                            {q.program && <Badge variant="outline">Program: {q.program}</Badge>}
+                                            {q.paper && <Badge variant="outline">Paper: {q.paper}</Badge>}
+                                            {q.chapter && <Badge variant="outline">Chapter: {q.chapter}</Badge>}
+                                            {q.exam_set && <Badge variant="outline">Exam Set: {q.exam_set}</Badge>}
+                                            {q.board && <Badge variant="outline">Board: {q.board}</Badge>}
+                                            {q.bloomsTaxonomyLevel && <Badge variant="outline">Bloom's: {q.bloomsTaxonomyLevel}</Badge>}
+                                        </div>
+                                    </TableCell>
+                                    </TableRow>
+                                ))}
+                                </TableBody>
+                            </Table>
+                            </ScrollArea>
+                        </div>
                     </div>
                 ) : (
                     <div className="flex items-center justify-center h-full border rounded-md bg-muted/20">
