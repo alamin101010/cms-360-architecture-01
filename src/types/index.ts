@@ -13,6 +13,7 @@ export type Question = {
   createdAt?: string;
 
   // New Hierarchical Fields
+  vertical?: string; // e.g., K-12, English
   program?: string;
   paper?: string;
   chapter?: string;

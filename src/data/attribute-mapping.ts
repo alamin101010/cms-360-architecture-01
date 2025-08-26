@@ -14,7 +14,8 @@ const attributeIdToName: { [key: string]: string } = {
     '11': 'question_types',
     '12': 'modules',
     '13': 'group_type',
-    '14': 'board' // Assuming board/school might be another attribute
+    '14': 'board', // Assuming board/school might be another attribute
+    '15': 'vertical' // Added Vertical
 };
 
 const attributeValueMap: { [key: string]: { [key: string]: string } } = {
@@ -86,6 +87,10 @@ const attributeValueMap: { [key: string]: { [key: string]: string } } = {
     },
     group_type: {
         '114': 'main passage', '115': 'child passage'
+    },
+    vertical: {
+        '183': 'K-12',
+        '184': 'English'
     }
 };
 

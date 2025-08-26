@@ -47,6 +47,7 @@ type QuestionBankProps = {
   addImportedQuestions: (newQuestions: Omit<Question, 'id'>[]) => void;
   addMultipleQuestionsToExam: (questionIds: string[]) => void;
   deleteQuestion: (questionId: string) => void;
+  deleteMultipleQuestions: (questionIds: string[]) => void;
 };
 
 type FilterValue = string | 'all';
@@ -112,13 +113,14 @@ const FilterableSelect = ({ value, onValueChange, options, placeholder }: { valu
   )
 }
 
-export function QuestionBank({ questions, questionSets, addSuggestedQuestions, addImportedQuestions, addMultipleQuestionsToExam, deleteQuestion }: QuestionBankProps) {
+export function QuestionBank({ questions, questionSets, addSuggestedQuestions, addImportedQuestions, addMultipleQuestionsToExam, deleteQuestion, deleteMultipleQuestions }: QuestionBankProps) {
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
     setIsClient(true);
   }, []);
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [vertical, setVertical] = useState<FilterValue>('all');
   const [program, setProgram] = useState<FilterValue>('all');
   const [subject, setSubject] = useState<FilterValue>('all');
   const [paper, setPaper] = useState<FilterValue>('all');
@@ -128,6 +130,7 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
   const [difficulty, setDifficulty] = useState<FilterValue>('all');
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [questionToDelete, setQuestionToDelete] = useState<string | null>(null);
+  const [questionsToDelete, setQuestionsToDelete] = useState<string[]>([]);
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const { toast } = useToast();
 
@@ -147,6 +150,7 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
     return sortedQuestions.filter(q =>
       q &&
       ((q.text && q.text.toLowerCase().includes(searchTerm.toLowerCase())) || (q.topic && q.topic.toLowerCase().includes(searchTerm.toLowerCase()))) &&
+      (vertical === 'all' || q.vertical === vertical) &&
       (program === 'all' || q.program === program) &&
       (subject === 'all' || q.subject === subject) &&
       (paper === 'all' || q.paper === paper) &&
@@ -155,8 +159,9 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
       (topic === 'all' || q.topic === topic) &&
       (difficulty === 'all' || q.difficulty === difficulty)
     );
-  }, [sortedQuestions, searchTerm, program, subject, paper, chapter, examSet, topic, difficulty]);
+  }, [sortedQuestions, searchTerm, vertical, program, subject, paper, chapter, examSet, topic, difficulty]);
 
+  const allVerticals = useMemo(() => [...Array.from(new Set(questions.map(q => q.vertical).filter(Boolean))) as string[]], [questions]);
   const allPrograms = useMemo(() => [...Array.from(new Set(questions.map(q => q.program).filter(Boolean))) as string[]], [questions]);
   const allSubjects = useMemo(() => [...Array.from(new Set(questions.map(q => q.subject).filter(Boolean))) as string[]], [questions]);
   const allPapers = useMemo(() => [...Array.from(new Set(questions.map(q => q.paper).filter(Boolean))) as string[]], [questions]);
@@ -195,6 +200,24 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
     addMultipleQuestionsToExam(selectedQuestions);
     setSelectedQuestions([]);
   }
+  
+  const handleDeleteSelected = () => {
+    if (selectedQuestions.length === 0) {
+      toast({
+        variant: 'destructive',
+        title: "No questions selected",
+        description: "Please select questions to delete."
+      })
+      return;
+    }
+    setQuestionsToDelete(selectedQuestions);
+  }
+  
+  const confirmDeleteMultiple = () => {
+    deleteMultipleQuestions(questionsToDelete);
+    setSelectedQuestions([]);
+    setQuestionsToDelete([]);
+  }
 
   return (
     <>
@@ -228,6 +251,7 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
               <Input placeholder="Search questions by text or topic..." className="pl-10" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
+              <FilterableSelect value={vertical} onValueChange={setVertical} options={allVerticals} placeholder="All Verticals" />
               <FilterableSelect value={program} onValueChange={setProgram} options={allPrograms} placeholder="All Programs" />
               <FilterableSelect value={subject} onValueChange={setSubject} options={allSubjects} placeholder="All Subjects" />
               <FilterableSelect value={paper} onValueChange={setPaper} options={allPapers} placeholder="All Papers" />
@@ -245,7 +269,10 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
              {selectedQuestions.length > 0 && (
                 <div className="flex items-center justify-between bg-muted p-2 rounded-md">
                     <span className="text-sm font-medium">{selectedQuestions.length} questions selected</span>
-                    <Button size="sm" onClick={handleAddSelectedToExam}><PlusCircle/> Add to Exam</Button>
+                    <div className="flex gap-2">
+                      <Button size="sm" onClick={handleAddSelectedToExam}><PlusCircle/> Add to Exam</Button>
+                      <Button size="sm" variant="destructive" onClick={handleDeleteSelected}><Trash2/> Delete Selected</Button>
+                    </div>
                 </div>
             )}
             <ScrollArea className="flex-1 -mx-6 px-6">
@@ -303,6 +330,22 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setQuestionToDelete(null)}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={() => {if (questionToDelete) { deleteQuestion(questionToDelete); setQuestionToDelete(null);}}}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={questionsToDelete.length > 0} onOpenChange={(open) => !open && setQuestionsToDelete([])}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete {questionsToDelete.length} questions from the bank.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setQuestionsToDelete([])}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteMultiple}>
               Continue
             </AlertDialogAction>
           </AlertDialogFooter>

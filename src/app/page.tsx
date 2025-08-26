@@ -94,6 +94,12 @@ export default function Home() {
     toast({ title: "Question deleted." });
   };
 
+  const deleteMultipleQuestions = (questionIds: string[]) => {
+    setQuestions(prev => prev.filter(q => !questionIds.includes(q.id)));
+    setCurrentExamQuestions(prev => prev.filter(q => !questionIds.includes(q.id)));
+    toast({ title: `${questionIds.length} questions deleted.` });
+  };
+
 
   const saveExam = () => {
     if (examDetails.name.trim() === '' || currentExamQuestions.length === 0) {
@@ -154,6 +160,7 @@ export default function Home() {
           addImportedQuestions={addImportedQuestions}
           addMultipleQuestionsToExam={addMultipleQuestionsToExam}
           deleteQuestion={deleteQuestion}
+          deleteMultipleQuestions={deleteMultipleQuestions}
         />
         <ExamBuilder
           examDetails={examDetails}

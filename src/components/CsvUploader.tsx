@@ -39,9 +39,10 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
   const [file, setFile] = useState<File | null>(null);
   const [textData, setTextData] = useState<string>('');
   const [isParsing, setIsParsing] = useState(false);
-  const [manualTopic, setManualTopic] = useState('');
+  const [manualTopic, setManualTopic] = useState<string>('');
   const [manualBoardType, setManualBoardType] = useState('Board');
   const [manualBoardName, setManualBoardName] = useState('');
+  const [manualVertical, setManualVertical] = useState<string>('');
 
   const [previewQuestions, setPreviewQuestions] = useState<ParsedQuestion[]>([]);
   const { toast } = useToast();
@@ -68,6 +69,7 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
     setManualTopic('');
     setManualBoardName('');
     setManualBoardType('Board');
+    setManualVertical('');
     setIsParsing(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -107,6 +109,7 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
               class: decodedAttrs.class || 'Misc',
               difficulty: (decodedAttrs.difficulty as Question['difficulty']) || 'Medium',
               bloomsTaxonomyLevel: (decodedAttrs.learning_outcome as Question['bloomsTaxonomyLevel']) || 'Remembering',
+              vertical: manualVertical || decodedAttrs.vertical,
               program: decodedAttrs.program,
               paper: decodedAttrs.paper,
               chapter: decodedAttrs.chapter,
@@ -175,7 +178,7 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
         <DialogHeader>
           <DialogTitle>Upload Questions via CSV</DialogTitle>
           <DialogDescription>
-            Select a CSV file or paste data. You can manually assign a topic or board/school/college to all imported questions.
+            Select a CSV file or paste data. You can manually assign attributes to all imported questions.
           </DialogDescription>
         </DialogHeader>
 
@@ -198,6 +201,19 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
                         <Label htmlFor="manual-topic">Manual Topic (Optional)</Label>
                         <Input id="manual-topic" placeholder="e.g., Final Exam Batch A" value={manualTopic} onChange={(e) => setManualTopic(e.target.value)} />
                         <p className="text-xs text-muted-foreground mt-1">This topic will override any topic from the CSV.</p>
+                    </div>
+                     <div>
+                        <Label htmlFor="manual-vertical">Manual Vertical (Optional)</Label>
+                        <Select value={manualVertical} onValueChange={setManualVertical}>
+                            <SelectTrigger id="manual-vertical">
+                                <SelectValue placeholder="Select a vertical"/>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="K-12">K-12</SelectItem>
+                                <SelectItem value="English">English</SelectItem>
+                            </SelectContent>
+                        </Select>
+                         <p className="text-xs text-muted-foreground mt-1">This will override any vertical from the CSV.</p>
                     </div>
                     <div>
                         <Label>Manual Board/School/College (Optional)</Label>
@@ -256,6 +272,7 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
                       </TableCell>
                       <TableCell className="max-w-xs align-top">
                          <div className="flex flex-wrap gap-1">
+                            {q.vertical && <Badge>Vertical: {q.vertical}</Badge>}
                             {q.class && <Badge variant="outline">Class: {q.class}</Badge>}
                             {q.subject && <Badge variant="outline">Subject: {q.subject}</Badge>}
                             {q.topic && <Badge variant="outline">Topic: {q.topic}</Badge>}
