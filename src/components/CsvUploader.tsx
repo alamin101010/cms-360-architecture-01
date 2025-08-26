@@ -52,6 +52,7 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
   const [newQuestions, setNewQuestions] = useState<ParsedQuestion[]>([]);
   const [duplicateQuestions, setDuplicateQuestions] = useState<Question[]>([]);
   const [selectedNew, setSelectedNew] = useState<number[]>([]);
+  const [selectedDuplicates, setSelectedDuplicates] = useState<string[]>([]);
   
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -78,6 +79,7 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
     setNewQuestions([]);
     setDuplicateQuestions([]);
     setSelectedNew([]);
+    setSelectedDuplicates([]);
     setManualTopic('');
     setManualBoardName('');
     setManualBoardType('');
@@ -93,6 +95,7 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
     setNewQuestions([]);
     setDuplicateQuestions([]);
     setSelectedNew([]);
+    setSelectedDuplicates([]);
 
     const existingQuestionMap = new Map(existingQuestions.filter(q => q.text).map(q => [q.text.trim().toLowerCase(), q]));
 
@@ -209,16 +212,26 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
     setIsOpen(false);
     resetState();
   };
+  
+  const handleAddSelectedToExam = () => {
+    const questionsFromNew = selectedNew.map((index) => ({
+        ...newQuestions[index],
+        id: `import-exam-${Date.now()}-${index}`,
+    }));
+    const questionsFromDuplicates = duplicateQuestions.filter((q) => selectedDuplicates.includes(q.id));
 
-  const handleAddAllToExam = () => {
-    const allQuestionsForExam = [
-        ...newQuestions.map((q, i) => ({ ...q, id: `import-exam-${Date.now()}-${i}`})),
-        ...duplicateQuestions
-    ];
+    const allQuestionsForExam = [...questionsFromNew, ...questionsFromDuplicates];
+
+    if (allQuestionsForExam.length === 0) {
+      toast({ variant: 'destructive', title: 'No questions selected.'});
+      return;
+    }
+
     addQuestionsToExam(allQuestionsForExam);
     setIsOpen(false);
     resetState();
-  };
+  }
+
 
   const toggleSelectNew = (index: number) => {
       setSelectedNew(prev => prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]);
@@ -232,21 +245,37 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
       }
   }
 
+  const toggleSelectDuplicate = (id: string) => {
+      setSelectedDuplicates(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  }
+
+  const toggleSelectAllDuplicates = () => {
+      if (selectedDuplicates.length === duplicateQuestions.length) {
+          setSelectedDuplicates([]);
+      } else {
+          setSelectedDuplicates(duplicateQuestions.map(q => q.id));
+      }
+  }
+
+
   const hasPreview = newQuestions.length > 0 || duplicateQuestions.length > 0;
+  const totalSelectedForExam = selectedNew.length + selectedDuplicates.length;
 
   const QuestionPreviewTable = ({ questions, isDuplicate = false }: { questions: (ParsedQuestion | Question)[], isDuplicate?: boolean }) => (
     <Table>
       <TableHeader>
         <TableRow>
-            {!isDuplicate && (
-                <TableHead className="w-12">
-                   <Checkbox 
-                        checked={newQuestions.length > 0 && selectedNew.length === newQuestions.length}
-                        onCheckedChange={toggleSelectAllNew}
-                        aria-label="Select all new questions"
-                    />
-                </TableHead>
-            )}
+            <TableHead className="w-12">
+                <Checkbox 
+                    checked={
+                        isDuplicate 
+                            ? duplicateQuestions.length > 0 && selectedDuplicates.length === duplicateQuestions.length 
+                            : newQuestions.length > 0 && selectedNew.length === newQuestions.length
+                    }
+                    onCheckedChange={isDuplicate ? toggleSelectAllDuplicates : toggleSelectAllNew}
+                    aria-label={`Select all ${isDuplicate ? 'duplicate' : 'new'} questions`}
+                />
+            </TableHead>
             <TableHead>Question</TableHead>
             <TableHead>Options</TableHead>
             <TableHead>Attributes</TableHead>
@@ -255,11 +284,12 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
       <TableBody>
         {questions.map((q, i) => (
           <TableRow key={isDuplicate ? (q as Question).id : i}>
-            {!isDuplicate && (
-                 <TableCell>
-                    <Checkbox checked={selectedNew.includes(i)} onCheckedChange={() => toggleSelectNew(i)} />
-                 </TableCell>
-            )}
+             <TableCell>
+                <Checkbox 
+                    checked={isDuplicate ? selectedDuplicates.includes((q as Question).id) : selectedNew.includes(i)} 
+                    onCheckedChange={() => isDuplicate ? toggleSelectDuplicate((q as Question).id) : toggleSelectNew(i)} 
+                />
+             </TableCell>
             <TableCell className="align-top whitespace-pre-wrap">
               <p className="font-medium">{q.text}</p>
             </TableCell>
@@ -393,9 +423,9 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
                 <Button onClick={handleAddSelectedToBank} disabled={selectedNew.length === 0}>
                     Add {selectedNew.length > 0 ? selectedNew.length : ''} New to Bank
                 </Button>
-                 <Button onClick={handleAddAllToExam} variant="secondary">
+                 <Button onClick={handleAddSelectedToExam} variant="secondary" disabled={totalSelectedForExam === 0}>
                     <PlusCircle className="mr-2" />
-                    Add All to Exam ({newQuestions.length + duplicateQuestions.length})
+                    Add {totalSelectedForExam > 0 ? totalSelectedForExam : ''} Selected to Exam
                 </Button>
             </>
           )}
