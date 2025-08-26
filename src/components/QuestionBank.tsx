@@ -28,7 +28,8 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
 
   const filteredQuestions = useMemo(() => {
     return questions.filter(q =>
-      (q.text.toLowerCase().includes(searchTerm.toLowerCase()) || q.topic.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      q &&
+      ((q.text && q.text.toLowerCase().includes(searchTerm.toLowerCase())) || (q.topic && q.topic.toLowerCase().includes(searchTerm.toLowerCase()))) &&
       (subject === 'all' || q.subject === subject) &&
       (topic === 'all' || q.topic === topic) &&
       (difficulty === 'all' || q.difficulty === difficulty)
