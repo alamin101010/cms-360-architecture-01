@@ -5,11 +5,23 @@ export type Question = {
   topic: string;
   class: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
-  bloomsTaxonomyLevel: 'Remembering' | 'Understanding' | 'Applying' | 'Analyzing' | 'Evaluating' | 'Creating';
-  type?: string;
+  bloomsTaxonomyLevel: 'Remembering' | 'Understanding' | 'Applying' | 'Analyzing' | 'Evaluating' | 'Creating' | 'Knowledge' | 'Aptitude and Attitude';
+  type?: 'm1' | 'True / False' | 'Fill in the Blanks' | string; // m1 is MCQ
   image?: string;
-  options?: string[];
-  answer?: string;
+  options?: { text: string; isCorrect: boolean }[];
+  answer?: string; // This can be derived from options
+
+  // New Hierarchical Fields
+  program?: string;
+  paper?: string;
+  chapter?: string;
+  exam_set?: string;
+  board?: string; // or School/College/Others
+
+  // Other metadata
+  marks?: number;
+  language?: string;
+  format_type?: string;
 };
 
 export type QuestionSet = {

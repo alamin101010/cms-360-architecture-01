@@ -21,6 +21,9 @@ import { ScrollArea } from './ui/scroll-area';
 import { Badge } from './ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { decodeAttributes } from '@/data/attribute-mapping';
+import { CheckCircle, XCircle } from 'lucide-react';
+
 
 type CsvUploaderProps = {
   children: React.ReactNode;
@@ -28,15 +31,6 @@ type CsvUploaderProps = {
 };
 
 type ParsedQuestion = Omit<Question, 'id'>;
-
-const attributeMapping: { [key: string]: keyof Question } = {
-  '1': 'subject', // Example mapping
-  '2': 'topic',
-  '3': 'class',
-  '4': 'difficulty',
-  '5': 'bloomsTaxonomyLevel',
-};
-
 
 export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -80,43 +74,36 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
       skipEmptyLines: true,
       complete: (results) => {
         try {
-          const questions = results.data.map((row: any) => {
-            const options: string[] = [];
-            let answer: string | undefined = undefined;
-
+          const questions = results.data.map((row: any): ParsedQuestion => {
+            const options: { text: string; isCorrect: boolean }[] = [];
             for (let i = 1; i <= 4; i++) {
               if (row[`options_${i}_answer`]) {
-                options.push(row[`options_${i}_answer`]);
-                if (row[`options_${i}_is_correct`] === '1') {
-                  answer = row[`options_${i}_answer`];
-                }
+                options.push({
+                  text: row[`options_${i}_answer`],
+                  isCorrect: row[`options_${i}_is_correct`] === '1',
+                });
               }
             }
-            
+
+            const decodedAttrs = decodeAttributes(row);
+
             const question: ParsedQuestion = {
-              text: row.title,
+              text: row.title || 'No title',
               type: row.type,
               image: row.image,
               options,
-              answer,
-              // These are defaults that will be overwritten by attributes
-              subject: 'Misc',
-              topic: 'Misc',
-              class: 'Misc',
-              difficulty: 'Medium',
-              bloomsTaxonomyLevel: 'Remembering',
+              answer: options.find(o => o.isCorrect)?.text,
+              subject: decodedAttrs.subject || 'Misc',
+              topic: decodedAttrs.topics || 'Misc',
+              class: decodedAttrs.class || 'Misc',
+              difficulty: (decodedAttrs.difficulty as Question['difficulty']) || 'Medium',
+              bloomsTaxonomyLevel: (decodedAttrs.learning_outcome as Question['bloomsTaxonomyLevel']) || 'Remembering',
+              program: decodedAttrs.program,
+              paper: decodedAttrs.paper,
+              chapter: decodedAttrs.chapter,
+              exam_set: decodedAttrs.exam_set,
+              board: decodedAttrs.board
             };
-            
-            // Map attributes
-            for (let i = 1; i <= 5; i++) {
-                const id = row[`attributes_${i}_id`];
-                const value = row[`attributes_${i}_value`];
-                if (id && value && attributeMapping[id]) {
-                    // This is a simplification. You might need a more complex mapping logic
-                    // if attribute values are not direct strings for the question properties.
-                    (question as any)[attributeMapping[id]] = value;
-                }
-            }
 
             return question;
           });
@@ -130,7 +117,7 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
            toast({
             variant: 'destructive',
             title: 'Parsing error',
-            description: 'Failed to parse data. Please check the format and headers.',
+            description: `An error occurred during parsing. Check the data format. Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
           });
         } finally {
           setIsParsing(false);
@@ -170,34 +157,35 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetState(); }}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+      <DialogContent className="max-w-6xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Upload Questions via CSV</DialogTitle>
           <DialogDescription>
-            Select a CSV file, or paste CSV data to upload. After parsing, you can preview the questions before adding them to the bank.
+            Select a CSV file or paste CSV data to upload. After parsing, you can preview the questions before adding them to the bank.
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="file">
-            <TabsList className='grid w-full grid-cols-2'>
-                <TabsTrigger value="file">Upload File</TabsTrigger>
-                <TabsTrigger value="paste">Paste Text</TabsTrigger>
-            </TabsList>
-            <TabsContent value="file" className="py-4">
-                <Input type="file" accept=".csv" onChange={handleFileChange} ref={fileInputRef} className="flex-1" />
-            </TabsContent>
-            <TabsContent value="paste" className="py-4">
-                <Textarea placeholder='Paste your CSV data here...' className='h-32' value={textData} onChange={handleTextChange}/>
-            </TabsContent>
-        </Tabs>
-       
-        <div className="flex justify-end">
-           <Button onClick={handleParse} disabled={(!file && !textData) || isParsing}>
-            {isParsing ? 'Parsing...' : 'Parse & Preview'}
-          </Button>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Tabs defaultValue="file" className='w-full'>
+                <TabsList className='grid w-full grid-cols-2'>
+                    <TabsTrigger value="file">Upload File</TabsTrigger>
+                    <TabsTrigger value="paste">Paste Text</TabsTrigger>
+                </TabsList>
+                <TabsContent value="file" className="py-4">
+                    <Input type="file" accept=".csv" onChange={handleFileChange} ref={fileInputRef} className="flex-1" />
+                </TabsContent>
+                <TabsContent value="paste" className="py-4">
+                    <Textarea placeholder='Paste your CSV data here...' className='h-32' value={textData} onChange={handleTextChange}/>
+                </TabsContent>
+            </Tabs>
+        
+            <div className="flex items-end justify-end">
+              <Button onClick={handleParse} disabled={(!file && !textData) || isParsing}>
+                {isParsing ? 'Parsing...' : 'Parse & Preview'}
+              </Button>
+            </div>
         </div>
         
-
         {previewQuestions.length > 0 && (
           <div className="flex-1 flex flex-col overflow-hidden border rounded-md">
             <h3 className="text-lg font-semibold p-4 border-b">Question Preview ({previewQuestions.length})</h3>
@@ -205,19 +193,35 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Topic</TableHead>
-                    <TableHead>Difficulty</TableHead>
-                    <TableHead>Answer</TableHead>
+                    <TableHead>Question</TableHead>
+                    <TableHead>Options</TableHead>
+                    <TableHead>Attributes</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {previewQuestions.map((q, i) => (
                     <TableRow key={i}>
-                      <TableCell className="max-w-xs truncate">{q.text}</TableCell>
-                      <TableCell>{q.topic}</TableCell>
-                      <TableCell><Badge variant="outline">{q.difficulty}</Badge></TableCell>
-                      <TableCell className="max-w-xs truncate">{q.answer}</TableCell>
+                      <TableCell className="max-w-xs align-top">
+                        <p className="font-medium">{q.text}</p>
+                      </TableCell>
+                      <TableCell className="align-top">
+                        <ul className="space-y-1">
+                          {q.options?.map((opt, index) => (
+                            <li key={index} className="flex items-center text-sm">
+                              {opt.isCorrect ? <CheckCircle className="h-4 w-4 mr-2 text-green-500" /> : <XCircle className="h-4 w-4 mr-2 text-red-500" />}
+                              {opt.text}
+                            </li>
+                          ))}
+                        </ul>
+                      </TableCell>
+                      <TableCell className="max-w-xs align-top">
+                         <div className="flex flex-wrap gap-1">
+                            <Badge variant="outline">Class: {q.class}</Badge>
+                            <Badge variant="outline">Subject: {q.subject}</Badge>
+                            <Badge variant="outline">Topic: {q.topic}</Badge>
+                            <Badge variant="outline">Difficulty: {q.difficulty}</Badge>
+                         </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

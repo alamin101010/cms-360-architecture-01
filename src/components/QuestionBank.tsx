@@ -12,6 +12,21 @@ import { QuestionCard } from './QuestionCard';
 import { QuestionSetCard } from './QuestionSetCard';
 import { Button } from './ui/button';
 import { CsvUploader } from './CsvUploader';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 type QuestionBankProps = {
   questions: Question[];
@@ -20,24 +35,97 @@ type QuestionBankProps = {
   addImportedQuestions: (newQuestions: Omit<Question, 'id'>[]) => void;
 };
 
+type FilterValue = string | 'all';
+
+const FilterableSelect = ({ value, onValueChange, options, placeholder }: { value: FilterValue, onValueChange: (value: FilterValue) => void, options: string[], placeholder: string }) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between"
+        >
+          {value !== 'all' ? options.find(o => o === value) || placeholder : placeholder}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[200px] p-0">
+        <Command>
+          <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} />
+          <CommandList>
+            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandGroup>
+              <CommandItem
+                onSelect={() => {
+                  onValueChange('all');
+                  setOpen(false);
+                }}
+              >
+                <Check
+                  className={cn(
+                    "mr-2 h-4 w-4",
+                    value === 'all' ? "opacity-100" : "opacity-0"
+                  )}
+                />
+                {placeholder}
+              </CommandItem>
+              {options.map((option) => (
+                <CommandItem
+                  key={option}
+                  onSelect={() => {
+                    onValueChange(option);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === option ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {option}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
 export function QuestionBank({ questions, questionSets, addSuggestedQuestions, addImportedQuestions }: QuestionBankProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [subject, setSubject] = useState('all');
-  const [topic, setTopic] = useState('all');
-  const [difficulty, setDifficulty] = useState('all');
+  const [program, setProgram] = useState<FilterValue>('all');
+  const [subject, setSubject] = useState<FilterValue>('all');
+  const [paper, setPaper] = useState<FilterValue>('all');
+  const [chapter, setChapter] = useState<FilterValue>('all');
+  const [examSet, setExamSet] = useState<FilterValue>('all');
+  const [difficulty, setDifficulty] = useState<FilterValue>('all');
+
 
   const filteredQuestions = useMemo(() => {
     return questions.filter(q =>
       q &&
       ((q.text && q.text.toLowerCase().includes(searchTerm.toLowerCase())) || (q.topic && q.topic.toLowerCase().includes(searchTerm.toLowerCase()))) &&
+      (program === 'all' || q.program === program) &&
       (subject === 'all' || q.subject === subject) &&
-      (topic === 'all' || q.topic === topic) &&
+      (paper === 'all' || q.paper === paper) &&
+      (chapter === 'all' || q.chapter === chapter) &&
+      (examSet === 'all' || q.exam_set === examSet) &&
       (difficulty === 'all' || q.difficulty === difficulty)
     );
-  }, [questions, searchTerm, subject, topic, difficulty]);
+  }, [questions, searchTerm, program, subject, paper, chapter, examSet, difficulty]);
 
-  const allSubjects = useMemo(() => ['all', ...Array.from(new Set(questions.map(q => q.subject).filter(Boolean)))], [questions]);
-  const allTopics = useMemo(() => ['all', ...Array.from(new Set(questions.map(q => q.topic).filter(Boolean)))], [questions]);
+  const allPrograms = useMemo(() => [...Array.from(new Set(questions.map(q => q.program).filter(Boolean)))], [questions]);
+  const allSubjects = useMemo(() => [...Array.from(new Set(questions.map(q => q.subject).filter(Boolean)))], [questions]);
+  const allPapers = useMemo(() => [...Array.from(new Set(questions.map(q => q.paper).filter(Boolean)))], [questions]);
+  const allChapters = useMemo(() => [...Array.from(new Set(questions.map(q => q.chapter).filter(Boolean)))], [questions]);
+  const allExamSets = useMemo(() => [...Array.from(new Set(questions.map(q => q.exam_set).filter(Boolean)))], [questions]);
   const allDifficulties = ['all', 'Easy', 'Medium', 'Hard'];
 
   return (
@@ -66,23 +154,16 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
             <TabsTrigger value="sets">Question Sets</TabsTrigger>
           </TabsList>
           <TabsContent value="questions" className="flex-1 flex flex-col gap-4 overflow-hidden mt-4">
-            <div className="grid sm:grid-cols-4 gap-2">
-              <div className="relative sm:col-span-4">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search questions by text or topic..." className="pl-10" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
-              </div>
-              <Select value={subject} onValueChange={setSubject}>
-                <SelectTrigger><SelectValue placeholder="Filter by subject" /></SelectTrigger>
-                <SelectContent>
-                  {allSubjects.map(s => <SelectItem key={s} value={s}>{s === 'all' ? 'All Subjects' : s}</SelectItem>)}
-                </SelectContent>
-              </Select>
-               <Select value={topic} onValueChange={setTopic}>
-                <SelectTrigger><SelectValue placeholder="Filter by topic" /></SelectTrigger>
-                <SelectContent>
-                  {allTopics.map(t => <SelectItem key={t} value={t}>{t === 'all' ? 'All Topics' : t}</SelectItem>)}
-                </SelectContent>
-              </Select>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search questions by text or topic..." className="pl-10" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+            </div>
+            <div className="grid sm:grid-cols-3 lg:grid-cols-6 gap-2">
+              <FilterableSelect value={program} onValueChange={setProgram} options={allPrograms} placeholder="All Programs" />
+              <FilterableSelect value={subject} onValueChange={setSubject} options={allSubjects} placeholder="All Subjects" />
+              <FilterableSelect value={paper} onValueChange={setPaper} options={allPapers} placeholder="All Papers" />
+              <FilterableSelect value={chapter} onValueChange={setChapter} options={allChapters} placeholder="All Chapters" />
+              <FilterableSelect value={examSet} onValueChange={setExamSet} options={allExamSets} placeholder="All Exam Sets" />
               <Select value={difficulty} onValueChange={setDifficulty}>
                 <SelectTrigger><SelectValue placeholder="Filter by difficulty" /></SelectTrigger>
                 <SelectContent>
