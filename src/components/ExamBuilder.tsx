@@ -153,7 +153,7 @@ export function ExamBuilder({
             </div>
         </div>
         <div 
-          className="flex-1 border-2 border-dashed rounded-lg p-4 bg-muted/20 flex flex-col"
+          className="flex-1 border-2 border-dashed rounded-lg p-4 bg-muted/20 flex flex-col min-h-0"
            onDrop={onDrop} onDragOver={onDragOver}
         >
           {currentExamQuestions.length === 0 ? (
@@ -163,7 +163,7 @@ export function ExamBuilder({
               <p className="text-sm">Drop questions from the bank to get started.</p>
             </div>
           ) : (
-            <ScrollArea className="-m-4">
+            <ScrollArea className="flex-1 -mx-4">
               <div className="p-4 space-y-3">
               {currentExamQuestions.map((q, index) => (
                 <div key={`${q.id}-${index}`} className="group bg-card border rounded-lg p-3 flex items-start justify-between gap-4 animate-in fade-in-50">
