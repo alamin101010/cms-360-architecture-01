@@ -1,0 +1,127 @@
+'use client';
+import type { DragEvent } from 'react';
+import { Bar, BarChart, XAxis, YAxis } from 'recharts';
+import type { Question } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { X, Save, Trash2, DraftingCompass, BarChartHorizontal } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { ChartContainer, ChartConfig, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+
+type ExamBuilderProps = {
+  examName: string;
+  setExamName: (name: string) => void;
+  currentExamQuestions: Question[];
+  onDrop: (e: DragEvent<HTMLDivElement>) => void;
+  onDragOver: (e: DragEvent<HTMLDivElement>) => void;
+  removeQuestionFromExam: (id: string) => void;
+  saveExam: () => void;
+  clearExam: () => void;
+};
+
+const chartConfigDifficulty: ChartConfig = {
+  count: { label: "Count", color: "hsl(var(--primary))" },
+  Easy: { label: "Easy", color: "hsl(var(--chart-2))" },
+  Medium: { label: "Medium", color: "hsl(var(--chart-3))" },
+  Hard: { label: "Hard", color: "hsl(var(--chart-4))" },
+};
+const chartConfigBlooms: ChartConfig = {
+  count: { label: "Count", color: "hsl(var(--primary))" },
+};
+
+
+export function ExamBuilder({
+  examName,
+  setExamName,
+  currentExamQuestions,
+  onDrop,
+  onDragOver,
+  removeQuestionFromExam,
+  saveExam,
+  clearExam
+}: ExamBuilderProps) {
+
+  const difficultyData = ['Easy', 'Medium', 'Hard'].map(level => ({
+    level,
+    count: currentExamQuestions.filter(q => q.difficulty === level).length
+  }));
+
+  const bloomsData = ['Remembering', 'Understanding', 'Applying', 'Analyzing', 'Evaluating', 'Creating'].map(level => ({
+    level,
+    count: currentExamQuestions.filter(q => q.bloomsTaxonomyLevel === level).length
+  })).filter(d => d.count > 0);
+
+  return (
+    <Card className="flex flex-col h-full overflow-hidden" onDrop={onDrop} onDragOver={onDragOver}>
+      <CardHeader>
+        <CardTitle>Exam Builder</CardTitle>
+        <CardDescription>Drag questions here to build your exam.</CardDescription>
+      </CardHeader>
+      <CardContent className="flex-1 flex flex-col gap-4 overflow-hidden">
+        <div className="flex gap-2">
+          <Input value={examName} onChange={e => setExamName(e.target.value)} placeholder="Enter exam name" />
+        </div>
+        <div 
+          className="flex-1 border-2 border-dashed rounded-lg p-4 bg-muted/20 flex flex-col"
+        >
+          {currentExamQuestions.length === 0 ? (
+            <div className="m-auto text-center text-muted-foreground">
+              <DraftingCompass className="mx-auto h-12 w-12" />
+              <p className="mt-2">Your exam canvas is empty.</p>
+              <p className="text-sm">Drop questions from the bank to get started.</p>
+            </div>
+          ) : (
+            <ScrollArea className="-m-4">
+              <div className="p-4 space-y-3">
+              {currentExamQuestions.map((q, index) => (
+                <div key={`${q.id}-${index}`} className="group bg-card border rounded-lg p-3 flex items-start justify-between gap-4 animate-in fade-in-50">
+                  <div className="flex-1">
+                    <p className="text-sm">{q.text}</p>
+                    <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                      <Badge variant="secondary">{q.subject}</Badge>
+                      <Badge variant="outline">{q.difficulty}</Badge>
+                       <Badge variant="outline">{q.bloomsTaxonomyLevel}</Badge>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 opacity-50 group-hover:opacity-100" onClick={() => removeQuestionFromExam(q.id)}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              </div>
+            </ScrollArea>
+          )}
+        </div>
+        {currentExamQuestions.length > 0 && (
+          <div className="flex flex-col gap-4">
+            <h3 className="font-semibold flex items-center gap-2"><BarChartHorizontal className="w-5 h-5 text-primary"/> Exam Summary</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <ChartContainer config={chartConfigDifficulty} className="h-40 w-full">
+                <BarChart data={difficultyData} layout="vertical" margin={{left: 10, right:10}}>
+                   <XAxis type="number" dataKey="count" hide/>
+                   <YAxis type="category" dataKey="level" tickLine={false} axisLine={false} tickMargin={10} width={70} />
+                   <ChartTooltip content={<ChartTooltipContent />} />
+                   <Bar dataKey="count" radius={4} fill="var(--color-primary)" />
+                </BarChart>
+              </ChartContainer>
+               <ChartContainer config={chartConfigBlooms} className="h-40 w-full">
+                <BarChart data={bloomsData} layout="vertical" margin={{left: 10, right:10}}>
+                   <XAxis type="number" dataKey="count" hide/>
+                   <YAxis type="category" dataKey="level" tickLine={false} axisLine={false} tickMargin={10} width={80}/>
+                   <ChartTooltip content={<ChartTooltipContent />} />
+                   <Bar dataKey="count" radius={4} fill="var(--color-accent)"/>
+                </BarChart>
+              </ChartContainer>
+            </div>
+          </div>
+        )}
+      </CardContent>
+      <CardFooter className="justify-end gap-2">
+        <Button variant="ghost" onClick={clearExam}><Trash2 /> Clear</Button>
+        <Button onClick={saveExam}><Save /> Save Exam</Button>
+      </CardFooter>
+    </Card>
+  );
+}
