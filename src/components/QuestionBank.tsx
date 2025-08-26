@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, Bot, Upload, Trash2, PlusCircle, Filter } from 'lucide-react';
+import { Search, Bot, Upload, Trash2, PlusCircle, Filter, X } from 'lucide-react';
 import { AiQuestionSuggester } from './AiQuestionSuggester';
 import { QuestionCard } from './QuestionCard';
 import { QuestionSetCard } from './QuestionSetCard';
@@ -19,19 +19,6 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command"
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -41,8 +28,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Check, ChevronsUpDown } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
 type QuestionBankProps = {
@@ -57,57 +42,6 @@ type QuestionBankProps = {
 
 type FilterValue = string | null;
 
-const FilterableSelect = ({ value, onValueChange, options, placeholder }: { value: FilterValue, onValueChange: (value: FilterValue) => void, options: string[], placeholder: string }) => {
-  const [open, setOpen] = useState(false);
-
-  const handleSelect = (currentValue: string) => {
-    onValueChange(currentValue === value ? null : currentValue);
-    setOpen(false)
-  }
-  
-  const displayValue = value ? value : placeholder;
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between"
-        >
-          <span className="truncate">{displayValue}</span>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
-        <Command>
-          <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} />
-          <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
-            <CommandGroup>
-              {options.map((option) => (
-                <CommandItem
-                  key={option}
-                  value={option}
-                  onSelect={(currentValue) => handleSelect(currentValue)}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === option ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {option}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  )
-}
 
 export function QuestionBank({ questions, questionSets, addSuggestedQuestions, addImportedQuestions, addMultipleQuestionsToExam, deleteQuestion, deleteMultipleQuestions }: QuestionBankProps) {
   const [isClient, setIsClient] = useState(false);
@@ -168,6 +102,31 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
   const allTopics = useMemo(() => [...Array.from(new Set(questions.map(q => q.topic).filter(Boolean))) as string[]], [questions]);
   const allBoards = useMemo(() => [...Array.from(new Set(questions.map(q => q.board).filter(Boolean))) as string[]], [questions]);
   const allDifficulties = ['Easy', 'Medium', 'Hard'];
+  
+  const FilterableSelect = ({ value, onValueChange, options, placeholder }: { value: FilterValue, onValueChange: (value: FilterValue) => void, options: string[], placeholder: string }) => {
+    return (
+        <div className="relative">
+            <Select value={value || ''} onValueChange={(val) => onValueChange(val || null)}>
+                <SelectTrigger>
+                    <SelectValue placeholder={placeholder} />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="">All</SelectItem>
+                    {options.map((option) => (
+                        <SelectItem key={option} value={option}>
+                            {option}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+            {value && (
+                <Button variant="ghost" size="icon" className="absolute right-8 top-0 h-full w-8" onClick={() => onValueChange(null)}>
+                    <X className="h-4 w-4"/>
+                </Button>
+            )}
+        </div>
+    )
+  }
 
   const handleToggleSelectQuestion = (questionId: string) => {
     setSelectedQuestions(prev => 
