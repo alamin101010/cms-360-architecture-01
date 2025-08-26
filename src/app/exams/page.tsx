@@ -1,13 +1,12 @@
 'use client';
 import { useState } from 'react';
 import useLocalStorage from '@/hooks/useLocalStorage';
-import type { Exam, Question } from '@/types';
+import type { Exam } from '@/types';
 import { Header } from '@/components/Header';
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -20,7 +19,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { MoreHorizontal, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import {
@@ -123,7 +121,7 @@ export default function ExamsPage() {
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the exam.
-            </redDescription>
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setExamToDelete(null)}>Cancel</AlertDialogCancel>
