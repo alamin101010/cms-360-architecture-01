@@ -105,6 +105,8 @@ export default function ExamPage() {
     return `${h}:${m}:${s}`;
   };
 
+  const isMCQ = (currentQuestion.type?.toLowerCase() === 'm1' || currentQuestion.type?.toLowerCase() === 'mcq') && currentQuestion.options && currentQuestion.options.length > 0;
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-muted/20 p-4 font-body">
       <Card className="w-full max-w-3xl">
@@ -121,7 +123,7 @@ export default function ExamPage() {
         </CardHeader>
         <CardContent className="min-h-[300px]">
             <h2 className="text-xl font-semibold mb-4">{currentQuestion.text}</h2>
-            {currentQuestion.type === "m1" && currentQuestion.options && (
+            {isMCQ && currentQuestion.options && (
                 <RadioGroup 
                     value={answers[currentQuestion.id] || ''}
                     onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)}
