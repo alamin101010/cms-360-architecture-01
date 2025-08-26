@@ -36,8 +36,8 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
     );
   }, [questions, searchTerm, subject, topic, difficulty]);
 
-  const allSubjects = useMemo(() => ['all', ...Array.from(new Set(questions.map(q => q.subject)))], [questions]);
-  const allTopics = useMemo(() => ['all', ...Array.from(new Set(questions.map(q => q.topic)))], [questions]);
+  const allSubjects = useMemo(() => ['all', ...Array.from(new Set(questions.map(q => q.subject).filter(Boolean)))], [questions]);
+  const allTopics = useMemo(() => ['all', ...Array.from(new Set(questions.map(q => q.topic).filter(Boolean)))], [questions]);
   const allDifficulties = ['all', 'Easy', 'Medium', 'Hard'];
 
   return (
@@ -69,7 +69,7 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
             <div className="grid sm:grid-cols-4 gap-2">
               <div className="relative sm:col-span-4">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search questions..." className="pl-10" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+                <Input placeholder="Search questions by text or topic..." className="pl-10" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
               </div>
               <Select value={subject} onValueChange={setSubject}>
                 <SelectTrigger><SelectValue placeholder="Filter by subject" /></SelectTrigger>
