@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import Papa from 'papaparse';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,19 +24,22 @@ import { Badge } from './ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { decodeAttributes } from '@/data/attribute-mapping';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle, PlusCircle } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Checkbox } from './ui/checkbox';
+import { Separator } from './ui/separator';
 
 
 type CsvUploaderProps = {
   children: React.ReactNode;
   addImportedQuestions: (questions: Omit<Question, 'id'>[]) => void;
+  addQuestionsToExam: (questions: Question[]) => void;
   existingQuestions: Question[];
 };
 
 type ParsedQuestion = Omit<Question, 'id'>;
 
-export function CsvUploader({ children, addImportedQuestions, existingQuestions }: CsvUploaderProps) {
+export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam, existingQuestions }: CsvUploaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [textData, setTextData] = useState<string>('');
@@ -46,7 +49,10 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
   const [manualBoardName, setManualBoardName] = useState('');
   const [manualVertical, setManualVertical] = useState<string>('');
 
-  const [previewQuestions, setPreviewQuestions] = useState<ParsedQuestion[]>([]);
+  const [newQuestions, setNewQuestions] = useState<ParsedQuestion[]>([]);
+  const [duplicateQuestions, setDuplicateQuestions] = useState<Question[]>([]);
+  const [selectedNew, setSelectedNew] = useState<number[]>([]);
+  
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -54,20 +60,24 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
     if (event.target.files) {
       setFile(event.target.files[0]);
       setTextData('');
-      setPreviewQuestions([]);
+      setNewQuestions([]);
+      setDuplicateQuestions([]);
     }
   };
 
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTextData(event.target.value);
     setFile(null);
-    setPreviewQuestions([]);
+    setNewQuestions([]);
+    setDuplicateQuestions([]);
   };
 
   const resetState = () => {
     setFile(null);
     setTextData('');
-    setPreviewQuestions([]);
+    setNewQuestions([]);
+    setDuplicateQuestions([]);
+    setSelectedNew([]);
     setManualTopic('');
     setManualBoardName('');
     setManualBoardType('');
@@ -80,21 +90,31 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
   
   const parseData = (data: File | string) => {
     setIsParsing(true);
-    setPreviewQuestions([]);
-    const existingQuestionTexts = new Set(existingQuestions.map(q => q.text));
+    setNewQuestions([]);
+    setDuplicateQuestions([]);
+    setSelectedNew([]);
+
+    const existingQuestionMap = new Map(existingQuestions.map(q => [q.text.trim().toLowerCase(), q]));
 
     Papa.parse(data, {
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
         try {
-          let duplicateCount = 0;
-          const questions = results.data.map((row: any): ParsedQuestion | null => {
-            const questionText = row.title || 'No title provided';
+          const parsedNew: ParsedQuestion[] = [];
+          const parsedDuplicates: Question[] = [];
 
-            if (existingQuestionTexts.has(questionText)) {
-                duplicateCount++;
-                return null;
+          results.data.forEach((row: any) => {
+            const questionText = (row.title || 'No title provided').trim();
+            if (questionText === 'No title provided') return;
+
+            const duplicate = existingQuestionMap.get(questionText.toLowerCase());
+
+            if (duplicate) {
+              if (!parsedDuplicates.some(dq => dq.id === duplicate.id)) {
+                 parsedDuplicates.push(duplicate);
+              }
+              return;
             }
 
             const options: { text: string; isCorrect: boolean }[] = [];
@@ -132,20 +152,17 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
               group_type: decodedAttrs.group_type,
               marks: row.marks ? parseInt(row.marks) : 1,
             };
+            
+            parsedNew.push(question);
+          });
 
-            return question;
-          }).filter((q): q is ParsedQuestion => q !== null && q.text !== 'No title provided');
-
-          setPreviewQuestions(questions);
-
-          let toastMessage = `Parsed ${questions.length} new questions.`;
-          if (duplicateCount > 0) {
-            toastMessage += ` Skipped ${duplicateCount} duplicate questions.`
-          }
+          setNewQuestions(parsedNew);
+          setDuplicateQuestions(parsedDuplicates);
+          setSelectedNew(parsedNew.map((_, index) => index)); // Select all new by default
 
           toast({
             title: 'Preview ready',
-            description: toastMessage,
+            description: `Found ${parsedNew.length} new questions and ${parsedDuplicates.length} duplicates.`,
           });
         } catch (error) {
            toast({
@@ -182,11 +199,100 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
     }
   };
 
-  const handleAddQuestionsToBank = () => {
-    addImportedQuestions(previewQuestions);
+  const handleAddSelectedToBank = () => {
+    const questionsToAdd = selectedNew.map(index => newQuestions[index]);
+    if (questionsToAdd.length === 0) {
+        toast({ variant: 'destructive', title: 'No new questions selected.'});
+        return;
+    }
+    addImportedQuestions(questionsToAdd);
     setIsOpen(false);
     resetState();
   };
+
+  const handleAddAllToExam = () => {
+    const allQuestionsForExam = [
+        ...newQuestions.map((q, i) => ({ ...q, id: `import-exam-${Date.now()}-${i}`})),
+        ...duplicateQuestions
+    ];
+    addQuestionsToExam(allQuestionsForExam);
+    setIsOpen(false);
+    resetState();
+  };
+
+  const toggleSelectNew = (index: number) => {
+      setSelectedNew(prev => prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]);
+  }
+
+  const toggleSelectAllNew = () => {
+      if (selectedNew.length === newQuestions.length) {
+          setSelectedNew([]);
+      } else {
+          setSelectedNew(newQuestions.map((_, index) => index));
+      }
+  }
+
+  const hasPreview = newQuestions.length > 0 || duplicateQuestions.length > 0;
+
+  const QuestionPreviewTable = ({ questions, isDuplicate = false }: { questions: (ParsedQuestion | Question)[], isDuplicate?: boolean }) => (
+    <Table>
+      <TableHeader>
+        <TableRow>
+            {!isDuplicate && (
+                <TableHead className="w-12">
+                   <Checkbox 
+                        checked={newQuestions.length > 0 && selectedNew.length === newQuestions.length}
+                        onCheckedChange={toggleSelectAllNew}
+                        aria-label="Select all new questions"
+                    />
+                </TableHead>
+            )}
+            <TableHead>Question</TableHead>
+            <TableHead>Options</TableHead>
+            <TableHead>Attributes</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {questions.map((q, i) => (
+          <TableRow key={isDuplicate ? (q as Question).id : i}>
+            {!isDuplicate && (
+                 <TableCell>
+                    <Checkbox checked={selectedNew.includes(i)} onCheckedChange={() => toggleSelectNew(i)} />
+                 </TableCell>
+            )}
+            <TableCell className="align-top whitespace-pre-wrap">
+              <p className="font-medium">{q.text}</p>
+            </TableCell>
+            <TableCell className="align-top whitespace-pre-wrap">
+              <ul className="space-y-1">
+                {q.options?.map((opt, index) => (
+                  <li key={index} className="flex items-start text-sm">
+                    {opt.isCorrect ? <CheckCircle className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-1" /> : <XCircle className="h-4 w-4 mr-2 text-red-500 flex-shrink-0 mt-1" />}
+                    <span>{opt.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </TableCell>
+            <TableCell className="align-top">
+              <div className="flex flex-wrap gap-1">
+                {q.vertical && <Badge>Vertical: {q.vertical}</Badge>}
+                {q.class && <Badge variant="outline">Class: {q.class}</Badge>}
+                {q.subject && <Badge variant="outline">Subject: {q.subject}</Badge>}
+                {q.topic && <Badge variant="outline">Topic: {q.topic}</Badge>}
+                {q.difficulty && <Badge variant="outline">Difficulty: {q.difficulty}</Badge>}
+                {q.program && <Badge variant="outline">Program: {q.program}</Badge>}
+                {q.paper && <Badge variant="outline">Paper: {q.paper}</Badge>}
+                {q.chapter && <Badge variant="outline">Chapter: {q.chapter}</Badge>}
+                {q.exam_set && <Badge variant="outline">Exam Set: {q.exam_set}</Badge>}
+                {q.board && <Badge variant="outline">Board: {q.board}</Badge>}
+                {q.bloomsTaxonomyLevel && <Badge variant="outline">Bloom's: {q.bloomsTaxonomyLevel}</Badge>}
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetState(); }}>
@@ -195,7 +301,7 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
         <DialogHeader>
           <DialogTitle>Upload Questions via CSV</DialogTitle>
           <DialogDescription>
-            Select a CSV file or paste data. You can manually assign attributes to all imported questions.
+            Select a CSV file or paste data. Duplicates will be identified from the question bank.
           </DialogDescription>
         </DialogHeader>
 
@@ -246,60 +352,30 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
                  </Button>
             </div>
         
-            <div className="flex flex-col min-h-0">
-                {previewQuestions.length > 0 ? (
-                    <div className="border rounded-md flex-1 flex flex-col min-h-0">
-                        <h3 className="text-lg font-semibold p-4 border-b shrink-0">Question Preview ({previewQuestions.length})</h3>
-                        <div className="flex-1 min-h-0">
-                            <ScrollArea className="h-full">
-                            <Table>
-                                <TableHeader>
-                                <TableRow>
-                                    <TableHead>Question</TableHead>
-                                    <TableHead>Options</TableHead>
-                                    <TableHead>Attributes</TableHead>
-                                </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                {previewQuestions.map((q, i) => (
-                                    <TableRow key={i}>
-                                    <TableCell className="align-top whitespace-pre-wrap">
-                                        <p className="font-medium">{q.text}</p>
-                                    </TableCell>
-                                    <TableCell className="align-top whitespace-pre-wrap">
-                                        <ul className="space-y-1">
-                                        {q.options?.map((opt, index) => (
-                                            <li key={index} className="flex items-start text-sm">
-                                            {opt.isCorrect ? <CheckCircle className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-1" /> : <XCircle className="h-4 w-4 mr-2 text-red-500 flex-shrink-0 mt-1" />}
-                                            <span>{opt.text}</span>
-                                            </li>
-                                        ))}
-                                        </ul>
-                                    </TableCell>
-                                    <TableCell className="align-top">
-                                        <div className="flex flex-wrap gap-1">
-                                            {q.vertical && <Badge>Vertical: {q.vertical}</Badge>}
-                                            {q.class && <Badge variant="outline">Class: {q.class}</Badge>}
-                                            {q.subject && <Badge variant="outline">Subject: {q.subject}</Badge>}
-                                            {q.topic && <Badge variant="outline">Topic: {q.topic}</Badge>}
-                                            {q.difficulty && <Badge variant="outline">Difficulty: {q.difficulty}</Badge>}
-                                            {q.program && <Badge variant="outline">Program: {q.program}</Badge>}
-                                            {q.paper && <Badge variant="outline">Paper: {q.paper}</Badge>}
-                                            {q.chapter && <Badge variant="outline">Chapter: {q.chapter}</Badge>}
-                                            {q.exam_set && <Badge variant="outline">Exam Set: {q.exam_set}</Badge>}
-                                            {q.board && <Badge variant="outline">Board: {q.board}</Badge>}
-                                            {q.bloomsTaxonomyLevel && <Badge variant="outline">Bloom's: {q.bloomsTaxonomyLevel}</Badge>}
-                                        </div>
-                                    </TableCell>
-                                    </TableRow>
-                                ))}
-                                </TableBody>
-                            </Table>
-                            </ScrollArea>
-                        </div>
-                    </div>
+            <div className="flex flex-col min-h-0 border rounded-md">
+                <h3 className="text-lg font-semibold p-4 border-b shrink-0">Question Preview</h3>
+                {hasPreview ? (
+                    <ScrollArea className="flex-1">
+                        {newQuestions.length > 0 && (
+                            <div className='p-4'>
+                                <h4 className='font-semibold mb-2'>New Questions ({newQuestions.length})</h4>
+                                <div className='border rounded-md'>
+                                    <QuestionPreviewTable questions={newQuestions} />
+                                </div>
+                            </div>
+                        )}
+                        {duplicateQuestions.length > 0 && (
+                            <div className='p-4'>
+                                {newQuestions.length > 0 && <Separator className="my-4" />}
+                                <h4 className='font-semibold mb-2'>Found Duplicates ({duplicateQuestions.length})</h4>
+                                <div className='border rounded-md'>
+                                    <QuestionPreviewTable questions={duplicateQuestions} isDuplicate={true} />
+                                </div>
+                            </div>
+                        )}
+                    </ScrollArea>
                 ) : (
-                    <div className="flex items-center justify-center h-full border rounded-md bg-muted/20">
+                    <div className="flex items-center justify-center h-full bg-muted/20">
                         <p className="text-muted-foreground">Preview of parsed questions will appear here.</p>
                     </div>
                 )}
@@ -310,9 +386,17 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button onClick={handleAddQuestionsToBank} disabled={previewQuestions.length === 0}>
-            Add {previewQuestions.length > 0 ? previewQuestions.length : ''} Questions to Bank
-          </Button>
+          {hasPreview && (
+            <>
+                <Button onClick={handleAddSelectedToBank} disabled={selectedNew.length === 0}>
+                    Add {selectedNew.length > 0 ? selectedNew.length : ''} New to Bank
+                </Button>
+                 <Button onClick={handleAddAllToExam} variant="secondary">
+                    <PlusCircle className="mr-2" />
+                    Add All to Exam ({newQuestions.length + duplicateQuestions.length})
+                </Button>
+            </>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

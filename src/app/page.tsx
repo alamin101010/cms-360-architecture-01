@@ -77,15 +77,19 @@ export default function Home() {
     toast({ title: `${questionsWithIds.length} imported questions added to the bank.` });
   };
   
+  const addQuestionsToExam = (questionsToAdd: Question[]) => {
+    const newQuestions = questionsToAdd.filter(q => !currentExamQuestions.some(examQ => examQ.id === q.id));
+    setCurrentExamQuestions(prev => [...prev, ...newQuestions]);
+    toast({ title: `Added ${newQuestions.length} questions to the exam.` });
+  };
+
   const removeQuestionFromExam = (questionId: string) => {
     setCurrentExamQuestions(prev => prev.filter(q => q.id !== questionId));
   };
   
   const addMultipleQuestionsToExam = (questionIds: string[]) => {
     const questionsToAdd = questions.filter(q => questionIds.includes(q.id));
-    const newQuestions = questionsToAdd.filter(q => !currentExamQuestions.some(examQ => examQ.id === q.id));
-    setCurrentExamQuestions(prev => [...prev, ...newQuestions]);
-    toast({ title: `Added ${newQuestions.length} questions to the exam.` });
+    addQuestionsToExam(questionsToAdd);
   };
 
   const deleteQuestion = (questionId: string) => {
@@ -159,6 +163,7 @@ export default function Home() {
           addSuggestedQuestions={addSuggestedQuestions}
           addImportedQuestions={addImportedQuestions}
           addMultipleQuestionsToExam={addMultipleQuestionsToExam}
+          addQuestionsToExam={addQuestionsToExam}
           deleteQuestion={deleteQuestion}
           deleteMultipleQuestions={deleteMultipleQuestions}
         />
