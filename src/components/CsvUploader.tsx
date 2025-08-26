@@ -246,9 +246,9 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
                  </Button>
             </div>
         
-            <div className="flex-1 flex flex-col min-h-0">
+            <div className="flex flex-col min-h-0">
                 {previewQuestions.length > 0 ? (
-                    <div className="flex-1 flex flex-col overflow-hidden border rounded-md min-h-0">
+                    <div className="flex flex-col overflow-hidden border rounded-md h-full">
                         <h3 className="text-lg font-semibold p-4 border-b shrink-0">Question Preview ({previewQuestions.length})</h3>
                         <ScrollArea className="flex-1">
                         <Table>
