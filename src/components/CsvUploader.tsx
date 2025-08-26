@@ -14,11 +14,13 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import type { Question } from '@/types';
 import { ScrollArea } from './ui/scroll-area';
 import { Badge } from './ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
 type CsvUploaderProps = {
   children: React.ReactNode;
@@ -39,6 +41,7 @@ const attributeMapping: { [key: string]: keyof Question } = {
 export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [textData, setTextData] = useState<string>('');
   const [isParsing, setIsParsing] = useState(false);
   const [previewQuestions, setPreviewQuestions] = useState<ParsedQuestion[]>([]);
   const { toast } = useToast();
@@ -47,33 +50,32 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       setFile(event.target.files[0]);
+      setTextData('');
       setPreviewQuestions([]);
     }
   };
 
+  const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setTextData(event.target.value);
+    setFile(null);
+    setPreviewQuestions([]);
+  };
+
   const resetState = () => {
     setFile(null);
+    setTextData('');
     setPreviewQuestions([]);
     setIsParsing(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
-
-  const handleParse = () => {
-    if (!file) {
-      toast({
-        variant: 'destructive',
-        title: 'No file selected',
-        description: 'Please select a CSV file to parse.',
-      });
-      return;
-    }
-
+  
+  const parseData = (data: File | string) => {
     setIsParsing(true);
     setPreviewQuestions([]);
 
-    Papa.parse(file, {
+    Papa.parse(data, {
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
@@ -128,7 +130,7 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
            toast({
             variant: 'destructive',
             title: 'Parsing error',
-            description: 'Failed to parse CSV. Please check the file format and headers.',
+            description: 'Failed to parse data. Please check the format and headers.',
           });
         } finally {
           setIsParsing(false);
@@ -143,6 +145,20 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
         setIsParsing(false);
       }
     });
+  }
+
+  const handleParse = () => {
+    if (file) {
+      parseData(file);
+    } else if (textData) {
+      parseData(textData);
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'No data selected',
+        description: 'Please select a CSV file or paste CSV data to parse.',
+      });
+    }
   };
 
   const handleAddQuestionsToBank = () => {
@@ -158,15 +174,29 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
         <DialogHeader>
           <DialogTitle>Upload Questions via CSV</DialogTitle>
           <DialogDescription>
-            Select a CSV file to upload. After parsing, you can preview the questions before adding them to the bank.
+            Select a CSV file, or paste CSV data to upload. After parsing, you can preview the questions before adding them to the bank.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex items-center gap-4 py-4">
-          <Input type="file" accept=".csv" onChange={handleFileChange} ref={fileInputRef} className="flex-1" />
-           <Button onClick={handleParse} disabled={!file || isParsing}>
+
+        <Tabs defaultValue="file">
+            <TabsList className='grid w-full grid-cols-2'>
+                <TabsTrigger value="file">Upload File</TabsTrigger>
+                <TabsTrigger value="paste">Paste Text</TabsTrigger>
+            </TabsList>
+            <TabsContent value="file" className="py-4">
+                <Input type="file" accept=".csv" onChange={handleFileChange} ref={fileInputRef} className="flex-1" />
+            </TabsContent>
+            <TabsContent value="paste" className="py-4">
+                <Textarea placeholder='Paste your CSV data here...' className='h-32' value={textData} onChange={handleTextChange}/>
+            </TabsContent>
+        </Tabs>
+       
+        <div className="flex justify-end">
+           <Button onClick={handleParse} disabled={(!file && !textData) || isParsing}>
             {isParsing ? 'Parsing...' : 'Parse & Preview'}
           </Button>
         </div>
+        
 
         {previewQuestions.length > 0 && (
           <div className="flex-1 flex flex-col overflow-hidden border rounded-md">
