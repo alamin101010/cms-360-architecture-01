@@ -110,8 +110,14 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
 
   const sortedQuestions = useMemo(() => {
+    // Sorting by createdAt first, then by ID for a stable sort order
     return [...questions].sort((a, b) => {
-        return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+        const dateA = new Date(a.createdAt || 0).getTime();
+        const dateB = new Date(b.createdAt || 0).getTime();
+        if (dateB !== dateA) {
+            return dateB - dateA;
+        }
+        return a.id.localeCompare(b.id);
     });
   }, [questions]);
 
