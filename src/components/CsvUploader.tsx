@@ -94,7 +94,7 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
     setDuplicateQuestions([]);
     setSelectedNew([]);
 
-    const existingQuestionMap = new Map(existingQuestions.map(q => [q.text.trim().toLowerCase(), q]));
+    const existingQuestionMap = new Map(existingQuestions.filter(q => q.text).map(q => [q.text.trim().toLowerCase(), q]));
 
     Papa.parse(data, {
       header: true,
@@ -352,28 +352,30 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
                  </Button>
             </div>
         
-            <div className="flex flex-col min-h-0 border rounded-md">
+            <div className="border rounded-md flex flex-col min-h-0">
                 <h3 className="text-lg font-semibold p-4 border-b shrink-0">Question Preview</h3>
                 {hasPreview ? (
-                    <ScrollArea className="flex-1">
-                        {newQuestions.length > 0 && (
-                            <div className='p-4'>
-                                <h4 className='font-semibold mb-2'>New Questions ({newQuestions.length})</h4>
-                                <div className='border rounded-md'>
-                                    <QuestionPreviewTable questions={newQuestions} />
+                    <div className="flex-1 overflow-hidden">
+                        <ScrollArea className="h-full">
+                            {newQuestions.length > 0 && (
+                                <div className='p-4'>
+                                    <h4 className='font-semibold mb-2'>New Questions ({newQuestions.length})</h4>
+                                    <div className='border rounded-md'>
+                                        <QuestionPreviewTable questions={newQuestions} />
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                        {duplicateQuestions.length > 0 && (
-                            <div className='p-4'>
-                                {newQuestions.length > 0 && <Separator className="my-4" />}
-                                <h4 className='font-semibold mb-2'>Found Duplicates ({duplicateQuestions.length})</h4>
-                                <div className='border rounded-md'>
-                                    <QuestionPreviewTable questions={duplicateQuestions} isDuplicate={true} />
+                            )}
+                            {duplicateQuestions.length > 0 && (
+                                <div className='p-4'>
+                                    {newQuestions.length > 0 && <Separator className="my-4" />}
+                                    <h4 className='font-semibold mb-2'>Found Duplicates ({duplicateQuestions.length})</h4>
+                                    <div className='border rounded-md'>
+                                        <QuestionPreviewTable questions={duplicateQuestions} isDuplicate={true} />
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </ScrollArea>
+                            )}
+                        </ScrollArea>
+                    </div>
                 ) : (
                     <div className="flex items-center justify-center h-full bg-muted/20">
                         <p className="text-muted-foreground">Preview of parsed questions will appear here.</p>
