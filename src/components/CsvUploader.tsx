@@ -241,66 +241,65 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
                         <p className="text-xs text-muted-foreground mt-1">This will override any board/school from the CSV.</p>
                     </div>
                 </div>
+                 <Button onClick={handleParse} disabled={(!file && !textData) || isParsing}>
+                    {isParsing ? 'Parsing...' : 'Parse & Preview'}
+                 </Button>
             </div>
         
-            <div className="flex items-end justify-end h-full">
-              <Button onClick={handleParse} disabled={(!file && !textData) || isParsing}>
-                {isParsing ? 'Parsing...' : 'Parse & Preview'}
-              </Button>
+            <div className="h-full flex flex-col overflow-hidden">
+                {previewQuestions.length > 0 && (
+                    <div className="flex-1 flex flex-col overflow-hidden border rounded-md">
+                        <h3 className="text-lg font-semibold p-4 border-b">Question Preview ({previewQuestions.length})</h3>
+                        <ScrollArea className="flex-1 h-0">
+                        <Table>
+                            <TableHeader>
+                            <TableRow>
+                                <TableHead>Question</TableHead>
+                                <TableHead>Options</TableHead>
+                                <TableHead>Attributes</TableHead>
+                            </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                            {previewQuestions.map((q, i) => (
+                                <TableRow key={i}>
+                                <TableCell className="align-top whitespace-pre-wrap">
+                                    <p className="font-medium">{q.text}</p>
+                                </TableCell>
+                                <TableCell className="align-top whitespace-pre-wrap">
+                                    <ul className="space-y-1">
+                                    {q.options?.map((opt, index) => (
+                                        <li key={index} className="flex items-start text-sm">
+                                        {opt.isCorrect ? <CheckCircle className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-1" /> : <XCircle className="h-4 w-4 mr-2 text-red-500 flex-shrink-0 mt-1" />}
+                                        <span>{opt.text}</span>
+                                        </li>
+                                    ))}
+                                    </ul>
+                                </TableCell>
+                                <TableCell className="align-top">
+                                    <div className="flex flex-wrap gap-1">
+                                        {q.vertical && <Badge>Vertical: {q.vertical}</Badge>}
+                                        {q.class && <Badge variant="outline">Class: {q.class}</Badge>}
+                                        {q.subject && <Badge variant="outline">Subject: {q.subject}</Badge>}
+                                        {q.topic && <Badge variant="outline">Topic: {q.topic}</Badge>}
+                                        {q.difficulty && <Badge variant="outline">Difficulty: {q.difficulty}</Badge>}
+                                        {q.program && <Badge variant="outline">Program: {q.program}</Badge>}
+                                        {q.paper && <Badge variant="outline">Paper: {q.paper}</Badge>}
+                                        {q.chapter && <Badge variant="outline">Chapter: {q.chapter}</Badge>}
+                                        {q.exam_set && <Badge variant="outline">Exam Set: {q.exam_set}</Badge>}
+                                        {q.board && <Badge variant="outline">Board: {q.board}</Badge>}
+                                        {q.bloomsTaxonomyLevel && <Badge variant="outline">Bloom's: {q.bloomsTaxonomyLevel}</Badge>}
+                                    </div>
+                                </TableCell>
+                                </TableRow>
+                            ))}
+                            </TableBody>
+                        </Table>
+                        </ScrollArea>
+                    </div>
+                )}
             </div>
         </div>
         
-        {previewQuestions.length > 0 && (
-          <div className="flex-1 flex flex-col overflow-hidden border rounded-md mt-4">
-            <h3 className="text-lg font-semibold p-4 border-b">Question Preview ({previewQuestions.length})</h3>
-            <ScrollArea className="flex-1">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Question</TableHead>
-                    <TableHead>Options</TableHead>
-                    <TableHead>Attributes</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {previewQuestions.map((q, i) => (
-                    <TableRow key={i}>
-                      <TableCell className="align-top whitespace-pre-wrap">
-                        <p className="font-medium">{q.text}</p>
-                      </TableCell>
-                      <TableCell className="align-top whitespace-pre-wrap">
-                        <ul className="space-y-1">
-                          {q.options?.map((opt, index) => (
-                            <li key={index} className="flex items-start text-sm">
-                              {opt.isCorrect ? <CheckCircle className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-1" /> : <XCircle className="h-4 w-4 mr-2 text-red-500 flex-shrink-0 mt-1" />}
-                              <span>{opt.text}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </TableCell>
-                      <TableCell className="align-top">
-                         <div className="flex flex-wrap gap-1">
-                            {q.vertical && <Badge>Vertical: {q.vertical}</Badge>}
-                            {q.class && <Badge variant="outline">Class: {q.class}</Badge>}
-                            {q.subject && <Badge variant="outline">Subject: {q.subject}</Badge>}
-                            {q.topic && <Badge variant="outline">Topic: {q.topic}</Badge>}
-                            {q.difficulty && <Badge variant="outline">Difficulty: {q.difficulty}</Badge>}
-                            {q.program && <Badge variant="outline">Program: {q.program}</Badge>}
-                            {q.paper && <Badge variant="outline">Paper: {q.paper}</Badge>}
-                            {q.chapter && <Badge variant="outline">Chapter: {q.chapter}</Badge>}
-                            {q.exam_set && <Badge variant="outline">Exam Set: {q.exam_set}</Badge>}
-                            {q.board && <Badge variant="outline">Board: {q.board}</Badge>}
-                            {q.bloomsTaxonomyLevel && <Badge variant="outline">Bloom's: {q.bloomsTaxonomyLevel}</Badge>}
-                         </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </ScrollArea>
-          </div>
-        )}
-
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
