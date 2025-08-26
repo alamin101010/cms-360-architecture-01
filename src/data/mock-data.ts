@@ -1,4 +1,4 @@
-import type { Question, QuestionSet } from '@/types';
+import type { Question } from '@/types';
 
 export const allQuestions: Question[] = [
   {
@@ -150,26 +150,5 @@ export const allQuestions: Question[] = [
     difficulty: 'Medium',
     bloomsTaxonomyLevel: 'Creating',
     createdAt: new Date().toISOString(),
-  },
-];
-
-export const allQuestionSets: QuestionSet[] = [
-  {
-    id: 'qs1',
-    name: '9th Grade Biology Midterm',
-    description: 'A selection of questions covering key topics in 9th-grade biology.',
-    questionIds: ['q1', 'q2', 'q6', 'q8', 'q13'],
-  },
-  {
-    id: 'qs2',
-    name: '8th Grade Math Fundamentals',
-    description: 'Basic math questions suitable for an 8th-grade level assessment.',
-    questionIds: ['q3', 'q7', 'q12', 'q15'],
-  },
-  {
-    id: 'qs3',
-    name: 'Advanced Social Studies',
-    description: 'Challenging questions for 10th and 11th graders on history and society.',
-    questionIds: ['q4', 'q5', 'q10', 'q14'],
   },
 ];

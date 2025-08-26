@@ -10,7 +10,7 @@ type QuestionSetCardProps = {
 
 export function QuestionSetCard({ questionSet }: QuestionSetCardProps) {
   const handleDragStart = (e: DragEvent<HTMLDivElement>) => {
-    e.dataTransfer.setData('questionSetId', questionSet.id);
+    e.dataTransfer.setData('questionSetId', questionSet.questionIds.join(','));
   };
 
   return (

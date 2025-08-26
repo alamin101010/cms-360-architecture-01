@@ -4,7 +4,7 @@ import type { DragEvent } from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Question, QuestionSet, Exam } from '@/types';
-import { allQuestions, allQuestionSets } from '@/data/mock-data';
+import { allQuestions } from '@/data/mock-data';
 import { Header } from '@/components/Header';
 import { QuestionBank } from '@/components/QuestionBank';
 import { ExamBuilder } from '@/components/ExamBuilder';
@@ -14,7 +14,6 @@ import { Button } from '@/components/ui/button';
 
 export default function Home() {
   const [questions, setQuestions] = useLocalStorage<Question[]>('allQuestions', allQuestions);
-  const [questionSets, setQuestionSets] = useLocalStorage<QuestionSet[]>('allQuestionSets', allQuestionSets);
   const [currentExamQuestions, setCurrentExamQuestions] = useState<Question[]>([]);
   const [examDetails, setExamDetails] = useState({
     name: 'New Exam',
@@ -48,13 +47,11 @@ export default function Home() {
     }
 
     if (questionSetId) {
-      const set = questionSets.find(s => s.id === questionSetId);
-      if (set) {
-        const questionsFromSet = questions.filter(q => set.questionIds.includes(q.id));
-        const newQuestions = questionsFromSet.filter(q => !currentExamQuestions.some(examQ => examQ.id === q.id));
-        setCurrentExamQuestions(prev => [...prev, ...newQuestions]);
-        toast({ title: `Added ${newQuestions.length} new questions from "${set.name}".` });
-      }
+      const questionIdsInSet = questionSetId.split(',');
+      const questionsFromSet = questions.filter(q => questionIdsInSet.includes(q.id));
+      const newQuestions = questionsFromSet.filter(q => !currentExamQuestions.some(examQ => examQ.id === q.id));
+      setCurrentExamQuestions(prev => [...prev, ...newQuestions]);
+      toast({ title: `Added ${newQuestions.length} new questions from the set.` });
     }
   };
 
@@ -159,7 +156,6 @@ export default function Home() {
       <main className="flex-1 grid lg:grid-cols-2 gap-6 p-4 md:p-6 overflow-hidden">
         <QuestionBank
           questions={questions}
-          questionSets={questionSets}
           addSuggestedQuestions={addSuggestedQuestions}
           addImportedQuestions={addImportedQuestions}
           addMultipleQuestionsToExam={addMultipleQuestionsToExam}

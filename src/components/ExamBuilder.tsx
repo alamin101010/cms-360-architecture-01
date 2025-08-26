@@ -1,15 +1,13 @@
 'use client';
 import type { DragEvent } from 'react';
-import { Bar, BarChart, XAxis, YAxis } from 'recharts';
 import type { Question } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { X, Save, Trash2, DraftingCompass, BarChartHorizontal, Clock, Calendar } from 'lucide-react';
+import { X, Save, Trash2, DraftingCompass, Calendar } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ChartContainer, ChartConfig, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Calendar as CalendarPicker } from './ui/calendar';
 import { format } from 'date-fns';
@@ -33,17 +31,6 @@ type ExamBuilderProps = {
   clearExam: () => void;
 };
 
-const chartConfigDifficulty: ChartConfig = {
-  count: { label: "Count", color: "hsl(var(--primary))" },
-  Easy: { label: "Easy", color: "hsl(var(--chart-2))" },
-  Medium: { label: "Medium", color: "hsl(var(--chart-3))" },
-  Hard: { label: "Hard", color: "hsl(var(--chart-4))" },
-};
-const chartConfigBlooms: ChartConfig = {
-  count: { label: "Count", color: "hsl(var(--primary))" },
-};
-
-
 export function ExamBuilder({
   examDetails,
   setExamDetails,
@@ -55,16 +42,6 @@ export function ExamBuilder({
   clearExam
 }: ExamBuilderProps) {
 
-  const difficultyData = ['Easy', 'Medium', 'Hard'].map(level => ({
-    level,
-    count: currentExamQuestions.filter(q => q.difficulty === level).length
-  }));
-
-  const bloomsData = ['Remembering', 'Understanding', 'Applying', 'Analyzing', 'Evaluating', 'Creating'].map(level => ({
-    level,
-    count: currentExamQuestions.filter(q => q.bloomsTaxonomyLevel === level).length
-  })).filter(d => d.count > 0);
-  
   const handleDetailChange = (field: keyof ExamDetails, value: any) => {
     setExamDetails({ ...examDetails, [field]: value });
   }
@@ -184,29 +161,6 @@ export function ExamBuilder({
             </ScrollArea>
           )}
         </div>
-        {currentExamQuestions.length > 0 && (
-          <div className="flex flex-col gap-4">
-            <h3 className="font-semibold flex items-center gap-2"><BarChartHorizontal className="w-5 h-5 text-primary"/> Exam Summary</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <ChartContainer config={chartConfigDifficulty} className="h-40 w-full">
-                <BarChart data={difficultyData} layout="vertical" margin={{left: 10, right:10}}>
-                   <XAxis type="number" dataKey="count" hide/>
-                   <YAxis type="category" dataKey="level" tickLine={false} axisLine={false} tickMargin={10} width={70} />
-                   <ChartTooltip content={<ChartTooltipContent />} />
-                   <Bar dataKey="count" radius={4} fill="var(--color-primary)" />
-                </BarChart>
-              </ChartContainer>
-               <ChartContainer config={chartConfigBlooms} className="h-40 w-full">
-                <BarChart data={bloomsData} layout="vertical" margin={{left: 10, right:10}}>
-                   <XAxis type="number" dataKey="count" hide/>
-                   <YAxis type="category" dataKey="level" tickLine={false} axisLine={false} tickMargin={10} width={80}/>
-                   <ChartTooltip content={<ChartTooltipContent />} />
-                   <Bar dataKey="count" radius={4} fill="var(--color-accent)"/>
-                </BarChart>
-              </ChartContainer>
-            </div>
-          </div>
-        )}
       </CardContent>
       <CardFooter className="justify-end gap-2">
         <Button variant="ghost" onClick={clearExam}><Trash2 /> Clear</Button>

@@ -33,7 +33,6 @@ import { useToast } from '@/hooks/use-toast';
 
 type QuestionBankProps = {
   questions: Question[];
-  questionSets: QuestionSet[];
   addSuggestedQuestions: (newQuestions: Omit<Question, 'id'>[]) => Question[];
   addImportedQuestions: (newQuestions: Omit<Question, 'id'>[]) => void;
   addMultipleQuestionsToExam: (questionIds: string[]) => void;
@@ -45,7 +44,7 @@ type QuestionBankProps = {
 type FilterValue = string | null;
 
 
-export function QuestionBank({ questions, questionSets, addSuggestedQuestions, addImportedQuestions, addMultipleQuestionsToExam, addQuestionsToExam, deleteQuestion, deleteMultipleQuestions }: QuestionBankProps) {
+export function QuestionBank({ questions, addSuggestedQuestions, addImportedQuestions, addMultipleQuestionsToExam, addQuestionsToExam, deleteQuestion, deleteMultipleQuestions }: QuestionBankProps) {
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
     setIsClient(true);
@@ -95,6 +94,25 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
       (!board || q.board === board)
     );
   }, [sortedQuestions, searchTerm, vertical, program, subject, paper, chapter, examSet, topic, difficulty, board]);
+
+  const questionSets = useMemo(() => {
+    const topics: { [key: string]: Question[] } = {};
+    questions.forEach(q => {
+      const topicKey = q.topic || 'Uncategorized';
+      if (!topics[topicKey]) {
+        topics[topicKey] = [];
+      }
+      topics[topicKey].push(q);
+    });
+
+    return Object.entries(topics).map(([topicName, questionsInSet]) => ({
+      id: topicName, // Using topic name as a unique ID for the set
+      name: topicName,
+      description: `A set of ${questionsInSet.length} questions about ${topicName}.`,
+      questionIds: questionsInSet.map(q => q.id)
+    }));
+  }, [questions]);
+
 
   const getUniqueOptions = (key: keyof Question) => {
       const allValues = questions.map(q => q[key]).filter((v): v is string => typeof v === 'string' && v.trim() !== '');
