@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef } from 'react';
@@ -30,11 +31,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 type CsvUploaderProps = {
   children: React.ReactNode;
   addImportedQuestions: (questions: Omit<Question, 'id'>[]) => void;
+  existingQuestions: Question[];
 };
 
 type ParsedQuestion = Omit<Question, 'id'>;
 
-export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps) {
+export function CsvUploader({ children, addImportedQuestions, existingQuestions }: CsvUploaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [textData, setTextData] = useState<string>('');
@@ -79,13 +81,22 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
   const parseData = (data: File | string) => {
     setIsParsing(true);
     setPreviewQuestions([]);
+    const existingQuestionTexts = new Set(existingQuestions.map(q => q.text));
 
     Papa.parse(data, {
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
         try {
-          const questions = results.data.map((row: any): ParsedQuestion => {
+          let duplicateCount = 0;
+          const questions = results.data.map((row: any): ParsedQuestion | null => {
+            const questionText = row.title || 'No title provided';
+
+            if (existingQuestionTexts.has(questionText)) {
+                duplicateCount++;
+                return null;
+            }
+
             const options: { text: string; isCorrect: boolean }[] = [];
             for (let i = 1; i <= 4; i++) {
               if (row[`options_${i}_answer`]) {
@@ -99,7 +110,7 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
             const decodedAttrs = decodeAttributes(row);
 
             const question: ParsedQuestion = {
-              text: row.title || 'No title provided',
+              text: questionText,
               type: row.type,
               image: row.image,
               options,
@@ -123,12 +134,18 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
             };
 
             return question;
-          }).filter(q => q.text && q.text !== 'No title provided');
+          }).filter((q): q is ParsedQuestion => q !== null && q.text !== 'No title provided');
 
           setPreviewQuestions(questions);
+
+          let toastMessage = `Parsed ${questions.length} new questions.`;
+          if (duplicateCount > 0) {
+            toastMessage += ` Skipped ${duplicateCount} duplicate questions.`
+          }
+
           toast({
             title: 'Preview ready',
-            description: `Parsed ${questions.length} questions. Review and add them to the bank.`,
+            description: toastMessage,
           });
         } catch (error) {
            toast({
@@ -257,15 +274,15 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
                 <TableBody>
                   {previewQuestions.map((q, i) => (
                     <TableRow key={i}>
-                      <TableCell className="max-w-xs align-top">
+                      <TableCell className="max-w-xs align-top whitespace-pre-wrap">
                         <p className="font-medium">{q.text}</p>
                       </TableCell>
-                      <TableCell className="align-top">
+                      <TableCell className="align-top whitespace-pre-wrap">
                         <ul className="space-y-1">
                           {q.options?.map((opt, index) => (
-                            <li key={index} className="flex items-center text-sm">
-                              {opt.isCorrect ? <CheckCircle className="h-4 w-4 mr-2 text-green-500 flex-shrink-0" /> : <XCircle className="h-4 w-4 mr-2 text-red-500 flex-shrink-0" />}
-                              {opt.text}
+                            <li key={index} className="flex items-start text-sm">
+                              {opt.isCorrect ? <CheckCircle className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-1" /> : <XCircle className="h-4 w-4 mr-2 text-red-500 flex-shrink-0 mt-1" />}
+                              <span>{opt.text}</span>
                             </li>
                           ))}
                         </ul>

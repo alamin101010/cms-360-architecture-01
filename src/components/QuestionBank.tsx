@@ -94,14 +94,19 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
     );
   }, [sortedQuestions, searchTerm, vertical, program, subject, paper, chapter, examSet, topic, difficulty, board]);
 
-  const allVerticals = useMemo(() => [...Array.from(new Set(questions.map(q => q.vertical).filter(Boolean))) as string[]], [questions]);
-  const allPrograms = useMemo(() => [...Array.from(new Set(questions.map(q => q.program).filter(Boolean))) as string[]], [questions]);
-  const allSubjects = useMemo(() => [...Array.from(new Set(questions.map(q => q.subject).filter(Boolean))) as string[]], [questions]);
-  const allPapers = useMemo(() => [...Array.from(new Set(questions.map(q => q.paper).filter(Boolean))) as string[]], [questions]);
-  const allChapters = useMemo(() => [...Array.from(new Set(questions.map(q => q.chapter).filter(Boolean))) as string[]], [questions]);
-  const allExamSets = useMemo(() => [...Array.from(new Set(questions.map(q => q.exam_set).filter(Boolean))) as string[]], [questions]);
-  const allTopics = useMemo(() => [...Array.from(new Set(questions.map(q => q.topic).filter(Boolean))) as string[]], [questions]);
-  const allBoards = useMemo(() => [...Array.from(new Set(questions.map(q => q.board).filter(Boolean))) as string[]], [questions]);
+  const getUniqueOptions = (key: keyof Question) => {
+      const allValues = questions.map(q => q[key]).filter(Boolean) as string[];
+      return [...new Set(allValues)];
+  }
+
+  const allVerticals = useMemo(() => getUniqueOptions('vertical'), [questions]);
+  const allPrograms = useMemo(() => getUniqueOptions('program'), [questions]);
+  const allSubjects = useMemo(() => getUniqueOptions('subject'), [questions]);
+  const allPapers = useMemo(() => getUniqueOptions('paper'), [questions]);
+  const allChapters = useMemo(() => getUniqueOptions('chapter'), [questions]);
+  const allExamSets = useMemo(() => getUniqueOptions('exam_set'), [questions]);
+  const allTopics = useMemo(() => getUniqueOptions('topic'), [questions]);
+  const allBoards = useMemo(() => getUniqueOptions('board'), [questions]);
   const allDifficulties = ['Easy', 'Medium', 'Hard'];
   
   const FilterableSelect = ({ value, onValueChange, options, placeholder }: { value: FilterValue, onValueChange: (value: FilterValue) => void, options: string[], placeholder: string }) => {
@@ -120,7 +125,7 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
                 </SelectContent>
             </Select>
             {value && (
-                <Button variant="ghost" size="icon" className="absolute right-8 top-0 h-full w-8" onClick={() => onValueChange(null)}>
+                <Button variant="ghost" size="icon" className="absolute right-8 top-0 h-full w-8" onClick={(e) => { e.stopPropagation(); onValueChange(null); }}>
                     <X className="h-4 w-4"/>
                 </Button>
             )}
@@ -183,7 +188,7 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Question Bank</CardTitle>
         <div className="flex gap-2">
-          <CsvUploader addImportedQuestions={addImportedQuestions}>
+          <CsvUploader addImportedQuestions={addImportedQuestions} existingQuestions={questions}>
              <Button variant="outline" size="sm">
                 <Upload className="mr-2 h-4 w-4" />
                 Import CSV
