@@ -199,7 +199,7 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start flex-1 min-h-0">
             <div className="space-y-4">
                 <Tabs defaultValue="file" className='w-full'>
                     <TabsList className='grid w-full grid-cols-2'>
@@ -246,11 +246,11 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
                  </Button>
             </div>
         
-            <div className="h-full flex flex-col overflow-hidden">
-                {previewQuestions.length > 0 && (
-                    <div className="flex-1 flex flex-col overflow-hidden border rounded-md">
-                        <h3 className="text-lg font-semibold p-4 border-b">Question Preview ({previewQuestions.length})</h3>
-                        <ScrollArea className="flex-1 h-0">
+            <div className="flex-1 flex flex-col min-h-0">
+                {previewQuestions.length > 0 ? (
+                    <div className="flex-1 flex flex-col overflow-hidden border rounded-md min-h-0">
+                        <h3 className="text-lg font-semibold p-4 border-b shrink-0">Question Preview ({previewQuestions.length})</h3>
+                        <ScrollArea className="flex-1">
                         <Table>
                             <TableHeader>
                             <TableRow>
@@ -295,6 +295,10 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
                             </TableBody>
                         </Table>
                         </ScrollArea>
+                    </div>
+                ) : (
+                    <div className="flex items-center justify-center h-full border rounded-md bg-muted/20">
+                        <p className="text-muted-foreground">Preview of parsed questions will appear here.</p>
                     </div>
                 )}
             </div>
