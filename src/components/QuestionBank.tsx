@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useMemo, useEffect } from 'react';
 import type { Question, QuestionSet } from '@/types';
@@ -111,7 +112,6 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
                     <SelectValue placeholder={placeholder} />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="">All</SelectItem>
                     {options.map((option) => (
                         <SelectItem key={option} value={option}>
                             {option}
@@ -317,3 +317,5 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
     </>
   );
 }
+
+    
