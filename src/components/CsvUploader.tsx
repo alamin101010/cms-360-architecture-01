@@ -42,7 +42,7 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
   const [textData, setTextData] = useState<string>('');
   const [isParsing, setIsParsing] = useState(false);
   const [manualTopic, setManualTopic] = useState<string>('');
-  const [manualBoardType, setManualBoardType] = useState('Board');
+  const [manualBoardType, setManualBoardType] = useState('');
   const [manualBoardName, setManualBoardName] = useState('');
   const [manualVertical, setManualVertical] = useState<string>('');
 
@@ -70,7 +70,7 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
     setPreviewQuestions([]);
     setManualTopic('');
     setManualBoardName('');
-    setManualBoardType('Board');
+    setManualBoardType('');
     setManualVertical('');
     setIsParsing(false);
     if (fileInputRef.current) {
@@ -125,7 +125,7 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
               paper: decodedAttrs.paper,
               chapter: decodedAttrs.chapter,
               exam_set: decodedAttrs.exam_set,
-              board: manualBoardName ? `${manualBoardType}: ${manualBoardName}` : decodedAttrs.board,
+              board: manualBoardType && manualBoardName ? `${manualBoardType}: ${manualBoardName}` : decodedAttrs.board,
               explanation: row.explanation,
               category: decodedAttrs.category,
               modules: decodedAttrs.modules,
@@ -233,21 +233,12 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
                          <p className="text-xs text-muted-foreground mt-1">This will override any vertical from the CSV.</p>
                     </div>
                     <div>
-                        <Label>Manual Board/School/College (Optional)</Label>
+                        <Label>Manual Attribute (Optional)</Label>
                         <div className='flex gap-2'>
-                            <Select value={manualBoardType} onValueChange={setManualBoardType}>
-                                <SelectTrigger className='w-[120px]'>
-                                    <SelectValue/>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Board">Board</SelectItem>
-                                    <SelectItem value="School">School</SelectItem>
-                                    <SelectItem value="College">College</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Input placeholder="Enter name" value={manualBoardName} onChange={(e) => setManualBoardName(e.target.value)} />
+                            <Input placeholder="Attribute Type (e.g. Board)" value={manualBoardType} onChange={(e) => setManualBoardType(e.target.value)} />
+                            <Input placeholder="Attribute Value (e.g. Dhaka)" value={manualBoardName} onChange={(e) => setManualBoardName(e.target.value)} />
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1">This will override any board from the CSV.</p>
+                        <p className="text-xs text-muted-foreground mt-1">This will override any board/school from the CSV.</p>
                     </div>
                 </div>
             </div>
