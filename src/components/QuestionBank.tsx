@@ -6,13 +6,18 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, Bot, Upload, Trash2, PlusCircle } from 'lucide-react';
+import { Search, Bot, Upload, Trash2, PlusCircle, Filter } from 'lucide-react';
 import { AiQuestionSuggester } from './AiQuestionSuggester';
 import { QuestionCard } from './QuestionCard';
 import { QuestionSetCard } from './QuestionSetCard';
 import { Button } from './ui/button';
 import { CsvUploader } from './CsvUploader';
 import { QuestionDetailsDialog } from './QuestionDetailsDialog';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import {
   Popover,
   PopoverContent,
@@ -54,11 +59,13 @@ type FilterValue = string | 'all';
 
 const FilterableSelect = ({ value, onValueChange, options, placeholder }: { value: FilterValue, onValueChange: (value: FilterValue) => void, options: string[], placeholder: string }) => {
   const [open, setOpen] = useState(false);
-  const [currentValue, setCurrentValue] = useState(value);
-
-  useEffect(() => {
-    setCurrentValue(value);
-  }, [value]);
+  
+  const handleSelect = (selectedValue: string) => {
+    onValueChange(selectedValue === value ? 'all' : selectedValue);
+    setOpen(false);
+  }
+  
+  const displayValue = value !== 'all' ? options.find(o => o === value) || placeholder : placeholder;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -69,7 +76,7 @@ const FilterableSelect = ({ value, onValueChange, options, placeholder }: { valu
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {currentValue !== 'all' ? options.find(o => o === currentValue) || placeholder : placeholder}
+          <span className="truncate">{displayValue}</span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -81,16 +88,12 @@ const FilterableSelect = ({ value, onValueChange, options, placeholder }: { valu
             <CommandGroup>
               <CommandItem
                 value='all'
-                onSelect={(v) => {
-                  onValueChange(v);
-                  setCurrentValue(v);
-                  setOpen(false);
-                }}
+                onSelect={() => handleSelect('all')}
               >
                 <Check
                   className={cn(
                     "mr-2 h-4 w-4",
-                    currentValue === 'all' ? "opacity-100" : "opacity-0"
+                    value === 'all' ? "opacity-100" : "opacity-0"
                   )}
                 />
                 All
@@ -99,16 +102,12 @@ const FilterableSelect = ({ value, onValueChange, options, placeholder }: { valu
                 <CommandItem
                   key={option}
                   value={option}
-                  onSelect={(v) => {
-                    onValueChange(v);
-                    setCurrentValue(v);
-                    setOpen(false);
-                  }}
+                  onSelect={() => handleSelect(option)}
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      currentValue === option ? "opacity-100" : "opacity-0"
+                      value === option ? "opacity-100" : "opacity-0"
                     )}
                   />
                   {option}
@@ -262,23 +261,33 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Search questions by text or topic..." className="pl-10" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
-              <FilterableSelect value={vertical} onValueChange={setVertical} options={allVerticals} placeholder="All Verticals" />
-              <FilterableSelect value={program} onValueChange={setProgram} options={allPrograms} placeholder="All Programs" />
-              <FilterableSelect value={subject} onValueChange={setSubject} options={allSubjects} placeholder="All Subjects" />
-              <FilterableSelect value={paper} onValueChange={setPaper} options={allPapers} placeholder="All Papers" />
-              <FilterableSelect value={chapter} onValueChange={setChapter} options={allChapters} placeholder="All Chapters" />
-              <FilterableSelect value={examSet} onValueChange={setExamSet} options={allExamSets} placeholder="All Exam Sets" />
-              <FilterableSelect value={topic} onValueChange={setTopic} options={allTopics} placeholder="All Topics" />
-              <FilterableSelect value={board} onValueChange={setBoard} options={allBoards} placeholder="All Boards/Schools" />
-              <Select value={difficulty} onValueChange={setDifficulty}>
-                <SelectTrigger><SelectValue placeholder="Filter by difficulty" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Difficulties</SelectItem>
-                  {allDifficulties.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
+            <Collapsible>
+                <CollapsibleTrigger asChild>
+                  <Button variant="outline" size="sm" className="w-full">
+                    <Filter className="mr-2 h-4 w-4"/>
+                    Advanced Filters
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="pt-4">
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                    <FilterableSelect value={vertical} onValueChange={setVertical} options={allVerticals} placeholder="All Verticals" />
+                    <FilterableSelect value={program} onValueChange={setProgram} options={allPrograms} placeholder="All Programs" />
+                    <FilterableSelect value={subject} onValueChange={setSubject} options={allSubjects} placeholder="All Subjects" />
+                    <FilterableSelect value={paper} onValueChange={setPaper} options={allPapers} placeholder="All Papers" />
+                    <FilterableSelect value={chapter} onValueChange={setChapter} options={allChapters} placeholder="All Chapters" />
+                    <FilterableSelect value={examSet} onValueChange={setExamSet} options={allExamSets} placeholder="All Exam Sets" />
+                    <FilterableSelect value={topic} onValueChange={setTopic} options={allTopics} placeholder="All Topics" />
+                    <FilterableSelect value={board} onValueChange={setBoard} options={allBoards} placeholder="All Boards/Schools" />
+                    <Select value={difficulty} onValueChange={setDifficulty}>
+                      <SelectTrigger><SelectValue placeholder="Filter by difficulty" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Difficulties</SelectItem>
+                        {allDifficulties.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CollapsibleContent>
+            </Collapsible>
              {selectedQuestions.length > 0 && (
                 <div className="flex items-center justify-between bg-muted p-2 rounded-md">
                     <span className="text-sm font-medium">{selectedQuestions.length} questions selected</span>
