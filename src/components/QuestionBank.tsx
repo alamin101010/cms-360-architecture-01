@@ -61,11 +61,11 @@ const FilterableSelect = ({ value, onValueChange, options, placeholder }: { valu
   const [open, setOpen] = useState(false);
 
   const handleSelect = (currentValue: string) => {
-    onValueChange(currentValue === value ? 'all' : currentValue)
+    onValueChange(currentValue);
     setOpen(false)
   }
   
-  const displayValue = value !== 'all' ? options.find(o => o === value) || placeholder : placeholder;
+  const displayValue = value !== 'all' ? value : placeholder;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -102,7 +102,7 @@ const FilterableSelect = ({ value, onValueChange, options, placeholder }: { valu
                   key={option}
                   value={option}
                   onSelect={(currentValue) => {
-                    handleSelect(currentValue === value ? 'all' : option)
+                    handleSelect(currentValue === option.toLowerCase() ? 'all' : option)
                   }}
                 >
                   <Check
