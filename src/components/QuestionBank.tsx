@@ -125,6 +125,8 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
   const allDifficulties = ['Easy', 'Medium', 'Hard'];
   
   const FilterableSelect = ({ value, onValueChange, options, placeholder }: { value: FilterValue, onValueChange: (value: FilterValue) => void, options: string[], placeholder: string }) => {
+    if (options.length === 0) return null;
+    
     return (
         <div className="relative">
             <Select value={value || ''} onValueChange={(val) => onValueChange(val || null)}>
@@ -197,6 +199,8 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
     setQuestionsToDelete([]);
   }
 
+  const hasAnyFilterOptions = [allVerticals, allPrograms, allSubjects, allPapers, allChapters, allExamSets, allTopics, allBoards, allDifficulties].some(options => options.length > 0);
+
   return (
     <>
     <Card className="flex flex-col h-full overflow-hidden">
@@ -228,31 +232,33 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Search questions by text or topic..." className="pl-10" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
             </div>
-            <Collapsible open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-                <CollapsibleTrigger asChild>
-                  <Button variant="outline" size="sm" className="w-full">
-                    <Filter className="mr-2 h-4 w-4"/>
-                    Advanced Filters
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="pt-4 space-y-4">
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
-                    <FilterableSelect value={vertical} onValueChange={setVertical} options={allVerticals} placeholder="Select Vertical" />
-                    <FilterableSelect value={program} onValueChange={setProgram} options={allPrograms} placeholder="Select Program" />
-                    <FilterableSelect value={subject} onValueChange={setSubject} options={allSubjects} placeholder="Select Subject" />
-                    <FilterableSelect value={paper} onValueChange={setPaper} options={allPapers} placeholder="Select Paper" />
-                    <FilterableSelect value={chapter} onValueChange={setChapter} options={allChapters} placeholder="Select Chapter" />
-                    <FilterableSelect value={examSet} onValueChange={setExamSet} options={allExamSets} placeholder="Select Exam Set" />
-                    <FilterableSelect value={topic} onValueChange={setTopic} options={allTopics} placeholder="Select Topic" />
-                    <FilterableSelect value={board} onValueChange={setBoard} options={allBoards} placeholder="Select Board/School" />
-                    <FilterableSelect value={difficulty} onValueChange={setDifficulty} options={allDifficulties} placeholder="Select Difficulty"/>
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={resetFilters} className="w-full text-destructive hover:bg-destructive/10 hover:text-destructive">
-                    <X className="mr-2 h-4 w-4"/>
-                    Clear All Filters
-                  </Button>
-                </CollapsibleContent>
-            </Collapsible>
+            {hasAnyFilterOptions && (
+              <Collapsible open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="outline" size="sm" className="w-full">
+                      <Filter className="mr-2 h-4 w-4"/>
+                      Advanced Filters
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-4 space-y-4">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                      <FilterableSelect value={vertical} onValueChange={setVertical} options={allVerticals} placeholder="Select Vertical" />
+                      <FilterableSelect value={program} onValueChange={setProgram} options={allPrograms} placeholder="Select Program" />
+                      <FilterableSelect value={subject} onValueChange={setSubject} options={allSubjects} placeholder="Select Subject" />
+                      <FilterableSelect value={paper} onValueChange={setPaper} options={allPapers} placeholder="Select Paper" />
+                      <FilterableSelect value={chapter} onValueChange={setChapter} options={allChapters} placeholder="Select Chapter" />
+                      <FilterableSelect value={examSet} onValueChange={setExamSet} options={allExamSets} placeholder="Select Exam Set" />
+                      <FilterableSelect value={topic} onValueChange={setTopic} options={allTopics} placeholder="Select Topic" />
+                      <FilterableSelect value={board} onValueChange={setBoard} options={allBoards} placeholder="Select Board/School" />
+                      <FilterableSelect value={difficulty} onValueChange={setDifficulty} options={allDifficulties} placeholder="Select Difficulty"/>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={resetFilters} className="w-full text-destructive hover:bg-destructive/10 hover:text-destructive">
+                      <X className="mr-2 h-4 w-4"/>
+                      Clear All Filters
+                    </Button>
+                  </CollapsibleContent>
+              </Collapsible>
+            )}
              {selectedQuestions.length > 0 && (
                 <div className="flex items-center justify-between bg-muted p-2 rounded-md">
                     <span className="text-sm font-medium">{selectedQuestions.length} questions selected</span>
