@@ -69,6 +69,22 @@ export function ExamBuilder({
     setExamDetails({ ...examDetails, [field]: value });
   }
 
+  const handleDateChange = (field: 'windowStart' | 'windowEnd', date: Date | undefined) => {
+    if (!date) return;
+    const currentFieldValue = examDetails[field];
+    const currentDate = currentFieldValue ? new Date(currentFieldValue) : new Date();
+    currentDate.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
+    handleDetailChange(field, currentDate.toISOString());
+  };
+
+  const handleTimeChange = (field: 'windowStart' | 'windowEnd', time: string) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const currentFieldValue = examDetails[field];
+    const currentDate = currentFieldValue ? new Date(currentFieldValue) : new Date();
+    currentDate.setHours(hours, minutes);
+    handleDetailChange(field, currentDate.toISOString());
+  };
+
   const handleNumericChange = (field: 'duration' | 'negativeMarking', value: string) => {
     const num = field === 'duration' ? parseInt(value) : parseFloat(value);
     handleDetailChange(field, isNaN(num) ? 0 : num);
@@ -97,22 +113,25 @@ export function ExamBuilder({
             <div className="space-y-2">
               <Label>Exam Window</Label>
               <div className="flex gap-2">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start font-normal">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      {examDetails.windowStart ? format(new Date(examDetails.windowStart), "PPP") : <span>Start Date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <CalendarPicker
-                      mode="single"
-                      selected={examDetails.windowStart ? new Date(examDetails.windowStart) : undefined}
-                      onSelect={(date) => handleDetailChange('windowStart', date?.toISOString() || '')}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                 <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="w-full justify-start font-normal">
+                        <Calendar className="mr-2 h-4 w-4" />
+                        {examDetails.windowStart ? format(new Date(examDetails.windowStart), "PPP") : <span>Start Date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <CalendarPicker
+                        mode="single"
+                        selected={examDetails.windowStart ? new Date(examDetails.windowStart) : undefined}
+                        onSelect={(date) => handleDateChange('windowStart', date)}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <Input type="time" value={examDetails.windowStart ? format(new Date(examDetails.windowStart), 'HH:mm') : ''} onChange={(e) => handleTimeChange('windowStart', e.target.value)} />
+              </div>
+              <div className="flex gap-2">
                  <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="w-full justify-start font-normal">
@@ -124,11 +143,12 @@ export function ExamBuilder({
                     <CalendarPicker
                       mode="single"
                       selected={examDetails.windowEnd ? new Date(examDetails.windowEnd) : undefined}
-                      onSelect={(date) => handleDetailChange('windowEnd', date?.toISOString() || '')}
+                      onSelect={(date) => handleDateChange('windowEnd', date)}
                       initialFocus
                     />
                   </PopoverContent>
                 </Popover>
+                <Input type="time" value={examDetails.windowEnd ? format(new Date(examDetails.windowEnd), 'HH:mm') : ''} onChange={(e) => handleTimeChange('windowEnd', e.target.value)} />
               </div>
             </div>
         </div>

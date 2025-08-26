@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
-import { Timer } from 'lucide-react';
+import { Timer, Clock, Home } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { format } from 'date-fns';
 
 export default function ExamPage() {
   const router = useRouter();
@@ -32,20 +33,50 @@ export default function ExamPage() {
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [timeLeft, setTimeLeft] = useState(0);
   const [startTime, setStartTime] = useState<number | null>(null);
+  const [examStarted, setExamStarted] = useState(false);
+  const [timeUntilStart, setTimeUntilStart] = useState('');
 
   useEffect(() => {
     const foundExam = savedExams.find((e) => e.id === examId);
     if (foundExam) {
       setExam(foundExam);
-      setTimeLeft(foundExam.duration * 60);
-      setStartTime(Date.now());
-    } else {
-      // Handle exam not found
     }
   }, [examId, savedExams]);
 
   useEffect(() => {
-    if (!startTime) return;
+    if (!exam) return;
+
+    const checkStartTime = () => {
+      const now = new Date().getTime();
+      const examStartTime = new Date(exam.windowStart).getTime();
+      
+      if (now >= examStartTime) {
+        setExamStarted(true);
+        setTimeLeft(exam.duration * 60);
+        setStartTime(Date.now());
+        return true;
+      } else {
+        const diff = examStartTime - now;
+        const h = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+        const s = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+        setTimeUntilStart(`${h}:${m}:${s}`);
+        return false;
+      }
+    };
+
+    if (!checkStartTime()) {
+      const interval = setInterval(() => {
+        if (checkStartTime()) {
+          clearInterval(interval);
+        }
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [exam]);
+
+  useEffect(() => {
+    if (!startTime || !examStarted) return;
 
     const timer = setInterval(() => {
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
@@ -58,7 +89,7 @@ export default function ExamPage() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [startTime, exam?.duration]);
+  }, [startTime, exam?.duration, examStarted]);
   
   const handleAnswerChange = (questionId: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));
@@ -85,14 +116,37 @@ export default function ExamPage() {
         submittedAt: new Date().toISOString()
     };
     
-    // In a real app, you would send this to a server.
-    // For now, we'll save it to local storage.
     localStorage.setItem(`submission-${examId}`, JSON.stringify(submission));
     router.push(`/exam/${examId}/results`);
   };
 
   if (!exam) {
     return <div className="flex items-center justify-center min-h-screen">Loading exam...</div>;
+  }
+
+  if (!examStarted) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-muted/20 p-4 font-body">
+        <Card className="w-full max-w-md text-center">
+          <CardHeader>
+            <CardTitle>{exam.name}</CardTitle>
+            <p className="text-muted-foreground pt-2">This exam has not started yet.</p>
+          </CardHeader>
+          <CardContent>
+            <p>It will be available on:</p>
+            <p className="font-semibold text-lg">{format(new Date(exam.windowStart), 'PPP p')}</p>
+            <div className="mt-4 flex items-center justify-center gap-2 text-2xl font-mono text-primary">
+              <Clock className="h-8 w-8" />
+              <span>{timeUntilStart}</span>
+            </div>
+          </CardContent>
+          <CardFooter className="flex-col gap-4">
+             <p className="text-sm text-muted-foreground">The page will automatically refresh when the exam begins.</p>
+             <Button onClick={() => router.push('/')} variant="outline"><Home className="mr-2"/> Back to Home</Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
   }
 
   const currentQuestion = exam.questions[currentQuestionIndex];
