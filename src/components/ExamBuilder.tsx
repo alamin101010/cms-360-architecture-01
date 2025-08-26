@@ -5,14 +5,26 @@ import type { Question } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { X, Save, Trash2, DraftingCompass, BarChartHorizontal } from 'lucide-react';
+import { X, Save, Trash2, DraftingCompass, BarChartHorizontal, Clock, Calendar } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ChartContainer, ChartConfig, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Calendar as CalendarPicker } from './ui/calendar';
+import { format } from 'date-fns';
+
+type ExamDetails = {
+  name: string;
+  duration: number;
+  negativeMarking: number;
+  windowStart: string;
+  windowEnd: string;
+}
 
 type ExamBuilderProps = {
-  examName: string;
-  setExamName: (name: string) => void;
+  examDetails: ExamDetails;
+  setExamDetails: (details: ExamDetails) => void;
   currentExamQuestions: Question[];
   onDrop: (e: DragEvent<HTMLDivElement>) => void;
   onDragOver: (e: DragEvent<HTMLDivElement>) => void;
@@ -33,8 +45,8 @@ const chartConfigBlooms: ChartConfig = {
 
 
 export function ExamBuilder({
-  examName,
-  setExamName,
+  examDetails,
+  setExamDetails,
   currentExamQuestions,
   onDrop,
   onDragOver,
@@ -52,19 +64,72 @@ export function ExamBuilder({
     level,
     count: currentExamQuestions.filter(q => q.bloomsTaxonomyLevel === level).length
   })).filter(d => d.count > 0);
+  
+  const handleDetailChange = (field: keyof ExamDetails, value: any) => {
+    setExamDetails({ ...examDetails, [field]: value });
+  }
 
   return (
-    <Card className="flex flex-col h-full overflow-hidden" onDrop={onDrop} onDragOver={onDragOver}>
+    <Card className="flex flex-col h-full overflow-hidden" >
       <CardHeader>
         <CardTitle>Exam Builder</CardTitle>
-        <CardDescription>Drag questions here to build your exam.</CardDescription>
+        <CardDescription>Configure exam details and drag questions here to build your exam.</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col gap-4 overflow-hidden">
-        <div className="flex gap-2">
-          <Input value={examName} onChange={e => setExamName(e.target.value)} placeholder="Enter exam name" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className='space-y-2'>
+                <Label htmlFor="examName">Exam Title</Label>
+                <Input id="examName" value={examDetails.name} onChange={e => handleDetailChange('name', e.target.value)} placeholder="Enter exam name" />
+            </div>
+            <div className='space-y-2'>
+                <Label htmlFor="duration">Duration (minutes)</Label>
+                <Input id="duration" type="number" value={examDetails.duration} onChange={e => handleDetailChange('duration', parseInt(e.target.value))} />
+            </div>
+             <div className='space-y-2'>
+                <Label htmlFor="negativeMarking">Negative Marking (%)</Label>
+                <Input id="negativeMarking" type="number" value={examDetails.negativeMarking} onChange={e => handleDetailChange('negativeMarking', parseFloat(e.target.value))} />
+            </div>
+            <div className="space-y-2">
+              <Label>Exam Window</Label>
+              <div className="flex gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start font-normal">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {examDetails.windowStart ? format(new Date(examDetails.windowStart), "PPP") : <span>Start Date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <CalendarPicker
+                      mode="single"
+                      selected={examDetails.windowStart ? new Date(examDetails.windowStart) : undefined}
+                      onSelect={(date) => handleDetailChange('windowStart', date?.toISOString() || '')}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                 <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start font-normal">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {examDetails.windowEnd ? format(new Date(examDetails.windowEnd), "PPP") : <span>End Date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <CalendarPicker
+                      mode="single"
+                      selected={examDetails.windowEnd ? new Date(examDetails.windowEnd) : undefined}
+                      onSelect={(date) => handleDetailChange('windowEnd', date?.toISOString() || '')}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
         </div>
         <div 
           className="flex-1 border-2 border-dashed rounded-lg p-4 bg-muted/20 flex flex-col"
+           onDrop={onDrop} onDragOver={onDragOver}
         >
           {currentExamQuestions.length === 0 ? (
             <div className="m-auto text-center text-muted-foreground">

@@ -1,0 +1,138 @@
+'use client';
+import { useState } from 'react';
+import useLocalStorage from '@/hooks/useLocalStorage';
+import type { Exam, Question } from '@/types';
+import { Header } from '@/components/Header';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { MoreHorizontal, Trash2 } from 'lucide-react';
+import { format } from 'date-fns';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
+export default function ExamsPage() {
+  const [savedExams, setSavedExams] = useLocalStorage<Exam[]>('savedExams', []);
+   const [examToDelete, setExamToDelete] = useState<string | null>(null);
+
+  const deleteExam = (id: string) => {
+    setSavedExams(savedExams.filter((exam) => exam.id !== id));
+    setExamToDelete(null);
+  };
+
+  return (
+    <div className="flex flex-col min-h-screen bg-background text-foreground font-body">
+      <Header savedExams={savedExams} />
+      <main className="flex-1 p-4 md:p-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Saved Exams</CardTitle>
+            <CardDescription>
+              Here is a list of all the exams you have created and saved.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Exam Name</TableHead>
+                  <TableHead>Questions</TableHead>
+                  <TableHead>Duration</TableHead>
+                  <TableHead>Created At</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {savedExams.length > 0 ? (
+                  savedExams.map((exam) => (
+                    <TableRow key={exam.id}>
+                      <TableCell className="font-medium">{exam.name}</TableCell>
+                      <TableCell>{exam.questions.length}</TableCell>
+                      <TableCell>{exam.duration} mins</TableCell>
+                      <TableCell>
+                        {format(new Date(exam.createdAt), 'PPP')}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                             <AlertDialogTrigger asChild>
+                                <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setExamToDelete(exam.id)}}>
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Delete
+                                </DropdownMenuItem>
+                             </AlertDialogTrigger>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className="h-24 text-center text-muted-foreground"
+                    >
+                      No saved exams yet.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </main>
+       <AlertDialog open={!!examToDelete} onOpenChange={(open) => !open && setExamToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the exam.
+            </redDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setExamToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => examToDelete && deleteExam(examToDelete)}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}

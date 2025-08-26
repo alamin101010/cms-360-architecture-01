@@ -11,10 +11,17 @@ import { useToast } from '@/hooks/use-toast';
 import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function Home() {
-  const [questions, setQuestions] = useState<Question[]>(allQuestions);
-  const [questionSets, setQuestionSets] = useState<QuestionSet[]>(allQuestionSets);
+  const [questions, setQuestions] = useLocalStorage<Question[]>('allQuestions', allQuestions);
+  const [questionSets, setQuestionSets] = useLocalStorage<QuestionSet[]>('allQuestionSets', allQuestionSets);
   const [currentExamQuestions, setCurrentExamQuestions] = useState<Question[]>([]);
-  const [examName, setExamName] = useState('New Exam');
+  const [examDetails, setExamDetails] = useState({
+    name: 'New Exam',
+    duration: 60,
+    negativeMarking: 0,
+    windowStart: '',
+    windowEnd: '',
+  });
+
   const [savedExams, setSavedExams] = useLocalStorage<Exam[]>('savedExams', []);
   const { toast } = useToast();
 
@@ -53,13 +60,20 @@ export default function Home() {
     toast({ title: `${questionsWithIds.length} AI-suggested questions added to the bank.` });
     return questionsWithIds;
   };
+
+  const addImportedQuestions = (newQuestions: Omit<Question, 'id'>[]) => {
+    const uniqueNewQuestions = newQuestions.filter(nq => !questions.some(q => q.text === nq.text));
+    const questionsWithIds: Question[] = uniqueNewQuestions.map((q, i) => ({...q, id: `import-${Date.now()}-${i}`}));
+    setQuestions(prev => [...prev, ...questionsWithIds]);
+    toast({ title: `${questionsWithIds.length} imported questions added to the bank.` });
+  };
   
   const removeQuestionFromExam = (questionId: string) => {
     setCurrentExamQuestions(prev => prev.filter(q => q.id !== questionId));
   };
   
   const saveExam = () => {
-    if (examName.trim() === '' || currentExamQuestions.length === 0) {
+    if (examDetails.name.trim() === '' || currentExamQuestions.length === 0) {
       toast({
         variant: 'destructive',
         title: 'Cannot save exam',
@@ -69,19 +83,28 @@ export default function Home() {
     }
     const newExam: Exam = {
       id: `exam-${Date.now()}`,
-      name: examName,
+      name: examDetails.name,
       questions: currentExamQuestions,
       createdAt: new Date().toISOString(),
+      duration: examDetails.duration,
+      negativeMarking: examDetails.negativeMarking,
+      windowStart: examDetails.windowStart,
+      windowEnd: examDetails.windowEnd,
     };
     setSavedExams([...savedExams, newExam]);
     toast({ title: 'Exam saved successfully!' });
-    setExamName('New Exam');
-    setCurrentExamQuestions([]);
+    clearExam();
   };
 
   const clearExam = () => {
     setCurrentExamQuestions([]);
-    setExamName('New Exam');
+    setExamDetails({
+      name: 'New Exam',
+      duration: 60,
+      negativeMarking: 0,
+      windowStart: '',
+      windowEnd: '',
+    });
     toast({ title: 'Exam cleared.' });
   }
 
@@ -93,10 +116,11 @@ export default function Home() {
           questions={questions}
           questionSets={questionSets}
           addSuggestedQuestions={addSuggestedQuestions}
+          addImportedQuestions={addImportedQuestions}
         />
         <ExamBuilder
-          examName={examName}
-          setExamName={setExamName}
+          examDetails={examDetails}
+          setExamDetails={setExamDetails}
           currentExamQuestions={currentExamQuestions}
           onDrop={handleDrop}
           onDragOver={handleDragOver}

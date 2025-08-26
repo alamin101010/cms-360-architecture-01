@@ -6,6 +6,8 @@ export type Question = {
   class: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   bloomsTaxonomyLevel: 'Remembering' | 'Understanding' | 'Applying' | 'Analyzing' | 'Evaluating' | 'Creating';
+  options?: string[];
+  answer?: string;
 };
 
 export type QuestionSet = {
@@ -20,4 +22,8 @@ export type Exam = {
   name: string;
   questions: Question[];
   createdAt: string;
+  duration?: number; // in minutes
+  negativeMarking?: number;
+  windowStart?: string;
+  windowEnd?: string;
 };
