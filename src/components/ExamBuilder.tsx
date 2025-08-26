@@ -69,6 +69,11 @@ export function ExamBuilder({
     setExamDetails({ ...examDetails, [field]: value });
   }
 
+  const handleNumericChange = (field: 'duration' | 'negativeMarking', value: string) => {
+    const num = field === 'duration' ? parseInt(value) : parseFloat(value);
+    handleDetailChange(field, isNaN(num) ? 0 : num);
+  };
+
   return (
     <Card className="flex flex-col h-full overflow-hidden" >
       <CardHeader>
@@ -83,11 +88,11 @@ export function ExamBuilder({
             </div>
             <div className='space-y-2'>
                 <Label htmlFor="duration">Duration (minutes)</Label>
-                <Input id="duration" type="number" value={examDetails.duration} onChange={e => handleDetailChange('duration', parseInt(e.target.value))} />
+                <Input id="duration" type="number" value={examDetails.duration || ''} onChange={e => handleNumericChange('duration', e.target.value)} />
             </div>
              <div className='space-y-2'>
                 <Label htmlFor="negativeMarking">Negative Marking (%)</Label>
-                <Input id="negativeMarking" type="number" value={examDetails.negativeMarking} onChange={e => handleDetailChange('negativeMarking', parseFloat(e.target.value))} />
+                <Input id="negativeMarking" type="number" value={examDetails.negativeMarking || ''} onChange={e => handleNumericChange('negativeMarking', e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label>Exam Window</Label>
