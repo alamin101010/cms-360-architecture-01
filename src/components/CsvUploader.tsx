@@ -203,8 +203,8 @@ export function CsvUploader({ children, addImportedQuestions, existingQuestions 
             <div className="space-y-4">
                 <Tabs defaultValue="file" className='w-full'>
                     <TabsList className='grid w-full grid-cols-2'>
-                        <TabsTrigger value="file" className="data-[state=inactive]:bg-black data-[state=inactive]:text-white">Upload File</TabsTrigger>
-                        <TabsTrigger value="paste" className="data-[state=inactive]:bg-black data-[state=inactive]:text-white">Paste Text</TabsTrigger>
+                        <TabsTrigger value="file" className="data-[state=active]:bg-green-600 data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:text-black">Upload File</TabsTrigger>
+                        <TabsTrigger value="paste" className="data-[state=active]:bg-green-600 data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:text-black">Paste Text</TabsTrigger>
                     </TabsList>
                     <TabsContent value="file" className="py-4">
                         <Input type="file" accept=".csv" onChange={handleFileChange} ref={fileInputRef} className="flex-1" />
