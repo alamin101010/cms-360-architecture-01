@@ -59,10 +59,10 @@ type FilterValue = string | 'all';
 
 const FilterableSelect = ({ value, onValueChange, options, placeholder }: { value: FilterValue, onValueChange: (value: FilterValue) => void, options: string[], placeholder: string }) => {
   const [open, setOpen] = useState(false);
-  
-  const handleSelect = (selectedValue: string) => {
-    onValueChange(selectedValue === value ? 'all' : selectedValue);
-    setOpen(false);
+
+  const handleSelect = (currentValue: string) => {
+    onValueChange(currentValue === value ? 'all' : currentValue)
+    setOpen(false)
   }
   
   const displayValue = value !== 'all' ? options.find(o => o === value) || placeholder : placeholder;
@@ -87,7 +87,6 @@ const FilterableSelect = ({ value, onValueChange, options, placeholder }: { valu
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
               <CommandItem
-                value='all'
                 onSelect={() => handleSelect('all')}
               >
                 <Check
@@ -102,7 +101,9 @@ const FilterableSelect = ({ value, onValueChange, options, placeholder }: { valu
                 <CommandItem
                   key={option}
                   value={option}
-                  onSelect={() => handleSelect(option)}
+                  onSelect={(currentValue) => {
+                    handleSelect(currentValue === value ? 'all' : option)
+                  }}
                 >
                   <Check
                     className={cn(
@@ -148,8 +149,8 @@ export function QuestionBank({ questions, questionSets, addSuggestedQuestions, a
     return [...questions].sort((a, b) => {
         const dateA = new Date(a.createdAt || 0).getTime();
         const dateB = new Date(b.createdAt || 0).getTime();
-        if (dateB !== dateA) {
-            return dateB - dateA;
+        if (isNaN(dateA) || isNaN(dateB) || dateB !== dateA) {
+            return (isNaN(dateB) ? 0 : dateB) - (isNaN(dateA) ? 0 : dateA);
         }
         return a.id.localeCompare(b.id);
     });
