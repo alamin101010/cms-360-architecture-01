@@ -5,11 +5,12 @@ export type Question = {
   topic: string;
   class: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
-  bloomsTaxonomyLevel: 'Remembering' | 'Understanding' | 'Applying' | 'Analyzing' | 'Evaluating' | 'Creating' | 'Knowledge' | 'Aptitude and Attitude';
+  bloomsTaxonomyLevel: 'Remembering' | 'Understanding' | 'Applying' | 'Analyzing' | 'Evaluating' | 'Creating' | 'Knowledge' | 'Aptitude and Attitude' | string;
   type?: 'm1' | 'True / False' | 'Fill in the Blanks' | string; // m1 is MCQ
   image?: string;
   options?: { text: string; isCorrect: boolean }[];
   answer?: string; // This can be derived from options
+  createdAt?: string;
 
   // New Hierarchical Fields
   program?: string;
@@ -22,6 +23,10 @@ export type Question = {
   marks?: number;
   language?: string;
   format_type?: string;
+  explanation?: string;
+  category?: string;
+  modules?: string;
+  group_type?: string;
 };
 
 export type QuestionSet = {
@@ -41,3 +46,14 @@ export type Exam = {
   windowStart: string;
   windowEnd: string;
 };
+
+export type Submission = {
+    examId: string;
+    answers: { [questionId: string]: string };
+    submittedAt: string;
+    timeTaken: number; // in seconds
+    score: number;
+    totalQuestions: number;
+    correctAnswers: number;
+    incorrectAnswers: number;
+}

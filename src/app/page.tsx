@@ -2,6 +2,7 @@
 
 import type { DragEvent } from 'react';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import type { Question, QuestionSet, Exam } from '@/types';
 import { allQuestions, allQuestionSets } from '@/data/mock-data';
 import { Header } from '@/components/Header';
@@ -24,6 +25,7 @@ export default function Home() {
 
   const [savedExams, setSavedExams] = useLocalStorage<Exam[]>('savedExams', []);
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -55,16 +57,16 @@ export default function Home() {
 
   const addSuggestedQuestions = (newQuestions: Omit<Question, 'id'>[]) => {
     const uniqueNewQuestions = newQuestions.filter(nq => !questions.some(q => q.text === nq.text));
-    const questionsWithIds: Question[] = uniqueNewQuestions.map((q, i) => ({ ...q, id: `ai-${Date.now()}-${i}` }));
-    setQuestions(prev => [...prev, ...questionsWithIds]);
+    const questionsWithIds: Question[] = uniqueNewQuestions.map((q, i) => ({ ...q, id: `ai-${Date.now()}-${i}`, createdAt: new Date().toISOString() }));
+    setQuestions(prev => [...questionsWithIds, ...prev]);
     toast({ title: `${questionsWithIds.length} AI-suggested questions added to the bank.` });
     return questionsWithIds;
   };
 
   const addImportedQuestions = (newQuestions: Omit<Question, 'id'>[]) => {
     const uniqueNewQuestions = newQuestions.filter(nq => !questions.some(q => q.text === nq.text));
-    const questionsWithIds: Question[] = uniqueNewQuestions.map((q, i) => ({...q, id: `import-${Date.now()}-${i}`}));
-    setQuestions(prev => [...prev, ...questionsWithIds]);
+    const questionsWithIds: Question[] = uniqueNewQuestions.map((q, i) => ({...q, id: `import-${Date.now()}-${i}`, createdAt: new Date().toISOString()}));
+    setQuestions(prev => [...questionsWithIds, ...prev]);
     toast({ title: `${questionsWithIds.length} imported questions added to the bank.` });
   };
   
@@ -92,7 +94,15 @@ export default function Home() {
       windowEnd: examDetails.windowEnd,
     };
     setSavedExams([...savedExams, newExam]);
-    toast({ title: 'Exam saved successfully!' });
+    toast({ 
+        title: 'Exam saved successfully!',
+        description: `URL: /exam/${newExam.id}`,
+        action: (
+            <Button variant="outline" size="sm" onClick={() => router.push(`/exam/${newExam.id}`)}>
+                Take Exam
+            </Button>
+        )
+    });
     clearExam();
   };
 

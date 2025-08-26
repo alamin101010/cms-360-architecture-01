@@ -14,6 +14,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import type { Question } from '@/types';
@@ -37,6 +38,7 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
   const [file, setFile] = useState<File | null>(null);
   const [textData, setTextData] = useState<string>('');
   const [isParsing, setIsParsing] = useState(false);
+  const [manualTopic, setManualTopic] = useState('');
   const [previewQuestions, setPreviewQuestions] = useState<ParsedQuestion[]>([]);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -59,6 +61,7 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
     setFile(null);
     setTextData('');
     setPreviewQuestions([]);
+    setManualTopic('');
     setIsParsing(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -80,7 +83,7 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
               if (row[`options_${i}_answer`]) {
                 options.push({
                   text: row[`options_${i}_answer`],
-                  isCorrect: row[`options_${i}_is_correct`] === '1',
+                  isCorrect: row[`options_${i}_is_correct`] === '1' || row[`options_${i}_is_correct`] === true,
                 });
               }
             }
@@ -88,13 +91,13 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
             const decodedAttrs = decodeAttributes(row);
 
             const question: ParsedQuestion = {
-              text: row.title || 'No title',
+              text: row.title || 'No title provided',
               type: row.type,
               image: row.image,
               options,
               answer: options.find(o => o.isCorrect)?.text,
               subject: decodedAttrs.subject || 'Misc',
-              topic: decodedAttrs.topics || 'Misc',
+              topic: manualTopic || decodedAttrs.topics || 'Misc',
               class: decodedAttrs.class || 'Misc',
               difficulty: (decodedAttrs.difficulty as Question['difficulty']) || 'Medium',
               bloomsTaxonomyLevel: (decodedAttrs.learning_outcome as Question['bloomsTaxonomyLevel']) || 'Remembering',
@@ -102,11 +105,16 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
               paper: decodedAttrs.paper,
               chapter: decodedAttrs.chapter,
               exam_set: decodedAttrs.exam_set,
-              board: decodedAttrs.board
+              board: decodedAttrs.board,
+              explanation: row.explanation,
+              category: decodedAttrs.category,
+              modules: decodedAttrs.modules,
+              group_type: decodedAttrs.group_type,
+              marks: row.marks ? parseInt(row.marks) : 1,
             };
 
             return question;
-          });
+          }).filter(q => q.text && q.text !== 'No title provided');
 
           setPreviewQuestions(questions);
           toast({
@@ -161,25 +169,32 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
         <DialogHeader>
           <DialogTitle>Upload Questions via CSV</DialogTitle>
           <DialogDescription>
-            Select a CSV file or paste CSV data to upload. After parsing, you can preview the questions before adding them to the bank.
+            Select a CSV file or paste data. You can manually assign a topic to all imported questions.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Tabs defaultValue="file" className='w-full'>
-                <TabsList className='grid w-full grid-cols-2'>
-                    <TabsTrigger value="file">Upload File</TabsTrigger>
-                    <TabsTrigger value="paste">Paste Text</TabsTrigger>
-                </TabsList>
-                <TabsContent value="file" className="py-4">
-                    <Input type="file" accept=".csv" onChange={handleFileChange} ref={fileInputRef} className="flex-1" />
-                </TabsContent>
-                <TabsContent value="paste" className="py-4">
-                    <Textarea placeholder='Paste your CSV data here...' className='h-32' value={textData} onChange={handleTextChange}/>
-                </TabsContent>
-            </Tabs>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            <div className="space-y-4">
+                <Tabs defaultValue="file" className='w-full'>
+                    <TabsList className='grid w-full grid-cols-2'>
+                        <TabsTrigger value="file">Upload File</TabsTrigger>
+                        <TabsTrigger value="paste">Paste Text</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="file" className="py-4">
+                        <Input type="file" accept=".csv" onChange={handleFileChange} ref={fileInputRef} className="flex-1" />
+                    </TabsContent>
+                    <TabsContent value="paste" className="py-4">
+                        <Textarea placeholder='Paste your CSV data here...' className='h-32' value={textData} onChange={handleTextChange}/>
+                    </TabsContent>
+                </Tabs>
+                 <div>
+                    <Label htmlFor="manual-topic">Manual Topic (Optional)</Label>
+                    <Input id="manual-topic" placeholder="e.g., Final Exam Batch A" value={manualTopic} onChange={(e) => setManualTopic(e.target.value)} />
+                    <p className="text-xs text-muted-foreground mt-1">This topic will override any topic from the CSV for this batch.</p>
+                </div>
+            </div>
         
-            <div className="flex items-end justify-end">
+            <div className="flex items-end justify-end h-full">
               <Button onClick={handleParse} disabled={(!file && !textData) || isParsing}>
                 {isParsing ? 'Parsing...' : 'Parse & Preview'}
               </Button>
@@ -187,7 +202,7 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
         </div>
         
         {previewQuestions.length > 0 && (
-          <div className="flex-1 flex flex-col overflow-hidden border rounded-md">
+          <div className="flex-1 flex flex-col overflow-hidden border rounded-md mt-4">
             <h3 className="text-lg font-semibold p-4 border-b">Question Preview ({previewQuestions.length})</h3>
             <ScrollArea className="flex-1">
               <Table>
@@ -208,7 +223,7 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
                         <ul className="space-y-1">
                           {q.options?.map((opt, index) => (
                             <li key={index} className="flex items-center text-sm">
-                              {opt.isCorrect ? <CheckCircle className="h-4 w-4 mr-2 text-green-500" /> : <XCircle className="h-4 w-4 mr-2 text-red-500" />}
+                              {opt.isCorrect ? <CheckCircle className="h-4 w-4 mr-2 text-green-500 flex-shrink-0" /> : <XCircle className="h-4 w-4 mr-2 text-red-500 flex-shrink-0" />}
                               {opt.text}
                             </li>
                           ))}
@@ -216,10 +231,16 @@ export function CsvUploader({ children, addImportedQuestions }: CsvUploaderProps
                       </TableCell>
                       <TableCell className="max-w-xs align-top">
                          <div className="flex flex-wrap gap-1">
-                            <Badge variant="outline">Class: {q.class}</Badge>
-                            <Badge variant="outline">Subject: {q.subject}</Badge>
-                            <Badge variant="outline">Topic: {q.topic}</Badge>
-                            <Badge variant="outline">Difficulty: {q.difficulty}</Badge>
+                            {q.class && <Badge variant="outline">Class: {q.class}</Badge>}
+                            {q.subject && <Badge variant="outline">Subject: {q.subject}</Badge>}
+                            {q.topic && <Badge variant="outline">Topic: {q.topic}</Badge>}
+                            {q.difficulty && <Badge variant="outline">Difficulty: {q.difficulty}</Badge>}
+                            {q.program && <Badge variant="outline">Program: {q.program}</Badge>}
+                            {q.paper && <Badge variant="outline">Paper: {q.paper}</Badge>}
+                            {q.chapter && <Badge variant="outline">Chapter: {q.chapter}</Badge>}
+                            {q.exam_set && <Badge variant="outline">Exam Set: {q.exam_set}</Badge>}
+                            {q.board && <Badge variant="outline">Board: {q.board}</Badge>}
+                            {q.bloomsTaxonomyLevel && <Badge variant="outline">Bloom's: {q.bloomsTaxonomyLevel}</Badge>}
                          </div>
                       </TableCell>
                     </TableRow>
