@@ -1,16 +1,8 @@
-import { BookMarked, History, FileText } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { BookMarked } from 'lucide-react';
 import { Button } from "@/components/ui/button"
 import type { Exam } from '@/types';
-import { format } from 'date-fns';
 import Link from 'next/link';
+import { ThemeToggle } from './ThemeToggle';
 
 type HeaderProps = {
   savedExams: Exam[];
@@ -25,15 +17,17 @@ export function Header({ savedExams }: HeaderProps) {
           EdFlex Exam Builder
         </h1>
       </Link>
-      <nav className="flex items-center gap-4">
-        <Button asChild variant="ghost">
-            <Link href="/">Exam Builder</Link>
-        </Button>
-        <Button asChild variant="ghost">
-            <Link href="/exams">Saved Exams</Link>
-        </Button>
-      </nav>
-      <div></div>
+      <div className="flex items-center gap-4">
+        <nav className="flex items-center gap-2">
+            <Button asChild variant="ghost">
+                <Link href="/">Exam Builder</Link>
+            </Button>
+            <Button asChild variant="ghost">
+                <Link href="/exams">Saved Exams</Link>
+            </Button>
+        </nav>
+        <ThemeToggle />
+      </div>
     </header>
   );
 }
