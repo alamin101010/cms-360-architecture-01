@@ -360,23 +360,24 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
   }
 
   const AttributeDiff = ({ label, oldVal, newVal, mergedVal }: { label: string, oldVal: any, newVal: any, mergedVal: any }) => {
-    const oldArr = Array.isArray(oldVal) ? oldVal : (oldVal ? [oldVal] : []);
-    const mergedArr = Array.isArray(mergedVal) ? mergedVal : (mergedVal ? [mergedVal] : []);
+    const oldArr = Array.isArray(oldVal) ? oldVal.filter(Boolean).sort() : (oldVal ? [String(oldVal)] : []);
+    const mergedArr = Array.isArray(mergedVal) ? mergedVal.filter(Boolean).sort() : (mergedVal ? [String(mergedVal)] : []);
     
-    if (JSON.stringify(oldArr.sort()) === JSON.stringify(mergedArr.sort())) {
+    if (JSON.stringify(oldArr) === JSON.stringify(mergedArr)) {
         return <AttributeBadge label={label} value={oldArr} />;
     }
 
     const added = mergedArr.filter(v => !oldArr.includes(v));
+    const removed = oldArr.filter(v => !mergedArr.includes(v)); // Should be empty with current logic, but good for future
 
-    if (added.length === 0) {
+    if (added.length === 0 && removed.length === 0) {
         return <AttributeBadge label={label} value={oldArr} />;
     }
     
     return (
         <div className="flex items-center gap-1 text-xs border rounded-full px-2 py-0.5 bg-green-50 text-green-800 border-green-200">
             <span>{label}:</span>
-            <span className="text-muted-foreground line-through">{oldArr.join(', ')}</span>
+            {oldArr.length > 0 && <span className="text-muted-foreground line-through">{oldArr.join(', ')}</span>}
             <span className="font-semibold">{mergedArr.join(', ')}</span>
         </div>
     );
