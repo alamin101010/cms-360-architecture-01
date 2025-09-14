@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -31,8 +32,14 @@ export default function ResultsPage() {
     unanswered: number;
     answeredQuestions: (Question & {userAnswer?: string, isCorrect?: boolean})[]
   } | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
     const subData = localStorage.getItem(`submission-${examId}`);
     const foundExam = savedExams.find((e) => e.id === examId);
 
@@ -41,7 +48,7 @@ export default function ResultsPage() {
         setSubmission(parsedSub);
         setExam(foundExam);
     }
-  }, [examId, savedExams]);
+  }, [examId, savedExams, isClient]);
 
   useEffect(() => {
       if(submission && exam) {
@@ -72,7 +79,11 @@ export default function ResultsPage() {
             answeredQuestions
         });
       }
-  }, [submission, exam])
+  }, [submission, exam]);
+  
+  if (!isClient) {
+    return <div className="flex items-center justify-center min-h-screen">Calculating results...</div>;
+  }
 
   if (!results || !exam) {
     return <div className="flex items-center justify-center min-h-screen">Calculating results...</div>;

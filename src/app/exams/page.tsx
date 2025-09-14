@@ -1,5 +1,6 @@
+
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import type { Exam } from '@/types';
@@ -43,6 +44,11 @@ export default function ExamsPage() {
   const [savedExams, setSavedExams] = useLocalStorage<Exam[]>('savedExams', []);
   const [examToDelete, setExamToDelete] = useState<string | null>(null);
   const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const deleteExam = (id: string) => {
     setSavedExams(savedExams.filter((exam) => exam.id !== id));
@@ -51,6 +57,10 @@ export default function ExamsPage() {
   
   const takeExam = (id: string) => {
     router.push(`/exam/${id}`);
+  }
+
+  if (!isClient) {
+    return null;
   }
 
   return (

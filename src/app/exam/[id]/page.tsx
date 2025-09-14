@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -35,16 +36,22 @@ export default function ExamPage() {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [examStarted, setExamStarted] = useState(false);
   const [timeUntilStart, setTimeUntilStart] = useState('');
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
     const foundExam = savedExams.find((e) => e.id === examId);
     if (foundExam) {
       setExam(foundExam);
     }
-  }, [examId, savedExams]);
+  }, [examId, savedExams, isClient]);
 
   useEffect(() => {
-    if (!exam) return;
+    if (!exam || !isClient) return;
 
     const checkStartTime = () => {
       const now = new Date().getTime();
@@ -73,10 +80,10 @@ export default function ExamPage() {
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [exam]);
+  }, [exam, isClient]);
 
   useEffect(() => {
-    if (!startTime || !examStarted) return;
+    if (!startTime || !examStarted || !isClient) return;
 
     const timer = setInterval(() => {
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
@@ -89,7 +96,7 @@ export default function ExamPage() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [startTime, exam?.duration, examStarted]);
+  }, [startTime, exam?.duration, examStarted, isClient]);
   
   const handleAnswerChange = (questionId: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));
@@ -119,6 +126,10 @@ export default function ExamPage() {
     localStorage.setItem(`submission-${examId}`, JSON.stringify(submission));
     router.push(`/exam/${examId}/results`);
   };
+
+  if (!isClient) {
+    return <div className="flex items-center justify-center min-h-screen">Loading exam...</div>;
+  }
 
   if (!exam) {
     return <div className="flex items-center justify-center min-h-screen">Loading exam...</div>;
