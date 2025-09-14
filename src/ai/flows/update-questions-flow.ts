@@ -6,10 +6,10 @@
  * - updateQuestions - A function that overwrites the mock data file with new questions.
  */
 
-import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
-import { generate } from 'genkit';
+import * as fs from 'fs';
+import * as path from 'path';
 import type { Question } from '@/types';
+import { z } from 'zod';
 
 
 const QuestionSchema = z.object({
@@ -43,38 +43,20 @@ const QuestionSchema = z.object({
 const UpdateQuestionsInputSchema = z.array(QuestionSchema);
 export type UpdateQuestionsInput = z.infer<typeof UpdateQuestionsInputSchema>;
 
-export async function updateQuestions(
-  input: UpdateQuestionsInput
-): Promise<void> {
-  return updateQuestionsFlow(input);
-}
 
-const updateQuestionsFlow = ai.defineFlow(
-  {
-    name: 'updateQuestionsFlow',
-    inputSchema: UpdateQuestionsInputSchema,
-    outputSchema: z.void(),
-  },
-  async (questions) => {
-    // Generate the file content as a string
-    const fileContent = `import type { Question } from '@/types';
+export async function updateQuestions(questions: UpdateQuestionsInput): Promise<void> {
+  const filePath = path.join(process.cwd(), 'src', 'data', 'mock-data.ts');
+  
+  // To prevent circular dependencies or complex regeneration, we'll just store the JSON data.
+  const fileContent = `import type { Question } from '@/types';
 
 export const allQuestions: Question[] = ${JSON.stringify(questions, null, 2)};
 `;
 
-    // Use the `generate` function with a prompt that uses `{{file}}`
-    await generate({
-        prompt: `Update the file src/data/mock-data.ts with the following content:
-        
-        {{file "src/data/mock-data.ts"}}
-        ${"```ts"}
-        ${fileContent}
-        ${"```"}
-        `,
-        model: 'googleai/gemini-2.5-flash',
-        config: {
-          temperature: 0, // Set temperature to 0 for deterministic output
-        },
-    });
+  try {
+    fs.writeFileSync(filePath, fileContent, 'utf8');
+  } catch (error) {
+    console.error('Failed to write questions file:', error);
+    throw new Error('Failed to update questions in the backend.');
   }
-);
+}
