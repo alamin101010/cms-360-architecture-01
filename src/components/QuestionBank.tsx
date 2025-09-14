@@ -119,10 +119,12 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
     questions.forEach(q => {
       const topicKeys = Array.isArray(q.topic) ? q.topic : [q.topic || 'Uncategorized'];
       topicKeys.forEach(topicKey => {
-         if (!topics[topicKey]) {
-           topics[topicKey] = [];
+         if (topicKey) {
+            if (!topics[topicKey]) {
+                topics[topicKey] = [];
+            }
+            topics[topicKey].push(q);
          }
-         topics[topicKey].push(q);
       });
     });
 
@@ -361,7 +363,7 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
             }}
         />
     )}
-     {questionToEdit && (
+    {questionToEdit && (
         <EditQuestionDialog
             question={questionToEdit}
             isOpen={!!questionToEdit}
@@ -382,7 +384,7 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
             }}
         />
     )}
-     <AlertDialog open={!!questionToDelete} onOpenChange={(open) => !open && setQuestionToDelete(null)}>
+    <AlertDialog open={!!questionToDelete} onOpenChange={(open) => !open && setQuestionToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -397,8 +399,8 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
-      <AlertDialog open={questionsToDelete.length > 0} onOpenChange={(open) => !open && setQuestionsToDelete([])}>
+    </AlertDialog>
+    <AlertDialog open={questionsToDelete.length > 0} onOpenChange={(open) => !open && setQuestionsToDelete([])}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -413,7 +415,7 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+    </AlertDialog>
     </>
   );
 }
