@@ -46,8 +46,8 @@ type DuplicateQuestionInfo = {
 
 // Helper function to merge attributes. It ensures values are arrays and unique.
 const mergeAttribute = (val1: any, val2: any): string[] => {
-    const arr1 = Array.isArray(val1) ? val1 : (val1 ? [val1] : []);
-    const arr2 = Array.isArray(val2) ? val2 : (val2 ? [val2] : []);
+    const arr1 = Array.isArray(val1) ? val1 : (val1 ? [String(val1)] : []);
+    const arr2 = Array.isArray(val2) ? val2 : (val2 ? [String(val2)] : []);
     return [...new Set([...arr1, ...arr2])].filter(v => v); // Filter out empty/null values
 };
 
@@ -561,10 +561,3 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
     </Dialog>
   );
 }
-
-    
-    
-
-    
-
-    
