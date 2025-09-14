@@ -114,6 +114,7 @@ export const allQuestions: Question[] = [
     ],
     "program": [
       "10MS Townhall",
+      "College Admission Course - 2022",
       "Medical Dreamers"
     ],
     "paper": [
