@@ -99,17 +99,21 @@ export const allQuestions: Question[] = [
     ],
     "answer": "পলিহাইড্রিক",
     "subject": [
-      "Bangla"
+      "Bangla",
+      "Science"
     ],
     "topic": [
+      "Misc",
+      "Test topic",
       "asds",
       "asds 1",
+      "test topic",
       "test topic physics"
     ],
     "class": [
       "Misc"
     ],
-    "difficulty": "Medium",
+    "difficulty": "Hard",
     "bloomsTaxonomyLevel": "Remembering",
     "vertical": [
       "English",

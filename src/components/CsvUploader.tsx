@@ -179,7 +179,7 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
 
                 const mergedData: Question = {
                     ...baseQuestion,
-                    // Merge attributes
+                    // Merge multi-value attributes
                     subject: mergeAttribute(baseQuestion.subject, newQuestionData.subject),
                     topic: mergeAttribute(baseQuestion.topic, newQuestionData.topic),
                     class: mergeAttribute(baseQuestion.class, newQuestionData.class),
@@ -191,12 +191,17 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
                     board: mergeAttribute(baseQuestion.board, newQuestionData.board),
                     category: mergeAttribute(baseQuestion.category, newQuestionData.category),
                     modules: mergeAttribute(baseQuestion.modules, newQuestionData.modules),
-                    // Overwrite some fields if they are new
+
+                    // Overwrite single-value fields only if they are new
                     difficulty: newQuestionData.difficulty || baseQuestion.difficulty,
                     bloomsTaxonomyLevel: newQuestionData.bloomsTaxonomyLevel || baseQuestion.bloomsTaxonomyLevel,
                     explanation: newQuestionData.explanation || baseQuestion.explanation,
                     marks: newQuestionData.marks || baseQuestion.marks,
-                    options: newQuestionData.options && newQuestionData.options.length > 0 ? newQuestionData.options : baseQuestion.options,
+                    options: (newQuestionData.options && newQuestionData.options.length > 0) ? newQuestionData.options : baseQuestion.options,
+                    type: newQuestionData.type || baseQuestion.type,
+                    image: newQuestionData.image || baseQuestion.image,
+                    answer: newQuestionData.answer || baseQuestion.answer,
+                    group_type: newQuestionData.group_type || baseQuestion.group_type,
                 };
                 
                 const duplicateInfo = { existingQuestion, newQuestionData, mergedData };
