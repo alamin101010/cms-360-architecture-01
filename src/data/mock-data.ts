@@ -179,7 +179,10 @@ export const allQuestions: Question[] = [
       "Higher Math"
     ],
     "topic": [
+      "Misc",
+      "New topic",
       "Test duplicate",
+      "test topic 1",
       "অধ্যায় ২: জৈব রসায়ন"
     ],
     "class": [
@@ -193,7 +196,8 @@ export const allQuestions: Question[] = [
     "program": [
       "10MS Townhall",
       "Bank Jobs Question Solve & Model Test",
-      "College Admission Course - 2022"
+      "College Admission Course - 2022",
+      "HSC 2023 শর্ট সিলেবাস ক্র্যাশ কোর্স [বিজ্ঞান বিভাগ]"
     ],
     "paper": [
       "1st Paper"
