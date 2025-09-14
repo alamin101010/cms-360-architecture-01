@@ -26,7 +26,8 @@ export const allQuestions: Question[] = [
     "answer": "ওয়েস্ট্রন",
     "subject": [
       "Bangla",
-      "Science"
+      "Science",
+      "Biology"
     ],
     "topic": [
       "asds"
@@ -34,7 +35,7 @@ export const allQuestions: Question[] = [
     "class": [
       "Misc"
     ],
-    "difficulty": "Hard",
+    "difficulty": "Medium",
     "bloomsTaxonomyLevel": "Remembering",
     "vertical": [
       "K-12",
@@ -43,13 +44,16 @@ export const allQuestions: Question[] = [
     "program": [
       "HSC 23 Business Studies",
       "Admission 23 A unit",
-      "HSC 26 Online Batch"
+      "HSC 26 Online Batch",
+      "HSC 2023 শর্ট সিলেবাস ক্র্যাশ কোর্স [বিজ্ঞান বিভাগ]"
     ],
     "paper": [
-      "2nd Paper"
+      "2nd Paper",
+      "1st Paper"
     ],
     "chapter": [
-      "Chapter 4"
+      "Chapter 4",
+      "Chapter 5"
     ],
     "explanation": "ভার্নিস, পেইন্ট, তৈল ও চর্বির দ্রাবকরূপে ভারী অদাহ্য তরল অ্যাসিটিলিন টেট্রাক্লোরাইড (〖𝐶𝐻𝐶𝑙〗_2−〖𝐶𝐻𝐶𝑙〗_2) বা ওয়েস্ট্রন (Westron) ব্যবহৃত হয়।",
     "marks": 1,
@@ -87,7 +91,8 @@ export const allQuestions: Question[] = [
     "answer": "অধাতুর সাথে বিক্রিয়া",
     "subject": [
       "Bangla",
-      "Science"
+      "Science",
+      "Biology"
     ],
     "topic": [
       "asds"
@@ -95,7 +100,7 @@ export const allQuestions: Question[] = [
     "class": [
       "Misc"
     ],
-    "difficulty": "Hard",
+    "difficulty": "Medium",
     "bloomsTaxonomyLevel": "Remembering",
     "vertical": [
       "K-12",
@@ -103,13 +108,16 @@ export const allQuestions: Question[] = [
     ],
     "program": [
       "HSC 23 Business Studies",
-      "HSC 26 Online Batch"
+      "HSC 26 Online Batch",
+      "HSC 2023 শর্ট সিলেবাস ক্র্যাশ কোর্স [বিজ্ঞান বিভাগ]"
     ],
     "paper": [
-      "2nd Paper"
+      "2nd Paper",
+      "1st Paper"
     ],
     "chapter": [
-      "Chapter 4"
+      "Chapter 4",
+      "Chapter 5"
     ],
     "explanation": "অ্যালকাইল হ্যালাইড ধাতুর সাথে বিক্রিয়া দেয়।",
     "marks": 1,
@@ -147,7 +155,8 @@ export const allQuestions: Question[] = [
     "answer": "পলিহাইড্রিক",
     "subject": [
       "Bangla",
-      "Science"
+      "Science",
+      "Biology"
     ],
     "topic": [
       "Misc",
@@ -161,7 +170,7 @@ export const allQuestions: Question[] = [
     "class": [
       "Misc"
     ],
-    "difficulty": "Hard",
+    "difficulty": "Medium",
     "bloomsTaxonomyLevel": "Remembering",
     "vertical": [
       "English",
@@ -169,13 +178,16 @@ export const allQuestions: Question[] = [
     ],
     "program": [
       "HSC 23 Business Studies",
-      "HSC 26 Online Batch"
+      "HSC 26 Online Batch",
+      "HSC 2023 শর্ট সিলেবাস ক্র্যাশ কোর্স [বিজ্ঞান বিভাগ]"
     ],
     "paper": [
-      "2nd Paper"
+      "2nd Paper",
+      "1st Paper"
     ],
     "chapter": [
-      "Chapter 4"
+      "Chapter 4",
+      "Chapter 5"
     ],
     "exam_set": [],
     "board": [
@@ -1154,16 +1166,6 @@ export const allQuestions: Question[] = [
     "createdAt": "2025-09-14T16:00:12.067Z"
   },
   {
-    "id": "q4",
-    "text": "Analyze the main causes of World War II.",
-    "subject": "History",
-    "topic": "World History",
-    "class": "10th Grade",
-    "difficulty": "Hard",
-    "bloomsTaxonomyLevel": "Analyzing",
-    "createdAt": "2025-09-14T16:00:12.067Z"
-  },
-  {
     "id": "q5",
     "text": "Evaluate the impact of the internet on modern society.",
     "subject": "Social Studies",
@@ -1171,46 +1173,6 @@ export const allQuestions: Question[] = [
     "class": "11th Grade",
     "difficulty": "Hard",
     "bloomsTaxonomyLevel": "Evaluating",
-    "createdAt": "2025-09-14T16:00:12.067Z"
-  },
-  {
-    "id": "q6",
-    "text": "Design an experiment to test the effect of light on plant growth.",
-    "subject": "Biology",
-    "topic": "Plant Biology",
-    "class": "9th Grade",
-    "difficulty": "Hard",
-    "bloomsTaxonomyLevel": "Creating",
-    "createdAt": "2025-09-14T16:00:12.067Z"
-  },
-  {
-    "id": "q7",
-    "text": "What is the formula for calculating the area of a circle?",
-    "subject": "Mathematics",
-    "topic": "Geometry",
-    "class": "8th Grade",
-    "difficulty": "Easy",
-    "bloomsTaxonomyLevel": "Remembering",
-    "createdAt": "2025-09-14T16:00:12.067Z"
-  },
-  {
-    "id": "q8",
-    "text": "Compare and contrast mitosis and meiosis.",
-    "subject": "Biology",
-    "topic": "Cell Biology",
-    "class": "10th Grade",
-    "difficulty": "Medium",
-    "bloomsTaxonomyLevel": "Understanding",
-    "createdAt": "2025-09-14T16:00:12.067Z"
-  },
-  {
-    "id": "q9",
-    "text": "If a car travels at 60 km/h, how far will it travel in 2.5 hours?",
-    "subject": "Physics",
-    "topic": "Kinematics",
-    "class": "10th Grade",
-    "difficulty": "Medium",
-    "bloomsTaxonomyLevel": "Applying",
     "createdAt": "2025-09-14T16:00:12.067Z"
   },
   {
