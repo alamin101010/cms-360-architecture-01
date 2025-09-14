@@ -1,3 +1,4 @@
+
 'use client';
 import {
   Dialog,
@@ -26,6 +27,18 @@ export function QuestionSetDetailsDialog({ questionSet, allQuestions, isOpen, on
 
   const questionsInSet = allQuestions.filter(q => questionSet.questionIds.includes(q.id));
 
+  const AttributeBadges = ({ question }: { question: Question }) => {
+    const { subject, difficulty } = question;
+    const subjects = Array.isArray(subject) ? subject : (subject ? [subject] : []);
+    
+    return (
+      <div className="flex flex-wrap gap-2 mt-2">
+        {subjects.map((s, i) => <Badge key={`sub-${i}`} variant="secondary">{s}</Badge>)}
+        {difficulty && <Badge variant="outline">{difficulty}</Badge>}
+      </div>
+    );
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
@@ -41,10 +54,7 @@ export function QuestionSetDetailsDialog({ questionSet, allQuestions, isOpen, on
                   {questionsInSet.map(question => (
                       <div key={question.id} className="border p-4 rounded-lg">
                           <p className="font-semibold">{question.text}</p>
-                          <div className="flex flex-wrap gap-2 mt-2">
-                            {question.subject && <Badge variant="secondary">{question.subject}</Badge>}
-                            {question.difficulty && <Badge variant="outline">{question.difficulty}</Badge>}
-                          </div>
+                          <AttributeBadges question={question} />
                           <div className="flex gap-2 mt-3">
                             <Button variant="ghost" size="sm" onClick={() => onQuestionClick(question)}>
                                 <Eye className="mr-2 h-4 w-4" />

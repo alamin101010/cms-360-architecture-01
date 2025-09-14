@@ -70,7 +70,7 @@ export function QuestionCard({ question, onCardClick, onDeleteClick, onSelectTog
               {question.difficulty}
             </Badge>}
             {question.bloomsTaxonomyLevel && <Badge variant="outline">{question.bloomsTaxonomyLevel}</Badge>}
-            <AttributeBadge value={question.topic?.toString().replace(/,/g, ', ')} />
+            <AttributeBadge value={question.topic} />
           </div>
         </div>
       </div>

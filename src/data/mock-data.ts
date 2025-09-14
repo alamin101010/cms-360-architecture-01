@@ -62,20 +62,39 @@ export const allQuestions: Question[] = [
       }
     ],
     "answer": "সুনিয়ন্ত্রিতভাবে",
-    "subject": "Biology",
-    "topic": "অধ্যায় ১: কোষ ও এর গঠন - 01",
-    "class": "Misc",
+    "subject": [
+      "Biology"
+    ],
+    "topic": [
+      "অধ্যায় ১: কোষ ও এর গঠন - 01"
+    ],
+    "class": [
+      "Misc"
+    ],
     "difficulty": "Medium",
     "bloomsTaxonomyLevel": "Remembering",
-    "vertical": "K-12",
-    "program": "HSC 25 SMP",
-    "paper": "1st Paper",
-    "chapter": "Chapter 1",
-    "exam_set": "Set 1",
+    "vertical": [
+      "K-12"
+    ],
+    "program": [
+      "HSC 25 SMP"
+    ],
+    "paper": [
+      "1st Paper"
+    ],
+    "chapter": [
+      "Chapter 1"
+    ],
+    "exam_set": [
+      "Set 1"
+    ],
     "explanation": "",
     "marks": 1,
     "id": "import-1757865745191-1",
-    "createdAt": "2025-09-14T16:02:25.191Z"
+    "createdAt": "2025-09-14T16:02:25.191Z",
+    "board": [],
+    "category": [],
+    "modules": []
   },
   {
     "text": "সর্বপ্রথম পূর্ণাঙ্গ কেষে পর্যবেক্ষণ করেন কে?",

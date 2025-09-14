@@ -25,15 +25,15 @@ export function QuestionDetailsDialog({ question, isOpen, onOpenChange, onEditCl
   if (!question) return null;
 
   const getAttributeBadge = (label: string, value: string | string[] | undefined | null | number) => {
-    if (!value) return null;
+    if (!value || (Array.isArray(value) && value.length === 0)) return null;
     const values = Array.isArray(value) ? value : [String(value)];
 
     return (
-        <>
+        <div className="flex flex-wrap gap-1">
             {values.map((val, index) => (
                  <Badge key={`${label}-${index}`} variant="outline">{label}: {val}</Badge>
             ))}
-        </>
+        </div>
     )
   };
   
@@ -90,6 +90,7 @@ export function QuestionDetailsDialog({ question, isOpen, onOpenChange, onEditCl
                         {getAttributeBadge('Modules', question.modules)}
                         {getAttributeBadge('Group Type', question.group_type)}
                         {getAttributeBadge('Marks', question.marks?.toString())}
+                        {getAttributeBadge('Vertical', question.vertical)}
                     </div>
                 </div>
 
