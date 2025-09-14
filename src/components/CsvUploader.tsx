@@ -255,7 +255,7 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
         return;
     }
 
-    toast({ title: `${questionsToAdd.length} new questions added and ${questionsToMerge.length} existing questions merged.`})
+    toast({ title: `${questionsToAdd.length} new questions added and ${questionsToMerge.length} existing questions updated.`})
     setIsOpen(false);
     resetState();
   };
@@ -537,6 +537,8 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
     </Dialog>
   );
 }
+
+    
 
     
 
