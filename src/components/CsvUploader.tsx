@@ -168,9 +168,13 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
             if (existingQuestion) {
                 const existingDuplicateIndex = parsedDuplicates.findIndex(d => d.existingQuestion.id === existingQuestion.id);
                 
-                let baseQuestion = existingQuestion;
+                let baseQuestion: Question;
                 if (existingDuplicateIndex > -1) {
+                    // If it's already in the duplicates list, use its currently merged data as the base
                     baseQuestion = parsedDuplicates[existingDuplicateIndex].mergedData;
+                } else {
+                    // Otherwise, use the original question from the bank as the base
+                    baseQuestion = existingQuestion;
                 }
 
                 const mergedData: Question = {
@@ -198,8 +202,10 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
                 const duplicateInfo = { existingQuestion, newQuestionData, mergedData };
 
                 if (existingDuplicateIndex > -1) {
+                    // Update the existing entry in the duplicates list
                     parsedDuplicates[existingDuplicateIndex] = duplicateInfo;
                 } else {
+                    // Add a new entry to the duplicates list
                     parsedDuplicates.push(duplicateInfo);
                 }
 
@@ -505,7 +511,7 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
                                                     <TableCell className="text-center"><Checkbox checked={selectedDuplicatesForExam.includes(d.existingQuestion.id)} onCheckedChange={() => toggleSelectDuplicateForExam(d.existingQuestion.id)} /></TableCell>
                                                     <TableCell className="align-top">
                                                         <p className="font-medium">{d.existingQuestion.text}</p>
-                                                        <OptionsList options={d.newQuestionData.options} />
+                                                        <OptionsList options={d.mergedData.options || d.existingQuestion.options} />
                                                         <div className="flex flex-wrap gap-1 mt-2">
                                                             <AttributeDiff label="Class" oldVal={d.existingQuestion.class} newVal={d.newQuestionData.class} mergedVal={d.mergedData.class} />
                                                             <AttributeDiff label="Subject" oldVal={d.existingQuestion.subject} newVal={d.newQuestionData.subject} mergedVal={d.mergedData.subject} />
@@ -557,6 +563,8 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
 }
 
     
+    
+
     
 
     
