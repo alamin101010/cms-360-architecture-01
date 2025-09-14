@@ -26,14 +26,11 @@ export function QuestionDetailsDialog({ question, isOpen, onOpenChange, onEditCl
 
   const getAttributeBadge = (label: string, value: string | string[] | undefined | null | number) => {
     if (!value || (Array.isArray(value) && value.length === 0)) return null;
-    const values = Array.isArray(value) ? value : [String(value)];
+    
+    const displayValue = Array.isArray(value) ? value.join(', ') : String(value);
 
     return (
-        <div className="flex flex-wrap gap-1">
-            {values.map((val, index) => (
-                 <Badge key={`${label}-${index}`} variant="outline">{label}: {val}</Badge>
-            ))}
-        </div>
+        <Badge variant="outline">{label}: {displayValue}</Badge>
     )
   };
   
