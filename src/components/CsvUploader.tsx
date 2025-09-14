@@ -169,7 +169,7 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
               if (!parsedDuplicates.some(dq => dq.existingQuestion.id === existingQuestion.id)) {
                  const mergedData: Question = {
                    ...existingQuestion,
-                   ...Object.fromEntries(Object.entries(newQuestionData).filter(([_, v]) => v != null && v !== '')),
+                   ...Object.fromEntries(Object.entries(newQuestionData).filter(([_, v]) => v != null && v !== '' && !Array.isArray(v) && !Object.keys(existingQuestion).includes(_))),
                    // Merge attributes
                    subject: mergeAttribute(existingQuestion.subject, newQuestionData.subject),
                    topic: mergeAttribute(existingQuestion.topic, newQuestionData.topic),
@@ -182,6 +182,12 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
                    board: mergeAttribute(existingQuestion.board, newQuestionData.board),
                    category: mergeAttribute(existingQuestion.category, newQuestionData.category),
                    modules: mergeAttribute(existingQuestion.modules, newQuestionData.modules),
+                   // Overwrite some fields if they are new
+                   difficulty: newQuestionData.difficulty || existingQuestion.difficulty,
+                   bloomsTaxonomyLevel: newQuestionData.bloomsTaxonomyLevel || existingQuestion.bloomsTaxonomyLevel,
+                   explanation: newQuestionData.explanation || existingQuestion.explanation,
+                   marks: newQuestionData.marks || existingQuestion.marks,
+                   options: newQuestionData.options && newQuestionData.options.length > 0 ? newQuestionData.options : existingQuestion.options,
                  };
                  parsedDuplicates.push({ existingQuestion, newQuestionData, mergedData });
               }
@@ -537,11 +543,5 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
     </Dialog>
   );
 }
-
-    
-
-    
-
-    
 
     
