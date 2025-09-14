@@ -166,31 +166,43 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
             const existingQuestion = existingQuestionMap.get(questionText.toLowerCase());
 
             if (existingQuestion) {
-              if (!parsedDuplicates.some(dq => dq.existingQuestion.id === existingQuestion.id)) {
-                 const mergedData: Question = {
-                   ...existingQuestion,
-                   ...Object.fromEntries(Object.entries(newQuestionData).filter(([_, v]) => v != null && v !== '' && !Array.isArray(v) && !Object.keys(existingQuestion).includes(_))),
-                   // Merge attributes
-                   subject: mergeAttribute(existingQuestion.subject, newQuestionData.subject),
-                   topic: mergeAttribute(existingQuestion.topic, newQuestionData.topic),
-                   class: mergeAttribute(existingQuestion.class, newQuestionData.class),
-                   vertical: mergeAttribute(existingQuestion.vertical, newQuestionData.vertical),
-                   program: mergeAttribute(existingQuestion.program, newQuestionData.program),
-                   paper: mergeAttribute(existingQuestion.paper, newQuestionData.paper),
-                   chapter: mergeAttribute(existingQuestion.chapter, newQuestionData.chapter),
-                   exam_set: mergeAttribute(existingQuestion.exam_set, newQuestionData.exam_set),
-                   board: mergeAttribute(existingQuestion.board, newQuestionData.board),
-                   category: mergeAttribute(existingQuestion.category, newQuestionData.category),
-                   modules: mergeAttribute(existingQuestion.modules, newQuestionData.modules),
-                   // Overwrite some fields if they are new
-                   difficulty: newQuestionData.difficulty || existingQuestion.difficulty,
-                   bloomsTaxonomyLevel: newQuestionData.bloomsTaxonomyLevel || existingQuestion.bloomsTaxonomyLevel,
-                   explanation: newQuestionData.explanation || existingQuestion.explanation,
-                   marks: newQuestionData.marks || existingQuestion.marks,
-                   options: newQuestionData.options && newQuestionData.options.length > 0 ? newQuestionData.options : existingQuestion.options,
-                 };
-                 parsedDuplicates.push({ existingQuestion, newQuestionData, mergedData });
-              }
+                const existingDuplicateIndex = parsedDuplicates.findIndex(d => d.existingQuestion.id === existingQuestion.id);
+                
+                let baseQuestion = existingQuestion;
+                if (existingDuplicateIndex > -1) {
+                    baseQuestion = parsedDuplicates[existingDuplicateIndex].mergedData;
+                }
+
+                const mergedData: Question = {
+                    ...baseQuestion,
+                    // Merge attributes
+                    subject: mergeAttribute(baseQuestion.subject, newQuestionData.subject),
+                    topic: mergeAttribute(baseQuestion.topic, newQuestionData.topic),
+                    class: mergeAttribute(baseQuestion.class, newQuestionData.class),
+                    vertical: mergeAttribute(baseQuestion.vertical, newQuestionData.vertical),
+                    program: mergeAttribute(baseQuestion.program, newQuestionData.program),
+                    paper: mergeAttribute(baseQuestion.paper, newQuestionData.paper),
+                    chapter: mergeAttribute(baseQuestion.chapter, newQuestionData.chapter),
+                    exam_set: mergeAttribute(baseQuestion.exam_set, newQuestionData.exam_set),
+                    board: mergeAttribute(baseQuestion.board, newQuestionData.board),
+                    category: mergeAttribute(baseQuestion.category, newQuestionData.category),
+                    modules: mergeAttribute(baseQuestion.modules, newQuestionData.modules),
+                    // Overwrite some fields if they are new
+                    difficulty: newQuestionData.difficulty || baseQuestion.difficulty,
+                    bloomsTaxonomyLevel: newQuestionData.bloomsTaxonomyLevel || baseQuestion.bloomsTaxonomyLevel,
+                    explanation: newQuestionData.explanation || baseQuestion.explanation,
+                    marks: newQuestionData.marks || baseQuestion.marks,
+                    options: newQuestionData.options && newQuestionData.options.length > 0 ? newQuestionData.options : baseQuestion.options,
+                };
+                
+                const duplicateInfo = { existingQuestion, newQuestionData, mergedData };
+
+                if (existingDuplicateIndex > -1) {
+                    parsedDuplicates[existingDuplicateIndex] = duplicateInfo;
+                } else {
+                    parsedDuplicates.push(duplicateInfo);
+                }
+
             } else {
                if (!parsedNew.some(nq => nq.text.toLowerCase() === newQuestionData.text.toLowerCase())) {
                   parsedNew.push(newQuestionData);
@@ -544,4 +556,5 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
   );
 }
 
+    
     

@@ -2,6 +2,210 @@ import type { Question } from '@/types';
 
 export const allQuestions: Question[] = [
   {
+    "text": "শূণ্যস্থানে দুটি ইলেকট্রনের মধ্যকার কুলম্ব বল [[$$𝑭_𝑬$$]] এবং মহাকর্ষ বল [[$$𝑭_𝑮$$]]-এর অনুপাত হবে-",
+    "type": "M1",
+    "image": "",
+    "options": [
+      {
+        "text": "4.2×10[[$$^{62}$$]]",
+        "isCorrect": false
+      },
+      {
+        "text": "4.2×40[[$$^{52}$$]]",
+        "isCorrect": false
+      },
+      {
+        "text": "4.2×10[[$$^{42}$$]]",
+        "isCorrect": true
+      },
+      {
+        "text": "4.2×10[[$$^{32}$$]]",
+        "isCorrect": false
+      }
+    ],
+    "answer": "4.2×10[[$$^{42}$$]]",
+    "subject": "Physics",
+    "topic": "test physics topic",
+    "class": "Misc",
+    "difficulty": "Medium",
+    "bloomsTaxonomyLevel": "Remembering",
+    "vertical": "K-12",
+    "program": "B Unit সেকেন্ড টাইমার এডমিশন কোর্স (HSC'23)",
+    "paper": "1st Paper",
+    "chapter": "Chapter 4",
+    "explanation": "",
+    "marks": 1,
+    "id": "import-1757871575887-0",
+    "createdAt": "2025-09-14T17:39:35.887Z"
+  },
+  {
+    "text": "𝟏𝟎 𝒌𝒈 ভরের কোনো বস্তু 𝟏𝟐 𝒎𝒔[[$$^{−1}$$]] বেগে গতিশীল হলে তার ভরবেগ হবে-",
+    "type": "M1",
+    "image": "",
+    "options": [
+      {
+        "text": "12 𝑘𝑔𝑚𝑠[[$$^{−1}$$]]",
+        "isCorrect": false
+      },
+      {
+        "text": "10 𝑘𝑔𝑚𝑠[[$$^{−1}$$]]",
+        "isCorrect": false
+      },
+      {
+        "text": "120 𝑘𝑔𝑚𝑠[[$$^{−1}$$]]",
+        "isCorrect": true
+      },
+      {
+        "text": "1.2 𝑘𝑔𝑚𝑠[[$$^{−1}$$]]",
+        "isCorrect": false
+      }
+    ],
+    "answer": "120 𝑘𝑔𝑚𝑠[[$$^{−1}$$]]",
+    "subject": "Physics",
+    "topic": "test physics topic",
+    "class": "Misc",
+    "difficulty": "Medium",
+    "bloomsTaxonomyLevel": "Remembering",
+    "vertical": "K-12",
+    "program": "B Unit সেকেন্ড টাইমার এডমিশন কোর্স (HSC'23)",
+    "paper": "1st Paper",
+    "chapter": "Chapter 4",
+    "explanation": "",
+    "marks": 1,
+    "id": "import-1757871575887-1",
+    "createdAt": "2025-09-14T17:39:35.887Z"
+  },
+  {
+    "text": "𝟏𝟎 𝒌𝒈 ভরের একটি স্থির বস্তুর ওপর 𝟏𝟎𝟎 𝑵 বল প্রয়োগ করলে ত্বরণ হবে-",
+    "type": "M1",
+    "image": "",
+    "options": [
+      {
+        "text": "100 𝑚𝑠[[$$^{−2}$$]]",
+        "isCorrect": false
+      },
+      {
+        "text": "10 𝑚𝑠[[$$^{−2}$$]]",
+        "isCorrect": true
+      },
+      {
+        "text": "1000 𝑚𝑠[[$$^{−2}$$]]",
+        "isCorrect": false
+      },
+      {
+        "text": "0.1 𝑚𝑠[[$$^{−2}$$]]",
+        "isCorrect": false
+      }
+    ],
+    "answer": "10 𝑚𝑠[[$$^{−2}$$]]",
+    "subject": "Physics",
+    "topic": "test physics topic",
+    "class": "Misc",
+    "difficulty": "Medium",
+    "bloomsTaxonomyLevel": "Remembering",
+    "vertical": "K-12",
+    "program": "B Unit সেকেন্ড টাইমার এডমিশন কোর্স (HSC'23)",
+    "paper": "1st Paper",
+    "chapter": "Chapter 4",
+    "explanation": "",
+    "marks": 1,
+    "id": "import-1757871575887-2",
+    "createdAt": "2025-09-14T17:39:35.887Z"
+  },
+  {
+    "text": "একটি বল 𝟒 𝒌𝒈 ভরের স্থির বস্তুর ওপর ক্রিয়া করায় বস্তু 𝟔 সেকেন্ডে 𝟑𝟎 𝒎𝒔[[$$^{−1}$$]] বেগ প্রাপ্ত হয়। বলের মান কত?",
+    "type": "M1",
+    "image": "",
+    "options": [
+      {
+        "text": "30 𝑁",
+        "isCorrect": false
+      },
+      {
+        "text": "20 𝑁",
+        "isCorrect": true
+      },
+      {
+        "text": "18 𝑁",
+        "isCorrect": false
+      },
+      {
+        "text": "কোনোটিই নয়",
+        "isCorrect": false
+      }
+    ],
+    "answer": "20 𝑁",
+    "subject": "Physics",
+    "topic": "test physics topic",
+    "class": "Misc",
+    "difficulty": "Medium",
+    "bloomsTaxonomyLevel": "Remembering",
+    "vertical": "K-12",
+    "program": "B Unit সেকেন্ড টাইমার এডমিশন কোর্স (HSC'23)",
+    "paper": "1st Paper",
+    "chapter": "Chapter 4",
+    "explanation": "",
+    "marks": 1,
+    "id": "import-1757871575887-3",
+    "createdAt": "2025-09-14T17:39:35.887Z"
+  },
+  {
+    "text": "নিউটনের গতির দ্বিতীয় সুত্রে দেখা যায় [[$$𝒎\\underrightarrow{𝒂}=𝒌\\underrightarrow{𝑭}$$]] ; এখানে, [[$$\\\\$$]] (i) 𝑘 হচ্ছে একটি সমানুপাতিক ধ্রুবক [[$$\\\\$$]] (ii) 𝑘-এর মান রাশিগুলোর এককের ওপর নির্ভর করে [[$$\\\\$$]] (iii) 𝑘-এর মান SI পদ্ধতিতে 1 [[$$\\\\$$]] নিচের কোনটি সঠিক?",
+    "type": "M1",
+    "image": "",
+    "options": [
+      {
+        "text": "i ও ii",
+        "isCorrect": false
+      },
+      {
+        "text": "i ও iii",
+        "isCorrect": false
+      },
+      {
+        "text": "ii ও iii",
+        "isCorrect": false
+      },
+      {
+        "text": "i, ii ও iii",
+        "isCorrect": true
+      }
+    ],
+    "answer": "i, ii ও iii",
+    "subject": [
+      "Physics"
+    ],
+    "topic": [
+      "test physics topic"
+    ],
+    "class": [
+      "Misc"
+    ],
+    "difficulty": "Medium",
+    "bloomsTaxonomyLevel": "Remembering",
+    "vertical": [
+      "K-12"
+    ],
+    "program": [
+      "B Unit সেকেন্ড টাইমার এডমিশন কোর্স (HSC'23)",
+      "Online Batch 25"
+    ],
+    "paper": [
+      "1st Paper"
+    ],
+    "chapter": [
+      "Chapter 4"
+    ],
+    "exam_set": [],
+    "board": [],
+    "explanation": "",
+    "category": [],
+    "modules": [],
+    "marks": 1,
+    "id": "import-1757871575887-4",
+    "createdAt": "2025-09-14T17:39:35.887Z"
+  },
+  {
     "text": "কোনটি বিউটানোনের রাসায়নিক সংকেত?",
     "type": "M1",
     "image": "",
