@@ -49,9 +49,9 @@ type FilterValue = string | null;
 
 
 export function QuestionBank({ questions, addSuggestedQuestions, addImportedQuestions, addMultipleQuestionsToExam, addQuestionsToExam, deleteQuestion, deleteMultipleQuestions, updateQuestion, updateMultipleQuestions }: QuestionBankProps) {
-  const [isClient, setIsClient] = useState(false);
+  const [mounted, setMounted] = useState(false);
   useEffect(() => {
-    setIsClient(true);
+    setMounted(true);
   }, []);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -77,7 +77,6 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
   const { toast } = useToast();
 
   const sortedQuestions = useMemo(() => {
-    if (!isClient) return [];
     return [...questions].sort((a, b) => {
         const dateA = new Date(a.createdAt || 0).getTime();
         const dateB = new Date(b.createdAt || 0).getTime();
@@ -86,7 +85,7 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
         }
         return a.id.localeCompare(b.id);
     });
-  }, [questions, isClient]);
+  }, [questions]);
 
   const doesValueMatch = (questionValue: string | string[] | undefined, filterValue: string) => {
     if (!questionValue) return false;
@@ -95,6 +94,7 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
   }
 
   const filteredQuestions = useMemo(() => {
+    if (!mounted) return [];
     return sortedQuestions.filter(q =>
       q &&
       // Search term logic
@@ -113,7 +113,7 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
       (!difficulty || q.difficulty === difficulty) &&
       (!board || doesValueMatch(q.board, board))
     );
-  }, [sortedQuestions, searchTerm, vertical, program, subject, paper, chapter, examSet, topic, difficulty, board]);
+  }, [sortedQuestions, searchTerm, vertical, program, subject, paper, chapter, examSet, topic, difficulty, board, mounted]);
 
   const questionSets = useMemo(() => {
     const topics: { [key: string]: Question[] } = {};

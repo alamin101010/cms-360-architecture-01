@@ -32,14 +32,14 @@ export default function ResultsPage() {
     unanswered: number;
     answeredQuestions: (Question & {userAnswer?: string, isCorrect?: boolean})[]
   } | null>(null);
-  const [isClient, setIsClient] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
+    setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (!isClient) return;
+    if (!mounted) return;
     const subData = localStorage.getItem(`submission-${examId}`);
     const foundExam = savedExams.find((e) => e.id === examId);
 
@@ -48,7 +48,7 @@ export default function ResultsPage() {
         setSubmission(parsedSub);
         setExam(foundExam);
     }
-  }, [examId, savedExams, isClient]);
+  }, [examId, savedExams, mounted]);
 
   useEffect(() => {
       if(submission && exam) {
@@ -81,11 +81,7 @@ export default function ResultsPage() {
       }
   }, [submission, exam]);
   
-  if (!isClient) {
-    return <div className="flex items-center justify-center min-h-screen">Calculating results...</div>;
-  }
-
-  if (!results || !exam) {
+  if (!mounted || !results || !exam) {
     return <div className="flex items-center justify-center min-h-screen">Calculating results...</div>;
   }
   

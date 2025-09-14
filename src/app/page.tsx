@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { DragEvent } from 'react';
@@ -28,10 +29,10 @@ export default function Home() {
   const { toast } = useToast();
   const router = useRouter();
   
-  const [isClient, setIsClient] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
+    setMounted(true);
   }, []);
 
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
@@ -181,7 +182,7 @@ export default function Home() {
     toast({ title: 'Exam cleared.' });
   }
 
-  if (!isClient) {
+  if (!mounted) {
     return null;
   }
 

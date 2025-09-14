@@ -44,10 +44,10 @@ export default function ExamsPage() {
   const [savedExams, setSavedExams] = useLocalStorage<Exam[]>('savedExams', []);
   const [examToDelete, setExamToDelete] = useState<string | null>(null);
   const router = useRouter();
-  const [isClient, setIsClient] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
+    setMounted(true);
   }, []);
 
   const deleteExam = (id: string) => {
@@ -59,7 +59,7 @@ export default function ExamsPage() {
     router.push(`/exam/${id}`);
   }
 
-  if (!isClient) {
+  if (!mounted) {
     return null;
   }
 

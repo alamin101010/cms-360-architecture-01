@@ -36,22 +36,22 @@ export default function ExamPage() {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [examStarted, setExamStarted] = useState(false);
   const [timeUntilStart, setTimeUntilStart] = useState('');
-  const [isClient, setIsClient] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
+    setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (!isClient) return;
+    if (!mounted) return;
     const foundExam = savedExams.find((e) => e.id === examId);
     if (foundExam) {
       setExam(foundExam);
     }
-  }, [examId, savedExams, isClient]);
+  }, [examId, savedExams, mounted]);
 
   useEffect(() => {
-    if (!exam || !isClient) return;
+    if (!exam || !mounted) return;
 
     const checkStartTime = () => {
       const now = new Date().getTime();
@@ -80,10 +80,10 @@ export default function ExamPage() {
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [exam, isClient]);
+  }, [exam, mounted]);
 
   useEffect(() => {
-    if (!startTime || !examStarted || !isClient) return;
+    if (!startTime || !examStarted || !mounted) return;
 
     const timer = setInterval(() => {
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
@@ -96,7 +96,7 @@ export default function ExamPage() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [startTime, exam?.duration, examStarted, isClient]);
+  }, [startTime, exam?.duration, examStarted, mounted]);
   
   const handleAnswerChange = (questionId: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));
@@ -127,11 +127,7 @@ export default function ExamPage() {
     router.push(`/exam/${examId}/results`);
   };
 
-  if (!isClient) {
-    return <div className="flex items-center justify-center min-h-screen">Loading exam...</div>;
-  }
-
-  if (!exam) {
+  if (!mounted || !exam) {
     return <div className="flex items-center justify-center min-h-screen">Loading exam...</div>;
   }
 
