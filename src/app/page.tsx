@@ -1,4 +1,3 @@
-
 'use client';
 
 import type { DragEvent } from 'react';
@@ -12,7 +11,7 @@ import { ExamBuilder } from '@/components/ExamBuilder';
 import { useToast } from '@/hooks/use-toast';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
-import { updateQuestions } from '@/ai/flows/update-questions-flow';
+import { updateQuestions as saveQuestionsToFile } from '@/ai/flows/update-questions-flow';
 
 export default function Home() {
   const [questions, setQuestions] = useState<Question[]>(allQuestions);
@@ -63,7 +62,7 @@ export default function Home() {
   
   const persistQuestions = async (updatedQuestions: Question[]) => {
     try {
-      await updateQuestions(updatedQuestions);
+      await saveQuestionsToFile(updatedQuestions);
       setQuestions(updatedQuestions);
     } catch (e) {
       toast({

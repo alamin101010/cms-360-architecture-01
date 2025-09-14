@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useRef, useMemo } from 'react';
@@ -24,22 +23,26 @@ import { Badge } from './ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { decodeAttributes } from '@/data/attribute-mapping';
-import { CheckCircle, XCircle, PlusCircle } from 'lucide-react';
+import { CheckCircle, XCircle, PlusCircle, Replace } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Checkbox } from './ui/checkbox';
 import { Separator } from './ui/separator';
 
-
 type CsvUploaderProps = {
   children: React.ReactNode;
   addImportedQuestions: (questions: Omit<Question, 'id'>[]) => void;
+  updateQuestion: (question: Question) => void;
   addQuestionsToExam: (questions: Question[]) => void;
   existingQuestions: Question[];
 };
 
 type ParsedQuestion = Omit<Question, 'id'>;
+type DuplicateQuestionInfo = {
+    existingQuestion: Question;
+    newQuestionData: ParsedQuestion;
+};
 
-export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam, existingQuestions }: CsvUploaderProps) {
+export function CsvUploader({ children, addImportedQuestions, updateQuestion, addQuestionsToExam, existingQuestions }: CsvUploaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [textData, setTextData] = useState<string>('');
@@ -50,9 +53,10 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
   const [manualVertical, setManualVertical] = useState<string>('');
 
   const [newQuestions, setNewQuestions] = useState<ParsedQuestion[]>([]);
-  const [duplicateQuestions, setDuplicateQuestions] = useState<Question[]>([]);
+  const [duplicateQuestions, setDuplicateQuestions] = useState<DuplicateQuestionInfo[]>([]);
   const [selectedNew, setSelectedNew] = useState<number[]>([]);
-  const [selectedDuplicates, setSelectedDuplicates] = useState<string[]>([]);
+  const [selectedDuplicatesForExam, setSelectedDuplicatesForExam] = useState<string[]>([]);
+  const [selectedDuplicatesForUpdate, setSelectedDuplicatesForUpdate] = useState<string[]>([]);
   
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -79,7 +83,8 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
     setNewQuestions([]);
     setDuplicateQuestions([]);
     setSelectedNew([]);
-    setSelectedDuplicates([]);
+    setSelectedDuplicatesForExam([]);
+    setSelectedDuplicatesForUpdate([]);
     setManualTopic('');
     setManualBoardName('');
     setManualBoardType('');
@@ -95,7 +100,8 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
     setNewQuestions([]);
     setDuplicateQuestions([]);
     setSelectedNew([]);
-    setSelectedDuplicates([]);
+    setSelectedDuplicatesForExam([]);
+    setSelectedDuplicatesForUpdate([]);
 
     const existingQuestionMap = new Map(existingQuestions.filter(q => q.text).map(q => [q.text.trim().toLowerCase(), q]));
 
@@ -105,34 +111,24 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
       complete: (results) => {
         try {
           const parsedNew: ParsedQuestion[] = [];
-          const parsedDuplicates: Question[] = [];
+          const parsedDuplicates: DuplicateQuestionInfo[] = [];
 
           results.data.forEach((row: any) => {
             const questionText = (row.title || 'No title provided').trim();
-            if (questionText === 'No title provided') return;
+            if (questionText === 'No title provided' || !questionText) return;
 
-            const duplicate = existingQuestionMap.get(questionText.toLowerCase());
-
-            if (duplicate) {
-              if (!parsedDuplicates.some(dq => dq.id === duplicate.id)) {
-                 parsedDuplicates.push(duplicate);
-              }
-              return;
-            }
-
-            const options: { text: string; isCorrect: boolean }[] = [];
+            const decodedAttrs = decodeAttributes(row);
+             const options: { text: string; isCorrect: boolean }[] = [];
             for (let i = 1; i <= 4; i++) {
               if (row[`options_${i}_answer`]) {
                 options.push({
                   text: row[`options_${i}_answer`],
-                  isCorrect: row[`options_${i}_is_correct`] === '1' || row[`options_${i}_is_correct`] === true,
+                  isCorrect: row[`options_${i}_is_correct`] === '1' || String(row[`options_${i}_is_correct`]).toLowerCase() === 'true',
                 });
               }
             }
-
-            const decodedAttrs = decodeAttributes(row);
-
-            const question: ParsedQuestion = {
+            
+            const newQuestionData: ParsedQuestion = {
               text: questionText,
               type: row.type,
               image: row.image,
@@ -155,8 +151,19 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
               group_type: decodedAttrs.group_type,
               marks: row.marks ? parseInt(row.marks) : 1,
             };
-            
-            parsedNew.push(question);
+
+
+            const existingQuestion = existingQuestionMap.get(questionText.toLowerCase());
+
+            if (existingQuestion) {
+              if (!parsedDuplicates.some(dq => dq.existingQuestion.id === existingQuestion.id)) {
+                 parsedDuplicates.push({ existingQuestion, newQuestionData });
+              }
+            } else {
+               if (!parsedNew.some(nq => nq.text.toLowerCase() === newQuestionData.text.toLowerCase())) {
+                  parsedNew.push(newQuestionData);
+               }
+            }
           });
 
           setNewQuestions(parsedNew);
@@ -165,7 +172,7 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
 
           toast({
             title: 'Preview ready',
-            description: `Found ${parsedNew.length} new questions and ${parsedDuplicates.length} duplicates.`,
+            description: `Found ${parsedNew.length} new questions and ${parsedDuplicates.length} potential duplicates.`,
           });
         } catch (error) {
            toast({
@@ -204,11 +211,25 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
 
   const handleAddSelectedToBank = () => {
     const questionsToAdd = selectedNew.map(index => newQuestions[index]);
-    if (questionsToAdd.length === 0) {
-        toast({ variant: 'destructive', title: 'No new questions selected.'});
+    if (questionsToAdd.length > 0) {
+        addImportedQuestions(questionsToAdd);
+    }
+    
+    const questionsToUpdate = selectedDuplicatesForUpdate
+        .map(id => duplicateQuestions.find(d => d.existingQuestion.id === id))
+        .filter((d): d is DuplicateQuestionInfo => !!d)
+        .map(d => ({ ...d.existingQuestion, ...d.newQuestionData }));
+    
+    if(questionsToUpdate.length > 0) {
+        questionsToUpdate.forEach(q => updateQuestion(q));
+        toast({ title: `${questionsToUpdate.length} existing questions updated.`})
+    }
+
+    if (questionsToAdd.length === 0 && questionsToUpdate.length === 0) {
+        toast({ variant: 'destructive', title: 'No questions selected for import or update.'});
         return;
     }
-    addImportedQuestions(questionsToAdd);
+
     setIsOpen(false);
     resetState();
   };
@@ -218,7 +239,9 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
         ...newQuestions[index],
         id: `import-exam-${Date.now()}-${index}`,
     }));
-    const questionsFromDuplicates = duplicateQuestions.filter((q) => selectedDuplicates.includes(q.id));
+    const questionsFromDuplicates = duplicateQuestions
+        .filter((q) => selectedDuplicatesForExam.includes(q.existingQuestion.id))
+        .map(q => q.existingQuestion);
 
     const allQuestionsForExam = [...questionsFromNew, ...questionsFromDuplicates];
 
@@ -228,6 +251,7 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
     }
 
     addQuestionsToExam(allQuestionsForExam);
+    toast({ title: `${allQuestionsForExam.length} questions added to the current exam.`});
     setIsOpen(false);
     resetState();
   }
@@ -245,84 +269,52 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
       }
   }
 
-  const toggleSelectDuplicate = (id: string) => {
-      setSelectedDuplicates(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  const toggleSelectDuplicateForExam = (id: string) => {
+      setSelectedDuplicatesForExam(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   }
 
-  const toggleSelectAllDuplicates = () => {
-      if (selectedDuplicates.length === duplicateQuestions.length) {
-          setSelectedDuplicates([]);
+  const toggleSelectAllDuplicatesForExam = () => {
+      if (selectedDuplicatesForExam.length === duplicateQuestions.length) {
+          setSelectedDuplicatesForExam([]);
       } else {
-          setSelectedDuplicates(duplicateQuestions.map(q => q.id));
+          setSelectedDuplicatesForExam(duplicateQuestions.map(q => q.existingQuestion.id));
+      }
+  }
+
+  const toggleSelectDuplicateForUpdate = (id: string) => {
+      setSelectedDuplicatesForUpdate(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  }
+
+  const toggleSelectAllDuplicatesForUpdate = () => {
+      if (selectedDuplicatesForUpdate.length === duplicateQuestions.length) {
+          setSelectedDuplicatesForUpdate([]);
+      } else {
+          setSelectedDuplicatesForUpdate(duplicateQuestions.map(q => q.existingQuestion.id));
       }
   }
 
 
   const hasPreview = newQuestions.length > 0 || duplicateQuestions.length > 0;
-  const totalSelectedForExam = selectedNew.length + selectedDuplicates.length;
+  const totalSelectedForExam = selectedNew.length + selectedDuplicatesForExam.length;
+  const totalSelectedForBank = selectedNew.length + selectedDuplicatesForUpdate.length;
 
-  const QuestionPreviewTable = ({ questions, isDuplicate = false }: { questions: (ParsedQuestion | Question)[], isDuplicate?: boolean }) => (
-    <Table>
-      <TableHeader>
-        <TableRow>
-            <TableHead className="w-12">
-                <Checkbox 
-                    checked={
-                        isDuplicate 
-                            ? duplicateQuestions.length > 0 && selectedDuplicates.length === duplicateQuestions.length 
-                            : newQuestions.length > 0 && selectedNew.length === newQuestions.length
-                    }
-                    onCheckedChange={isDuplicate ? toggleSelectAllDuplicates : toggleSelectAllNew}
-                    aria-label={`Select all ${isDuplicate ? 'duplicate' : 'new'} questions`}
-                />
-            </TableHead>
-            <TableHead>Question</TableHead>
-            <TableHead>Options</TableHead>
-            <TableHead>Attributes</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {questions.map((q, i) => (
-          <TableRow key={isDuplicate ? (q as Question).id : i}>
-             <TableCell>
-                <Checkbox 
-                    checked={isDuplicate ? selectedDuplicates.includes((q as Question).id) : selectedNew.includes(i)} 
-                    onCheckedChange={() => isDuplicate ? toggleSelectDuplicate((q as Question).id) : toggleSelectNew(i)} 
-                />
-             </TableCell>
-            <TableCell className="align-top whitespace-pre-wrap">
-              <p className="font-medium">{q.text}</p>
-            </TableCell>
-            <TableCell className="align-top whitespace-pre-wrap">
-              <ul className="space-y-1">
-                {q.options?.map((opt, index) => (
-                  <li key={index} className="flex items-start text-sm">
-                    {opt.isCorrect ? <CheckCircle className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-1" /> : <XCircle className="h-4 w-4 mr-2 text-red-500 flex-shrink-0 mt-1" />}
-                    <span>{opt.text}</span>
-                  </li>
-                ))}
-              </ul>
-            </TableCell>
-            <TableCell className="align-top">
-              <div className="flex flex-wrap gap-1">
-                {q.vertical && <Badge>Vertical: {q.vertical}</Badge>}
-                {q.class && <Badge variant="outline">Class: {q.class}</Badge>}
-                {q.subject && <Badge variant="outline">Subject: {q.subject}</Badge>}
-                {q.topic && <Badge variant="outline">Topic: {q.topic}</Badge>}
-                {q.difficulty && <Badge variant="outline">Difficulty: {q.difficulty}</Badge>}
-                {q.program && <Badge variant="outline">Program: {q.program}</Badge>}
-                {q.paper && <Badge variant="outline">Paper: {q.paper}</Badge>}
-                {q.chapter && <Badge variant="outline">Chapter: {q.chapter}</Badge>}
-                {q.exam_set && <Badge variant="outline">Exam Set: {q.exam_set}</Badge>}
-                {q.board && <Badge variant="outline">Board: {q.board}</Badge>}
-                {q.bloomsTaxonomyLevel && <Badge variant="outline">Bloom's: {q.bloomsTaxonomyLevel}</Badge>}
-              </div>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
+  const AttributeBadge = ({label, value}: {label: string, value: any}) => {
+    if (!value) return null;
+    return <Badge variant="outline">{label}: {String(value)}</Badge>
+  }
+
+  const AttributeDiff = ({ label, oldVal, newVal }: { label: string, oldVal: any, newVal: any }) => {
+    const oldStr = String(oldVal || '');
+    const newStr = String(newVal || '');
+    if (oldStr === newStr) return <AttributeBadge label={label} value={oldStr} />;
+    return (
+      <div className="flex items-center gap-1 text-xs border rounded-full px-2 py-0.5 bg-yellow-50 text-yellow-800 border-yellow-200">
+        <span>{label}:</span>
+        <span className="line-through text-muted-foreground">{oldStr}</span>
+        <span className="font-semibold">{newStr}</span>
+      </div>
+    );
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetState(); }}>
@@ -331,7 +323,7 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
         <DialogHeader>
           <DialogTitle>Upload Questions via CSV</DialogTitle>
           <DialogDescription>
-            Select a CSV file or paste data. Duplicates will be identified from the question bank.
+            Select a CSV file or paste data. Duplicates will be identified and you can choose to merge attributes.
           </DialogDescription>
         </DialogHeader>
 
@@ -339,8 +331,8 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
             <div className="space-y-4">
                 <Tabs defaultValue="file" className='w-full'>
                     <TabsList className='grid w-full grid-cols-2'>
-                        <TabsTrigger value="file" className="data-[state=active]:bg-green-600 data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:text-black">Upload File</TabsTrigger>
-                        <TabsTrigger value="paste" className="data-[state=active]:bg-green-600 data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:text-black">Paste Text</TabsTrigger>
+                        <TabsTrigger value="file">Upload File</TabsTrigger>
+                        <TabsTrigger value="paste">Paste Text</TabsTrigger>
                     </TabsList>
                     <TabsContent value="file" className="py-4">
                         <Input type="file" accept=".csv" onChange={handleFileChange} ref={fileInputRef} className="flex-1" />
@@ -391,7 +383,42 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
                                 <div className='p-4'>
                                     <h4 className='font-semibold mb-2'>New Questions ({newQuestions.length})</h4>
                                     <div className='border rounded-md'>
-                                        <QuestionPreviewTable questions={newQuestions} />
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead className="w-12"><Checkbox checked={newQuestions.length > 0 && selectedNew.length === newQuestions.length} onCheckedChange={toggleSelectAllNew}/></TableHead>
+                                                    <TableHead>Question</TableHead>
+                                                    <TableHead>Attributes</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {newQuestions.map((q, i) => (
+                                                <TableRow key={i}>
+                                                    <TableCell><Checkbox checked={selectedNew.includes(i)} onCheckedChange={() => toggleSelectNew(i)} /></TableCell>
+                                                    <TableCell className="align-top">
+                                                        <p className="font-medium">{q.text}</p>
+                                                        <ul className="mt-2 space-y-1">
+                                                            {q.options?.map((opt, index) => (
+                                                            <li key={index} className="flex items-start text-sm">
+                                                                {opt.isCorrect ? <CheckCircle className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-0.5" /> : <XCircle className="h-4 w-4 mr-2 text-red-500 flex-shrink-0 mt-0.5" />}
+                                                                <span>{opt.text}</span>
+                                                            </li>
+                                                            ))}
+                                                        </ul>
+                                                    </TableCell>
+                                                    <TableCell className="align-top">
+                                                        <div className="flex flex-wrap gap-1">
+                                                           <AttributeBadge label="Vertical" value={q.vertical} />
+                                                           <AttributeBadge label="Class" value={q.class} />
+                                                           <AttributeBadge label="Subject" value={q.subject} />
+                                                           <AttributeBadge label="Topic" value={q.topic} />
+                                                           <AttributeBadge label="Difficulty" value={q.difficulty} />
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
                                     </div>
                                 </div>
                             )}
@@ -399,8 +426,37 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
                                 <div className='p-4'>
                                     {newQuestions.length > 0 && <Separator className="my-4" />}
                                     <h4 className='font-semibold mb-2'>Found Duplicates ({duplicateQuestions.length})</h4>
+                                    <p className="text-sm text-muted-foreground mb-2">Review differences and choose to add to the exam or update the question in the bank with the new attributes.</p>
                                     <div className='border rounded-md'>
-                                        <QuestionPreviewTable questions={duplicateQuestions} isDuplicate={true} />
+                                         <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead className="w-24 text-center">Add to Exam<br/><Checkbox checked={duplicateQuestions.length > 0 && selectedDuplicatesForExam.length === duplicateQuestions.length} onCheckedChange={toggleSelectAllDuplicatesForExam}/></TableHead>
+                                                    <TableHead className="w-24 text-center">Update in Bank<br/><Checkbox checked={duplicateQuestions.length > 0 && selectedDuplicatesForUpdate.length === duplicateQuestions.length} onCheckedChange={toggleSelectAllDuplicatesForUpdate}/></TableHead>
+                                                    <TableHead>Question & Attribute Differences</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {duplicateQuestions.map(d => (
+                                                <TableRow key={d.existingQuestion.id}>
+                                                    <TableCell className="text-center"><Checkbox checked={selectedDuplicatesForExam.includes(d.existingQuestion.id)} onCheckedChange={() => toggleSelectDuplicateForExam(d.existingQuestion.id)} /></TableCell>
+                                                    <TableCell className="text-center"><Checkbox checked={selectedDuplicatesForUpdate.includes(d.existingQuestion.id)} onCheckedChange={() => toggleSelectDuplicateForUpdate(d.existingQuestion.id)} /></TableCell>
+                                                    <TableCell className="align-top">
+                                                        <p className="font-medium">{d.existingQuestion.text}</p>
+                                                        <div className="flex flex-wrap gap-1 mt-2">
+                                                            <AttributeDiff label="Class" oldVal={d.existingQuestion.class} newVal={d.newQuestionData.class} />
+                                                            <AttributeDiff label="Subject" oldVal={d.existingQuestion.subject} newVal={d.newQuestionData.subject} />
+                                                            <AttributeDiff label="Topic" oldVal={d.existingQuestion.topic} newVal={d.newQuestionData.topic} />
+                                                            <AttributeDiff label="Difficulty" oldVal={d.existingQuestion.difficulty} newVal={d.newQuestionData.difficulty} />
+                                                            <AttributeDiff label="Program" oldVal={d.existingQuestion.program} newVal={d.newQuestionData.program} />
+                                                            <AttributeDiff label="Vertical" oldVal={d.existingQuestion.vertical} newVal={d.newQuestionData.vertical} />
+                                                            <AttributeDiff label="Paper" oldVal={d.existingQuestion.paper} newVal={d.newQuestionData.paper} />
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
                                     </div>
                                 </div>
                             )}
@@ -420,12 +476,15 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
           </DialogClose>
           {hasPreview && (
             <>
-                <Button onClick={handleAddSelectedToBank} disabled={selectedNew.length === 0}>
-                    Add {selectedNew.length > 0 ? selectedNew.length : ''} New to Bank
+                <Button onClick={handleAddSelectedToBank} disabled={totalSelectedForBank === 0}>
+                    <Replace className="mr-2" />
+                    {selectedDuplicatesForUpdate.length > 0 ? `Update ${selectedDuplicatesForUpdate.length} & ` : ''}
+                    Add {selectedNew.length > 0 ? `${selectedNew.length} New` : ''}
+                    {selectedDuplicatesForUpdate.length === 0 && selectedNew.length === 0 ? 'to Bank' : ''}
                 </Button>
                  <Button onClick={handleAddSelectedToExam} variant="secondary" disabled={totalSelectedForExam === 0}>
                     <PlusCircle className="mr-2" />
-                    Add {totalSelectedForExam > 0 ? totalSelectedForExam : ''} Selected to Exam
+                    Add {totalSelectedForExam > 0 ? totalSelectedForExam : ''} to Exam
                 </Button>
             </>
           )}
