@@ -24,7 +24,7 @@ import { Badge } from './ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { decodeAttributes } from '@/data/attribute-mapping';
-import { CheckCircle, XCircle, PlusCircle, Replace, GitMerge } from 'lucide-react';
+import { CheckCircle, XCircle, PlusCircle, GitMerge } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Checkbox } from './ui/checkbox';
 import { Separator } from './ui/separator';

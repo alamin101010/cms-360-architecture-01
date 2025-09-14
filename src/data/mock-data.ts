@@ -113,6 +113,7 @@ export const allQuestions: Question[] = [
       "K-12"
     ],
     "program": [
+      "Classroom Genius 2025",
       "HSC 23 One Shot MCQ Course",
       "HSC 25 SMP",
       "Rct project"
