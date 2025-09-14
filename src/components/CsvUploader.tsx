@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useMemo } from 'react';
@@ -316,6 +317,20 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
     );
   };
 
+  const OptionsList = ({ options }: { options?: { text: string; isCorrect: boolean }[] }) => {
+    if (!options || options.length === 0) return null;
+    return (
+      <ul className="mt-2 space-y-1">
+        {options.map((opt, index) => (
+          <li key={index} className="flex items-start text-sm">
+            {opt.isCorrect ? <CheckCircle className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-0.5" /> : <XCircle className="h-4 w-4 mr-2 text-red-500 flex-shrink-0 mt-0.5" />}
+            <span>{opt.text}</span>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetState(); }}>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -397,14 +412,7 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
                                                     <TableCell><Checkbox checked={selectedNew.includes(i)} onCheckedChange={() => toggleSelectNew(i)} /></TableCell>
                                                     <TableCell className="align-top">
                                                         <p className="font-medium">{q.text}</p>
-                                                        <ul className="mt-2 space-y-1">
-                                                            {q.options?.map((opt, index) => (
-                                                            <li key={index} className="flex items-start text-sm">
-                                                                {opt.isCorrect ? <CheckCircle className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-0.5" /> : <XCircle className="h-4 w-4 mr-2 text-red-500 flex-shrink-0 mt-0.5" />}
-                                                                <span>{opt.text}</span>
-                                                            </li>
-                                                            ))}
-                                                        </ul>
+                                                        <OptionsList options={q.options} />
                                                     </TableCell>
                                                     <TableCell className="align-top">
                                                         <div className="flex flex-wrap gap-1">
@@ -443,6 +451,7 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
                                                     <TableCell className="text-center"><Checkbox checked={selectedDuplicatesForUpdate.includes(d.existingQuestion.id)} onCheckedChange={() => toggleSelectDuplicateForUpdate(d.existingQuestion.id)} /></TableCell>
                                                     <TableCell className="align-top">
                                                         <p className="font-medium">{d.existingQuestion.text}</p>
+                                                        <OptionsList options={d.newQuestionData.options} />
                                                         <div className="flex flex-wrap gap-1 mt-2">
                                                             <AttributeDiff label="Class" oldVal={d.existingQuestion.class} newVal={d.newQuestionData.class} />
                                                             <AttributeDiff label="Subject" oldVal={d.existingQuestion.subject} newVal={d.newQuestionData.subject} />
@@ -493,3 +502,5 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
     </Dialog>
   );
 }
+
+    
