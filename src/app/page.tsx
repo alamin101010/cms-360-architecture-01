@@ -12,6 +12,7 @@ import { ExamBuilder } from '@/components/ExamBuilder';
 import { useToast } from '@/hooks/use-toast';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
+import { updateQuestions } from '@/ai/flows/update-questions-flow';
 
 export default function Home() {
   const [questions, setQuestions] = useState<Question[]>(allQuestions);
@@ -59,12 +60,25 @@ export default function Home() {
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
+  
+  const persistQuestions = async (updatedQuestions: Question[]) => {
+    try {
+      await updateQuestions(updatedQuestions);
+      setQuestions(updatedQuestions);
+    } catch (e) {
+      toast({
+          variant: 'destructive',
+          title: 'Failed to save questions',
+          description: 'There was an error saving your questions. Please try again.',
+      });
+    }
+  }
 
   const addSuggestedQuestions = (newQuestions: Omit<Question, 'id'>[]) => {
     const uniqueNewQuestions = newQuestions.filter(nq => !questions.some(q => q.text === nq.text));
     const questionsWithIds: Question[] = uniqueNewQuestions.map((q, i) => ({ ...q, id: `ai-${Date.now()}-${i}`, createdAt: new Date().toISOString() }));
     const updatedQuestions = [...questionsWithIds, ...questions];
-    setQuestions(updatedQuestions);
+    persistQuestions(updatedQuestions);
     toast({ title: `${questionsWithIds.length} AI-suggested questions added to the bank.` });
     return questionsWithIds;
   };
@@ -73,7 +87,7 @@ export default function Home() {
     const uniqueNewQuestions = newQuestions.filter(nq => !questions.some(q => q.text === nq.text));
     const questionsWithIds: Question[] = uniqueNewQuestions.map((q, i) => ({...q, id: `import-${Date.now()}-${i}`, createdAt: new Date().toISOString()}));
     const updatedQuestions = [...questionsWithIds, ...questions];
-    setQuestions(updatedQuestions);
+    persistQuestions(updatedQuestions);
     toast({ title: `${questionsWithIds.length} imported questions added to the bank.` });
   };
   
@@ -94,21 +108,21 @@ export default function Home() {
 
   const deleteQuestion = (questionId: string) => {
     const updatedQuestions = questions.filter(q => q.id !== questionId);
-    setQuestions(updatedQuestions);
+    persistQuestions(updatedQuestions);
     setCurrentExamQuestions(prev => prev.filter(q => q.id !== questionId));
     toast({ title: "Question deleted." });
   };
 
   const deleteMultipleQuestions = (questionIds: string[]) => {
     const updatedQuestions = questions.filter(q => !questionIds.includes(q.id));
-    setQuestions(updatedQuestions);
+    persistQuestions(updatedQuestions);
     setCurrentExamQuestions(prev => prev.filter(q => !questionIds.includes(q.id)));
     toast({ title: `${questionIds.length} questions deleted.` });
   };
   
   const updateQuestion = (updatedQuestion: Question) => {
     const updatedQuestions = questions.map(q => q.id === updatedQuestion.id ? updatedQuestion : q);
-    setQuestions(updatedQuestions);
+    persistQuestions(updatedQuestions);
     setCurrentExamQuestions(prev => prev.map(q => q.id === updatedQuestion.id ? updatedQuestion : q));
     toast({ title: "Question updated successfully." });
   };
@@ -157,13 +171,6 @@ export default function Home() {
     });
     toast({ title: 'Exam cleared.' });
   }
-
-  useEffect(() => {
-    // This is a workaround to persist state changes to the mock data file.
-    // In a real application, this would be an API call to a database.
-    const updatedMockDataFileContent = `import type { Question } from '@/types';\n\nexport const allQuestions: Question[] = ${JSON.stringify(questions, null, 2)};\n`;
-    console.log("To persist the questions, update src/data/mock-data.ts with the following content:\n\n", updatedMockDataFileContent)
-  }, [questions]);
 
   if (!isClient) {
     return null;
