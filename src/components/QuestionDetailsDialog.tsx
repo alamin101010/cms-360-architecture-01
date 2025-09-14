@@ -5,22 +5,25 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import type { Question } from '@/types';
 import { ScrollArea } from './ui/scroll-area';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle, Pencil } from 'lucide-react';
+import { Button } from './ui/button';
 
 type QuestionDetailsDialogProps = {
   question: Question;
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
+  onEditClick: (question: Question) => void;
 };
 
-export function QuestionDetailsDialog({ question, isOpen, onOpenChange }: QuestionDetailsDialogProps) {
+export function QuestionDetailsDialog({ question, isOpen, onOpenChange, onEditClick }: QuestionDetailsDialogProps) {
   if (!question) return null;
 
-  const getAttributeBadge = (label: string, value: string | undefined) => {
+  const getAttributeBadge = (label: string, value: string | undefined | null) => {
     if (!value) return null;
     return <Badge variant="outline">{label}: {value}</Badge>;
   };
@@ -69,7 +72,6 @@ export function QuestionDetailsDialog({ question, isOpen, onOpenChange }: Questi
                         {getAttributeBadge('Subject', question.subject)}
                         {getAttributeBadge('Topic', question.topic)}
                         {getAttributeBadge('Difficulty', question.difficulty)}
-                        {getAttributeBadge('Bloom\'s Level', question.bloomsTaxonomyLevel)}
                         {getAttributeBadge('Program', question.program)}
                         {getAttributeBadge('Paper', question.paper)}
                         {getAttributeBadge('Chapter', question.chapter)}
@@ -84,6 +86,12 @@ export function QuestionDetailsDialog({ question, isOpen, onOpenChange }: Questi
 
             </div>
         </ScrollArea>
+        <DialogFooter>
+            <Button onClick={() => onEditClick(question)}>
+                <Pencil className="mr-2"/>
+                Edit Question
+            </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

@@ -14,6 +14,7 @@ import { QuestionSetCard } from './QuestionSetCard';
 import { Button } from './ui/button';
 import { CsvUploader } from './CsvUploader';
 import { QuestionDetailsDialog } from './QuestionDetailsDialog';
+import { QuestionSetDetailsDialog } from './QuestionSetDetailsDialog';
 import {
   Collapsible,
   CollapsibleContent,
@@ -30,6 +31,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
+import { EditQuestionDialog } from './EditQuestionDialog';
 
 type QuestionBankProps = {
   questions: Question[];
@@ -39,12 +41,13 @@ type QuestionBankProps = {
   addQuestionsToExam: (questions: Question[]) => void;
   deleteQuestion: (questionId: string) => void;
   deleteMultipleQuestions: (questionIds: string[]) => void;
+  updateQuestion: (question: Question) => void;
 };
 
 type FilterValue = string | null;
 
 
-export function QuestionBank({ questions, addSuggestedQuestions, addImportedQuestions, addMultipleQuestionsToExam, addQuestionsToExam, deleteQuestion, deleteMultipleQuestions }: QuestionBankProps) {
+export function QuestionBank({ questions, addSuggestedQuestions, addImportedQuestions, addMultipleQuestionsToExam, addQuestionsToExam, deleteQuestion, deleteMultipleQuestions, updateQuestion }: QuestionBankProps) {
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
     setIsClient(true);
@@ -60,10 +63,15 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
   const [topic, setTopic] = useState<FilterValue>(null);
   const [difficulty, setDifficulty] = useState<FilterValue>(null);
   const [board, setBoard] = useState<FilterValue>(null);
+  
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
+  const [questionToEdit, setQuestionToEdit] = useState<Question | null>(null);
   const [questionToDelete, setQuestionToDelete] = useState<string | null>(null);
   const [questionsToDelete, setQuestionsToDelete] = useState<string[]>([]);
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+  
+  const [selectedQuestionSet, setSelectedQuestionSet] = useState<QuestionSet | null>(null);
+  
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const { toast } = useToast();
 
@@ -218,6 +226,11 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
     setQuestionsToDelete([]);
   }
 
+  const handleSaveQuestion = (updatedQuestion: Question) => {
+    updateQuestion(updatedQuestion);
+    setQuestionToEdit(null);
+  };
+
   const hasAnyFilterOptions = useMemo(() => [allVerticals, allPrograms, allSubjects, allPapers, allChapters, allExamSets, allTopics, allBoards, allDifficulties].some(options => options.length > 0), [allVerticals, allPrograms, allSubjects, allPapers, allChapters, allExamSets, allTopics, allBoards, allDifficulties]);
 
   return (
@@ -317,7 +330,7 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
           <TabsContent value="sets" className="flex-1 overflow-hidden mt-4">
             <ScrollArea className="h-full -mx-6 px-6">
               <div className="space-y-3 pb-4">
-                {questionSets.map(qs => <QuestionSetCard key={qs.id} questionSet={qs} />)}
+                {questionSets.map(qs => <QuestionSetCard key={qs.id} questionSet={qs} onViewClick={() => setSelectedQuestionSet(qs)}/>)}
               </div>
             </ScrollArea>
           </TabsContent>
@@ -328,7 +341,32 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
         <QuestionDetailsDialog 
             question={selectedQuestion} 
             isOpen={!!selectedQuestion} 
-            onOpenChange={(open) => !open && setSelectedQuestion(null)} 
+            onOpenChange={(open) => !open && setSelectedQuestion(null)}
+            onEditClick={() => {
+                setQuestionToEdit(selectedQuestion);
+                setSelectedQuestion(null);
+            }}
+        />
+    )}
+     {questionToEdit && (
+        <EditQuestionDialog
+            question={questionToEdit}
+            isOpen={!!questionToEdit}
+            onOpenChange={(open) => !open && setQuestionToEdit(null)}
+            onSave={handleSaveQuestion}
+        />
+    )}
+    {selectedQuestionSet && (
+        <QuestionSetDetailsDialog
+            questionSet={selectedQuestionSet}
+            allQuestions={questions}
+            isOpen={!!selectedQuestionSet}
+            onOpenChange={(open) => !open && setSelectedQuestionSet(null)}
+            onQuestionClick={(question) => setSelectedQuestion(question)}
+            onEditClick={(question) => {
+                setQuestionToEdit(question);
+                setSelectedQuestionSet(null);
+            }}
         />
     )}
      <AlertDialog open={!!questionToDelete} onOpenChange={(open) => !open && setQuestionToDelete(null)}>
