@@ -169,7 +169,7 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
               if (!parsedDuplicates.some(dq => dq.existingQuestion.id === existingQuestion.id)) {
                  const mergedData: Question = {
                    ...existingQuestion,
-                   ...newQuestionData,
+                   ...Object.fromEntries(Object.entries(newQuestionData).filter(([_, v]) => v != null && v !== '')),
                    // Merge attributes
                    subject: mergeAttribute(existingQuestion.subject, newQuestionData.subject),
                    topic: mergeAttribute(existingQuestion.topic, newQuestionData.topic),
@@ -332,7 +332,6 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
 
   const AttributeDiff = ({ label, oldVal, newVal, mergedVal }: { label: string, oldVal: any, newVal: any, mergedVal: any }) => {
     const oldArr = Array.isArray(oldVal) ? oldVal : (oldVal ? [oldVal] : []);
-    const newArr = Array.isArray(newVal) ? newVal : (newVal ? [newVal] : []);
     const mergedArr = Array.isArray(mergedVal) ? mergedVal : (mergedVal ? [mergedVal] : []);
     
     if (JSON.stringify(oldArr.sort()) === JSON.stringify(mergedArr.sort())) {
@@ -341,11 +340,15 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
 
     const added = mergedArr.filter(v => !oldArr.includes(v));
 
+    if (added.length === 0) {
+        return <AttributeBadge label={label} value={oldArr} />;
+    }
+    
     return (
         <div className="flex items-center gap-1 text-xs border rounded-full px-2 py-0.5 bg-green-50 text-green-800 border-green-200">
             <span>{label}:</span>
-            <span className="text-muted-foreground">{oldArr.join(', ')}</span>
-            <span className="font-semibold text-green-600">(+{added.join(', ')})</span>
+            <span className="text-muted-foreground line-through">{oldArr.join(', ')}</span>
+            <span className="font-semibold">{mergedArr.join(', ')}</span>
         </div>
     );
   };
@@ -534,5 +537,7 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
     </Dialog>
   );
 }
+
+    
 
     
