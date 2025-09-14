@@ -126,6 +126,16 @@ export default function Home() {
     toast({ title: "Question updated successfully." });
   };
 
+  const updateMultipleQuestions = (questionsToUpdate: Question[]) => {
+    const questionMap = new Map(questionsToUpdate.map(q => [q.id, q]));
+    const updatedQuestions = questions.map(q => questionMap.has(q.id) ? questionMap.get(q.id)! : q);
+    persistQuestions(updatedQuestions);
+
+    // Also update questions in the current exam if they were edited
+    setCurrentExamQuestions(prev => prev.map(q => questionMap.has(q.id) ? questionMap.get(q.id)! : q));
+    toast({ title: `${questionsToUpdate.length} questions updated successfully.` });
+  };
+
 
   const saveExam = () => {
     if (examDetails.name.trim() === '' || currentExamQuestions.length === 0) {
@@ -188,6 +198,7 @@ export default function Home() {
           deleteQuestion={deleteQuestion}
           deleteMultipleQuestions={deleteMultipleQuestions}
           updateQuestion={updateQuestion}
+          updateMultipleQuestions={updateMultipleQuestions}
         />
         <ExamBuilder
           examDetails={examDetails}

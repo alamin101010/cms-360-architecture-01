@@ -32,7 +32,7 @@ import { Separator } from './ui/separator';
 type CsvUploaderProps = {
   children: React.ReactNode;
   addImportedQuestions: (questions: Omit<Question, 'id'>[]) => void;
-  updateQuestion: (question: Question) => void;
+  updateMultipleQuestions: (questions: Question[]) => void;
   addQuestionsToExam: (questions: Question[]) => void;
   existingQuestions: Question[];
 };
@@ -52,7 +52,7 @@ const mergeAttribute = (val1: any, val2: any): string[] => {
 };
 
 
-export function CsvUploader({ children, addImportedQuestions, updateQuestion, addQuestionsToExam, existingQuestions }: CsvUploaderProps) {
+export function CsvUploader({ children, addImportedQuestions, updateMultipleQuestions, addQuestionsToExam, existingQuestions }: CsvUploaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [textData, setTextData] = useState<string>('');
@@ -276,7 +276,7 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
         .filter((q): q is Question => !!q);
     
     if(questionsToMerge.length > 0) {
-        questionsToMerge.forEach(q => updateQuestion(q));
+        updateMultipleQuestions(questionsToMerge);
     }
 
     if (questionsToAdd.length === 0 && questionsToMerge.length === 0) {
@@ -284,7 +284,14 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
         return;
     }
 
-    toast({ title: `${questionsToAdd.length} new questions added and ${questionsToMerge.length} existing questions updated.`})
+    if (questionsToAdd.length > 0 && questionsToMerge.length > 0) {
+      toast({ title: `${questionsToAdd.length} new questions added and ${questionsToMerge.length} existing questions updated.`})
+    } else if (questionsToAdd.length > 0) {
+      toast({ title: `${questionsToAdd.length} new questions added.`})
+    } else if (questionsToMerge.length > 0) {
+      toast({ title: `${questionsToMerge.length} existing questions updated.`})
+    }
+
     setIsOpen(false);
     resetState();
   };
