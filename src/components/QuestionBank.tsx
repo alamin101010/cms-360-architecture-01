@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useMemo, useEffect } from 'react';
 import type { Question, QuestionSet } from '@/types';
@@ -86,30 +87,43 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
     });
   }, [questions, isClient]);
 
+  const doesValueMatch = (questionValue: string | string[] | undefined, filterValue: string) => {
+    if (!questionValue) return false;
+    if (Array.isArray(questionValue)) return questionValue.includes(filterValue);
+    return questionValue === filterValue;
+  }
+
   const filteredQuestions = useMemo(() => {
     return sortedQuestions.filter(q =>
       q &&
-      ((q.text && q.text.toLowerCase().includes(searchTerm.toLowerCase())) || (q.topic && q.topic.toLowerCase().includes(searchTerm.toLowerCase()))) &&
-      (!vertical || q.vertical === vertical) &&
-      (!program || q.program === program) &&
-      (!subject || q.subject === subject) &&
-      (!paper || q.paper === paper) &&
-      (!chapter || q.chapter === chapter) &&
-      (!examSet || q.exam_set === examSet) &&
-      (!topic || q.topic === topic) &&
+      // Search term logic
+      (
+        (q.text && q.text.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (q.topic && (Array.isArray(q.topic) ? q.topic.some(t => t.toLowerCase().includes(searchTerm.toLowerCase())) : q.topic.toLowerCase().includes(searchTerm.toLowerCase())))
+      ) &&
+      // Filter logic
+      (!vertical || doesValueMatch(q.vertical, vertical)) &&
+      (!program || doesValueMatch(q.program, program)) &&
+      (!subject || doesValueMatch(q.subject, subject)) &&
+      (!paper || doesValueMatch(q.paper, paper)) &&
+      (!chapter || doesValueMatch(q.chapter, chapter)) &&
+      (!examSet || doesValueMatch(q.exam_set, examSet)) &&
+      (!topic || doesValueMatch(q.topic, topic)) &&
       (!difficulty || q.difficulty === difficulty) &&
-      (!board || q.board === board)
+      (!board || doesValueMatch(q.board, board))
     );
   }, [sortedQuestions, searchTerm, vertical, program, subject, paper, chapter, examSet, topic, difficulty, board]);
 
   const questionSets = useMemo(() => {
     const topics: { [key: string]: Question[] } = {};
     questions.forEach(q => {
-      const topicKey = q.topic || 'Uncategorized';
-      if (!topics[topicKey]) {
-        topics[topicKey] = [];
-      }
-      topics[topicKey].push(q);
+      const topicKeys = Array.isArray(q.topic) ? q.topic : [q.topic || 'Uncategorized'];
+      topicKeys.forEach(topicKey => {
+         if (!topics[topicKey]) {
+           topics[topicKey] = [];
+         }
+         topics[topicKey].push(q);
+      });
     });
 
     return Object.entries(topics).map(([topicName, questionsInSet]) => ({
@@ -122,7 +136,7 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
 
 
   const getUniqueOptions = (key: keyof Question) => {
-      const allValues = questions.map(q => q[key]).filter((v): v is string => typeof v === 'string' && v.trim() !== '');
+      const allValues = questions.flatMap(q => q[key]).filter((v): v is string => typeof v === 'string' && v.trim() !== '');
       return [...new Set(allValues)];
   }
   

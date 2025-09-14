@@ -1,9 +1,9 @@
 export type Question = {
   id: string;
   text: string;
-  subject: string;
-  topic: string;
-  class: string;
+  subject: string | string[];
+  topic: string | string[];
+  class: string | string[];
   difficulty: 'Easy' | 'Medium' | 'Hard';
   bloomsTaxonomyLevel: 'Remembering' | 'Understanding' | 'Applying' | 'Analyzing' | 'Evaluating' | 'Creating' | 'Knowledge' | 'Aptitude and Attitude' | string;
   type?: 'm1' | 'True / False' | 'Fill in the Blanks' | string; // m1 is MCQ
@@ -13,20 +13,20 @@ export type Question = {
   createdAt?: string;
 
   // New Hierarchical Fields
-  vertical?: string; // e.g., K-12, English
-  program?: string;
-  paper?: string;
-  chapter?: string;
-  exam_set?: string;
-  board?: string; // or School/College/Others
+  vertical?: string | string[]; // e.g., K-12, English
+  program?: string | string[];
+  paper?: string | string[];
+  chapter?: string | string[];
+  exam_set?: string | string[];
+  board?: string | string[]; // or School/College/Others
 
   // Other metadata
   marks?: number;
   language?: string;
   format_type?: string;
   explanation?: string;
-  category?: string;
-  modules?: string;
+  category?: string | string[];
+  modules?: string | string[];
   group_type?: string;
 };
 

@@ -1,3 +1,4 @@
+
 'use client';
 import type { DragEvent, MouseEvent } from 'react';
 import type { Question } from '@/types';
@@ -10,14 +11,28 @@ type QuestionCardProps = {
   question: Question;
   onCardClick: () => void;
   onDeleteClick: (e: MouseEvent<HTMLButtonElement>) => void;
-  onSelectToggle: (e: MouseEvent<HTMLButtonElement>) => void;
+  onSelectToggle: (e: MouseEvent<HTMLButtonElement> | MouseEvent<HTMLDivElement>) => void;
   isSelected: boolean;
 };
+
+const AttributeBadge = ({ value }: { value: string | string[] | undefined }) => {
+  if (!value) return null;
+  const values = Array.isArray(value) ? value : [value];
+  return (
+    <>
+      {values.map((val, index) => (
+        <Badge key={index} variant="secondary">{val}</Badge>
+      ))}
+    </>
+  );
+};
+
 
 export function QuestionCard({ question, onCardClick, onDeleteClick, onSelectToggle, isSelected }: QuestionCardProps) {
   const handleDragStart = (e: DragEvent<HTMLDivElement>) => {
     // Don't drag if an interactive element was the target
-    if (e.target instanceof HTMLButtonElement || e.target instanceof HTMLInputElement || (e.target as HTMLElement).closest('button')) {
+    const target = e.target as HTMLElement;
+    if (target.closest('button') || target.closest('[role="checkbox"]')) {
       e.preventDefault();
       return;
     }
@@ -35,15 +50,16 @@ export function QuestionCard({ question, onCardClick, onDeleteClick, onSelectTog
         <div className="flex items-center pt-1" onClick={(e) => e.stopPropagation()}>
            <Checkbox 
             checked={isSelected} 
-            onCheckedChange={() => onSelectToggle({ stopPropagation: () => {} } as MouseEvent<HTMLButtonElement>)} 
+            onCheckedChange={() => onSelectToggle({ stopPropagation: () => {} } as MouseEvent<HTMLDivElement>)}
+            onClick={(e) => onSelectToggle(e)}
             aria-label="Select question"
           />
         </div>
         <div className="flex-1">
           <p className="text-sm font-medium line-clamp-2">{question.text}</p>
           <div className="flex flex-wrap items-center gap-2 mt-2 text-xs">
-            {question.subject && <Badge variant="secondary">{question.subject}</Badge>}
-            {question.class && <Badge variant="secondary">{question.class}</Badge>}
+            <AttributeBadge value={question.subject} />
+            <AttributeBadge value={question.class} />
             {question.difficulty && <Badge
               className={
                 question.difficulty === 'Easy' ? 'bg-green-100 text-green-800 hover:bg-green-200' :
@@ -54,7 +70,7 @@ export function QuestionCard({ question, onCardClick, onDeleteClick, onSelectTog
               {question.difficulty}
             </Badge>}
             {question.bloomsTaxonomyLevel && <Badge variant="outline">{question.bloomsTaxonomyLevel}</Badge>}
-            {question.topic && <Badge variant="outline">Topic: {question.topic}</Badge>}
+            <AttributeBadge value={question.topic?.toString().replace(/,/g, ', ')} />
           </div>
         </div>
       </div>

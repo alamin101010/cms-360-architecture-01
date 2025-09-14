@@ -1,3 +1,4 @@
+
 'use client';
 import {
   Dialog,
@@ -23,9 +24,17 @@ type QuestionDetailsDialogProps = {
 export function QuestionDetailsDialog({ question, isOpen, onOpenChange, onEditClick }: QuestionDetailsDialogProps) {
   if (!question) return null;
 
-  const getAttributeBadge = (label: string, value: string | undefined | null) => {
+  const getAttributeBadge = (label: string, value: string | string[] | undefined | null | number) => {
     if (!value) return null;
-    return <Badge variant="outline">{label}: {value}</Badge>;
+    const values = Array.isArray(value) ? value : [String(value)];
+
+    return (
+        <>
+            {values.map((val, index) => (
+                 <Badge key={`${label}-${index}`} variant="outline">{label}: {val}</Badge>
+            ))}
+        </>
+    )
   };
   
   return (

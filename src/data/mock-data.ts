@@ -30,7 +30,7 @@ export const allQuestions: Question[] = [
     "difficulty": "Medium",
     "bloomsTaxonomyLevel": "Remembering",
     "vertical": "K-12",
-    "program": "HSC 25 SMP",
+    "program": "Rct project",
     "paper": "1st Paper",
     "chapter": "Chapter 1",
     "exam_set": "Set 1",

@@ -24,7 +24,7 @@ import { Badge } from './ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { decodeAttributes } from '@/data/attribute-mapping';
-import { CheckCircle, XCircle, PlusCircle, Replace } from 'lucide-react';
+import { CheckCircle, XCircle, PlusCircle, Replace, GitMerge } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Checkbox } from './ui/checkbox';
 import { Separator } from './ui/separator';
@@ -41,7 +41,16 @@ type ParsedQuestion = Omit<Question, 'id'>;
 type DuplicateQuestionInfo = {
     existingQuestion: Question;
     newQuestionData: ParsedQuestion;
+    mergedData: Question;
 };
+
+// Helper function to merge attributes. It ensures values are arrays and unique.
+const mergeAttribute = (val1: any, val2: any): string[] => {
+    const arr1 = Array.isArray(val1) ? val1 : (val1 ? [val1] : []);
+    const arr2 = Array.isArray(val2) ? val2 : (val2 ? [val2] : []);
+    return [...new Set([...arr1, ...arr2])].filter(v => v); // Filter out empty/null values
+};
+
 
 export function CsvUploader({ children, addImportedQuestions, updateQuestion, addQuestionsToExam, existingQuestions }: CsvUploaderProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -57,7 +66,7 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
   const [duplicateQuestions, setDuplicateQuestions] = useState<DuplicateQuestionInfo[]>([]);
   const [selectedNew, setSelectedNew] = useState<number[]>([]);
   const [selectedDuplicatesForExam, setSelectedDuplicatesForExam] = useState<string[]>([]);
-  const [selectedDuplicatesForUpdate, setSelectedDuplicatesForUpdate] = useState<string[]>([]);
+  const [selectedDuplicatesForMerge, setSelectedDuplicatesForMerge] = useState<string[]>([]);
   
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -85,7 +94,7 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
     setDuplicateQuestions([]);
     setSelectedNew([]);
     setSelectedDuplicatesForExam([]);
-    setSelectedDuplicatesForUpdate([]);
+    setSelectedDuplicatesForMerge([]);
     setManualTopic('');
     setManualBoardName('');
     setManualBoardType('');
@@ -102,7 +111,7 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
     setDuplicateQuestions([]);
     setSelectedNew([]);
     setSelectedDuplicatesForExam([]);
-    setSelectedDuplicatesForUpdate([]);
+    setSelectedDuplicatesForMerge([]);
 
     const existingQuestionMap = new Map(existingQuestions.filter(q => q.text).map(q => [q.text.trim().toLowerCase(), q]));
 
@@ -158,7 +167,23 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
 
             if (existingQuestion) {
               if (!parsedDuplicates.some(dq => dq.existingQuestion.id === existingQuestion.id)) {
-                 parsedDuplicates.push({ existingQuestion, newQuestionData });
+                 const mergedData: Question = {
+                   ...existingQuestion,
+                   ...newQuestionData,
+                   // Merge attributes
+                   subject: mergeAttribute(existingQuestion.subject, newQuestionData.subject),
+                   topic: mergeAttribute(existingQuestion.topic, newQuestionData.topic),
+                   class: mergeAttribute(existingQuestion.class, newQuestionData.class),
+                   vertical: mergeAttribute(existingQuestion.vertical, newQuestionData.vertical),
+                   program: mergeAttribute(existingQuestion.program, newQuestionData.program),
+                   paper: mergeAttribute(existingQuestion.paper, newQuestionData.paper),
+                   chapter: mergeAttribute(existingQuestion.chapter, newQuestionData.chapter),
+                   exam_set: mergeAttribute(existingQuestion.exam_set, newQuestionData.exam_set),
+                   board: mergeAttribute(existingQuestion.board, newQuestionData.board),
+                   category: mergeAttribute(existingQuestion.category, newQuestionData.category),
+                   modules: mergeAttribute(existingQuestion.modules, newQuestionData.modules),
+                 };
+                 parsedDuplicates.push({ existingQuestion, newQuestionData, mergedData });
               }
             } else {
                if (!parsedNew.some(nq => nq.text.toLowerCase() === newQuestionData.text.toLowerCase())) {
@@ -170,6 +195,7 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
           setNewQuestions(parsedNew);
           setDuplicateQuestions(parsedDuplicates);
           setSelectedNew(parsedNew.map((_, index) => index)); // Select all new by default
+          setSelectedDuplicatesForMerge(parsedDuplicates.map(d => d.existingQuestion.id)); // Select all duplicates to be merged by default
 
           toast({
             title: 'Preview ready',
@@ -210,27 +236,26 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
     }
   };
 
-  const handleAddSelectedToBank = () => {
+  const handleAddToBank = () => {
     const questionsToAdd = selectedNew.map(index => newQuestions[index]);
     if (questionsToAdd.length > 0) {
         addImportedQuestions(questionsToAdd);
     }
     
-    const questionsToUpdate = selectedDuplicatesForUpdate
-        .map(id => duplicateQuestions.find(d => d.existingQuestion.id === id))
-        .filter((d): d is DuplicateQuestionInfo => !!d)
-        .map(d => ({ ...d.existingQuestion, ...d.newQuestionData }));
+    const questionsToMerge = selectedDuplicatesForMerge
+        .map(id => duplicateQuestions.find(d => d.existingQuestion.id === id)?.mergedData)
+        .filter((q): q is Question => !!q);
     
-    if(questionsToUpdate.length > 0) {
-        questionsToUpdate.forEach(q => updateQuestion(q));
-        toast({ title: `${questionsToUpdate.length} existing questions updated.`})
+    if(questionsToMerge.length > 0) {
+        questionsToMerge.forEach(q => updateQuestion(q));
     }
 
-    if (questionsToAdd.length === 0 && questionsToUpdate.length === 0) {
-        toast({ variant: 'destructive', title: 'No questions selected for import or update.'});
+    if (questionsToAdd.length === 0 && questionsToMerge.length === 0) {
+        toast({ variant: 'destructive', title: 'No questions selected for import or merge.'});
         return;
     }
 
+    toast({ title: `${questionsToAdd.length} new questions added and ${questionsToMerge.length} existing questions merged.`})
     setIsOpen(false);
     resetState();
   };
@@ -282,38 +307,46 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
       }
   }
 
-  const toggleSelectDuplicateForUpdate = (id: string) => {
-      setSelectedDuplicatesForUpdate(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  const toggleSelectDuplicateForMerge = (id: string) => {
+      setSelectedDuplicatesForMerge(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   }
 
-  const toggleSelectAllDuplicatesForUpdate = () => {
-      if (selectedDuplicatesForUpdate.length === duplicateQuestions.length) {
-          setSelectedDuplicatesForUpdate([]);
+  const toggleSelectAllDuplicatesForMerge = () => {
+      if (selectedDuplicatesForMerge.length === duplicateQuestions.length) {
+          setSelectedDuplicatesForMerge([]);
       } else {
-          setSelectedDuplicatesForUpdate(duplicateQuestions.map(q => q.existingQuestion.id));
+          setSelectedDuplicatesForMerge(duplicateQuestions.map(q => q.existingQuestion.id));
       }
   }
 
 
   const hasPreview = newQuestions.length > 0 || duplicateQuestions.length > 0;
   const totalSelectedForExam = selectedNew.length + selectedDuplicatesForExam.length;
-  const totalSelectedForBank = selectedNew.length + selectedDuplicatesForUpdate.length;
+  const totalSelectedForBank = selectedNew.length + selectedDuplicatesForMerge.length;
 
   const AttributeBadge = ({label, value}: {label: string, value: any}) => {
-    if (!value) return null;
-    return <Badge variant="outline">{label}: {String(value)}</Badge>
+    if (!value || (Array.isArray(value) && value.length === 0)) return null;
+    const displayValue = Array.isArray(value) ? value.join(', ') : String(value);
+    return <Badge variant="outline">{label}: {displayValue}</Badge>
   }
 
-  const AttributeDiff = ({ label, oldVal, newVal }: { label: string, oldVal: any, newVal: any }) => {
-    const oldStr = String(oldVal || '');
-    const newStr = String(newVal || '');
-    if (oldStr === newStr) return <AttributeBadge label={label} value={oldStr} />;
+  const AttributeDiff = ({ label, oldVal, newVal, mergedVal }: { label: string, oldVal: any, newVal: any, mergedVal: any }) => {
+    const oldArr = Array.isArray(oldVal) ? oldVal : (oldVal ? [oldVal] : []);
+    const newArr = Array.isArray(newVal) ? newVal : (newVal ? [newVal] : []);
+    const mergedArr = Array.isArray(mergedVal) ? mergedVal : (mergedVal ? [mergedVal] : []);
+    
+    if (JSON.stringify(oldArr.sort()) === JSON.stringify(mergedArr.sort())) {
+        return <AttributeBadge label={label} value={oldArr} />;
+    }
+
+    const added = mergedArr.filter(v => !oldArr.includes(v));
+
     return (
-      <div className="flex items-center gap-1 text-xs border rounded-full px-2 py-0.5 bg-yellow-50 text-yellow-800 border-yellow-200">
-        <span>{label}:</span>
-        <span className="line-through text-muted-foreground">{oldStr}</span>
-        <span className="font-semibold">{newStr}</span>
-      </div>
+        <div className="flex items-center gap-1 text-xs border rounded-full px-2 py-0.5 bg-green-50 text-green-800 border-green-200">
+            <span>{label}:</span>
+            <span className="text-muted-foreground">{oldArr.join(', ')}</span>
+            <span className="font-semibold text-green-600">(+{added.join(', ')})</span>
+        </div>
     );
   };
 
@@ -338,7 +371,7 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
         <DialogHeader>
           <DialogTitle>Upload Questions via CSV</DialogTitle>
           <DialogDescription>
-            Select a CSV file or paste data. Duplicates will be identified and you can choose to merge attributes.
+            Select a CSV file or paste data. New attributes for duplicate questions will be merged.
           </DialogDescription>
         </DialogHeader>
 
@@ -434,32 +467,31 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
                                 <div className='p-4'>
                                     {newQuestions.length > 0 && <Separator className="my-4" />}
                                     <h4 className='font-semibold mb-2'>Found Duplicates ({duplicateQuestions.length})</h4>
-                                    <p className="text-sm text-muted-foreground mb-2">Review differences and choose to add to the exam or update the question in the bank with the new attributes.</p>
+                                    <p className="text-sm text-muted-foreground mb-2">Review merged attributes. Uncheck to skip merging for specific questions.</p>
                                     <div className='border rounded-md'>
                                          <Table>
                                             <TableHeader>
                                                 <TableRow>
+                                                    <TableHead className="w-24 text-center">Merge into Bank<br/><Checkbox checked={duplicateQuestions.length > 0 && selectedDuplicatesForMerge.length === duplicateQuestions.length} onCheckedChange={toggleSelectAllDuplicatesForMerge}/></TableHead>
                                                     <TableHead className="w-24 text-center">Add to Exam<br/><Checkbox checked={duplicateQuestions.length > 0 && selectedDuplicatesForExam.length === duplicateQuestions.length} onCheckedChange={toggleSelectAllDuplicatesForExam}/></TableHead>
-                                                    <TableHead className="w-24 text-center">Update in Bank<br/><Checkbox checked={duplicateQuestions.length > 0 && selectedDuplicatesForUpdate.length === duplicateQuestions.length} onCheckedChange={toggleSelectAllDuplicatesForUpdate}/></TableHead>
-                                                    <TableHead>Question & Attribute Differences</TableHead>
+                                                    <TableHead>Question & Merged Attributes</TableHead>
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
                                                 {duplicateQuestions.map(d => (
                                                 <TableRow key={d.existingQuestion.id}>
+                                                    <TableCell className="text-center"><Checkbox checked={selectedDuplicatesForMerge.includes(d.existingQuestion.id)} onCheckedChange={() => toggleSelectDuplicateForMerge(d.existingQuestion.id)} /></TableCell>
                                                     <TableCell className="text-center"><Checkbox checked={selectedDuplicatesForExam.includes(d.existingQuestion.id)} onCheckedChange={() => toggleSelectDuplicateForExam(d.existingQuestion.id)} /></TableCell>
-                                                    <TableCell className="text-center"><Checkbox checked={selectedDuplicatesForUpdate.includes(d.existingQuestion.id)} onCheckedChange={() => toggleSelectDuplicateForUpdate(d.existingQuestion.id)} /></TableCell>
                                                     <TableCell className="align-top">
                                                         <p className="font-medium">{d.existingQuestion.text}</p>
                                                         <OptionsList options={d.newQuestionData.options} />
                                                         <div className="flex flex-wrap gap-1 mt-2">
-                                                            <AttributeDiff label="Class" oldVal={d.existingQuestion.class} newVal={d.newQuestionData.class} />
-                                                            <AttributeDiff label="Subject" oldVal={d.existingQuestion.subject} newVal={d.newQuestionData.subject} />
-                                                            <AttributeDiff label="Topic" oldVal={d.existingQuestion.topic} newVal={d.newQuestionData.topic} />
-                                                            <AttributeDiff label="Difficulty" oldVal={d.existingQuestion.difficulty} newVal={d.newQuestionData.difficulty} />
-                                                            <AttributeDiff label="Program" oldVal={d.existingQuestion.program} newVal={d.newQuestionData.program} />
-                                                            <AttributeDiff label="Vertical" oldVal={d.existingQuestion.vertical} newVal={d.newQuestionData.vertical} />
-                                                            <AttributeDiff label="Paper" oldVal={d.existingQuestion.paper} newVal={d.newQuestionData.paper} />
+                                                            <AttributeDiff label="Class" oldVal={d.existingQuestion.class} newVal={d.newQuestionData.class} mergedVal={d.mergedData.class} />
+                                                            <AttributeDiff label="Subject" oldVal={d.existingQuestion.subject} newVal={d.newQuestionData.subject} mergedVal={d.mergedData.subject} />
+                                                            <AttributeDiff label="Topic" oldVal={d.existingQuestion.topic} newVal={d.newQuestionData.topic} mergedVal={d.mergedData.topic} />
+                                                            <AttributeDiff label="Program" oldVal={d.existingQuestion.program} newVal={d.newQuestionData.program} mergedVal={d.mergedData.program} />
+                                                            <AttributeDiff label="Vertical" oldVal={d.existingQuestion.vertical} newVal={d.newQuestionData.vertical} mergedVal={d.mergedData.vertical} />
+                                                            <AttributeDiff label="Paper" oldVal={d.existingQuestion.paper} newVal={d.newQuestionData.paper} mergedVal={d.mergedData.paper} />
                                                         </div>
                                                     </TableCell>
                                                 </TableRow>
@@ -485,11 +517,11 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
           </DialogClose>
           {hasPreview && (
             <>
-                <Button onClick={handleAddSelectedToBank} disabled={totalSelectedForBank === 0}>
-                    <Replace className="mr-2" />
-                    {selectedDuplicatesForUpdate.length > 0 ? `Update ${selectedDuplicatesForUpdate.length} & ` : ''}
+                <Button onClick={handleAddToBank} disabled={totalSelectedForBank === 0}>
+                    <GitMerge className="mr-2" />
+                    {selectedDuplicatesForMerge.length > 0 ? `Merge ${selectedDuplicatesForMerge.length} & ` : ''}
                     Add {selectedNew.length > 0 ? `${selectedNew.length} New` : ''}
-                    {selectedDuplicatesForUpdate.length === 0 && selectedNew.length === 0 ? 'to Bank' : ''}
+                    {selectedDuplicatesForMerge.length === 0 && selectedNew.length === 0 ? 'to Bank' : ''}
                 </Button>
                  <Button onClick={handleAddSelectedToExam} variant="secondary" disabled={totalSelectedForExam === 0}>
                     <PlusCircle className="mr-2" />
@@ -502,5 +534,3 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
     </Dialog>
   );
 }
-
-    

@@ -34,15 +34,22 @@ const optionSchema = z.object({
   isCorrect: z.boolean(),
 });
 
+// Helper to handle both string and string[]
+const stringOrStringArray = z.union([z.string(), z.array(z.string())]);
+
 const questionFormSchema = z.object({
   text: z.string().min(1, 'Question text cannot be empty.'),
-  subject: z.string().optional(),
-  topic: z.string().optional(),
-  class: z.string().optional(),
+  subject: stringOrStringArray.optional(),
+  topic: stringOrStringArray.optional(),
+  class: stringOrStringArray.optional(),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']),
   options: z.array(optionSchema).min(2, 'Must have at least two options.'),
   correctOption: z.string().min(1, "Must select a correct option."),
   explanation: z.string().optional(),
+  program: stringOrStringArray.optional(),
+  paper: stringOrStringArray.optional(),
+  chapter: stringOrStringArray.optional(),
+  board: stringOrStringArray.optional(),
 });
 
 type EditQuestionDialogProps = {
@@ -52,19 +59,22 @@ type EditQuestionDialogProps = {
   onSave: (updatedQuestion: Question) => void;
 };
 
+// Helper to convert single string to comma-separated and handle arrays
+const formatForInput = (value: string | string[] | undefined): string => {
+    if (Array.isArray(value)) return value.join(', ');
+    return value || '';
+}
+
+// Helper to convert comma-separated string back to array (or single string if one item)
+const parseFromInput = (value: string): string | string[] => {
+    const parts = value.split(',').map(s => s.trim()).filter(Boolean);
+    if (parts.length <= 1) return parts[0] || '';
+    return parts;
+}
+
 export function EditQuestionDialog({ question, isOpen, onOpenChange, onSave }: EditQuestionDialogProps) {
   const form = useForm<z.infer<typeof questionFormSchema>>({
     resolver: zodResolver(questionFormSchema),
-    defaultValues: {
-      text: question.text || '',
-      subject: question.subject || '',
-      topic: question.topic || '',
-      class: question.class || '',
-      difficulty: question.difficulty || 'Medium',
-      options: question.options || [{ text: '', isCorrect: false }, { text: '', isCorrect: false }],
-      correctOption: question.options?.findIndex(o => o.isCorrect).toString() || '0',
-      explanation: question.explanation || ''
-    },
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -73,17 +83,23 @@ export function EditQuestionDialog({ question, isOpen, onOpenChange, onSave }: E
   });
   
   useEffect(() => {
-    form.reset({
-      text: question.text || '',
-      subject: question.subject || '',
-      topic: question.topic || '',
-      class: question.class || '',
-      difficulty: question.difficulty || 'Medium',
-      options: question.options || [{ text: '', isCorrect: false }, { text: '', isCorrect: false }],
-      correctOption: question.options?.findIndex(o => o.isCorrect).toString() || '0',
-      explanation: question.explanation || ''
-    });
-  }, [question, form]);
+    if (isOpen) {
+        form.reset({
+            text: question.text || '',
+            subject: formatForInput(question.subject),
+            topic: formatForInput(question.topic),
+            class: formatForInput(question.class),
+            difficulty: question.difficulty || 'Medium',
+            options: question.options || [{ text: '', isCorrect: false }, { text: '', isCorrect: false }],
+            correctOption: question.options?.findIndex(o => o.isCorrect).toString() || '0',
+            explanation: question.explanation || '',
+            program: formatForInput(question.program),
+            paper: formatForInput(question.paper),
+            chapter: formatForInput(question.chapter),
+            board: formatForInput(question.board),
+        });
+    }
+  }, [question, isOpen, form]);
 
   const onSubmit = (values: z.infer<typeof questionFormSchema>) => {
     const updatedOptions = values.options.map((opt, index) => ({
@@ -94,22 +110,36 @@ export function EditQuestionDialog({ question, isOpen, onOpenChange, onSave }: E
     const updatedQuestion: Question = {
       ...question,
       text: values.text,
-      subject: values.subject || '',
-      topic: values.topic || '',
-      class: values.class || '',
+      subject: parseFromInput(values.subject as string),
+      topic: parseFromInput(values.topic as string),
+      class: parseFromInput(values.class as string),
       difficulty: values.difficulty,
       options: updatedOptions,
       explanation: values.explanation,
+      program: parseFromInput(values.program as string),
+      paper: parseFromInput(values.paper as string),
+      chapter: parseFromInput(values.chapter as string),
+      board: parseFromInput(values.board as string),
     };
     onSave(updatedQuestion);
   };
+  
+  const AttributeInput = ({ name, label }: { name: "subject" | "topic" | "class" | "program" | "paper" | "chapter" | "board", label: string }) => (
+     <FormField control={form.control} name={name} render={({ field }) => (
+        <FormItem>
+            <FormLabel>{label}</FormLabel>
+            <FormControl><Input {...field} /></FormControl>
+            <FormMessage />
+        </FormItem>
+    )}/>
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Edit Question</DialogTitle>
-          <DialogDescription>Modify the question details and attributes below.</DialogDescription>
+          <DialogDescription>Modify the question details. For attributes like Topic or Subject, use commas to separate multiple values.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 flex flex-col gap-4 overflow-hidden">
@@ -166,27 +196,9 @@ export function EditQuestionDialog({ question, isOpen, onOpenChange, onSave }: E
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                        <FormField control={form.control} name="subject" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Subject</FormLabel>
-                                <FormControl><Input {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}/>
-                         <FormField control={form.control} name="topic" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Topic</FormLabel>
-                                <FormControl><Input {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}/>
-                         <FormField control={form.control} name="class" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Class</FormLabel>
-                                <FormControl><Input {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}/>
+                        <AttributeInput name="subject" label="Subject" />
+                        <AttributeInput name="topic" label="Topic" />
+                        <AttributeInput name="class" label="Class" />
                          <FormField control={form.control} name="difficulty" render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Difficulty</FormLabel>
@@ -205,6 +217,10 @@ export function EditQuestionDialog({ question, isOpen, onOpenChange, onSave }: E
                                 <FormMessage />
                             </FormItem>
                         )}/>
+                        <AttributeInput name="program" label="Program" />
+                        <AttributeInput name="paper" label="Paper" />
+                        <AttributeInput name="chapter" label="Chapter" />
+                        <AttributeInput name="board" label="Board/School" />
                     </div>
                      <FormField
                         control={form.control}
