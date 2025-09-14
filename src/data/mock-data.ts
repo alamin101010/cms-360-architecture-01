@@ -24,19 +24,43 @@ export const allQuestions: Question[] = [
       }
     ],
     "answer": "ওয়েস্ট্রন",
-    "subject": "Bangla",
-    "topic": "asds",
-    "class": "Misc",
-    "difficulty": "Medium",
+    "subject": [
+      "Bangla",
+      "Science"
+    ],
+    "topic": [
+      "asds"
+    ],
+    "class": [
+      "Misc"
+    ],
+    "difficulty": "Hard",
     "bloomsTaxonomyLevel": "Remembering",
-    "vertical": "K-12",
-    "program": "HSC 23 Business Studies",
-    "paper": "2nd Paper",
-    "chapter": "Chapter 4",
+    "vertical": [
+      "K-12",
+      "English"
+    ],
+    "program": [
+      "HSC 23 Business Studies",
+      "Admission 23 A unit",
+      "HSC 26 Online Batch"
+    ],
+    "paper": [
+      "2nd Paper"
+    ],
+    "chapter": [
+      "Chapter 4"
+    ],
     "explanation": "ভার্নিস, পেইন্ট, তৈল ও চর্বির দ্রাবকরূপে ভারী অদাহ্য তরল অ্যাসিটিলিন টেট্রাক্লোরাইড (〖𝐶𝐻𝐶𝑙〗_2−〖𝐶𝐻𝐶𝑙〗_2) বা ওয়েস্ট্রন (Westron) ব্যবহৃত হয়।",
     "marks": 1,
     "id": "import-1757872811038-0",
-    "createdAt": "2025-09-14T18:00:11.038Z"
+    "createdAt": "2025-09-14T18:00:11.038Z",
+    "exam_set": [],
+    "board": [
+      "Board: Dhaka"
+    ],
+    "category": [],
+    "modules": []
   },
   {
     "text": "অ্যালকাইল হ্যালাইড কোন ধরনের বিক্রিয়া দেয় না?",
@@ -61,19 +85,42 @@ export const allQuestions: Question[] = [
       }
     ],
     "answer": "অধাতুর সাথে বিক্রিয়া",
-    "subject": "Bangla",
-    "topic": "asds",
-    "class": "Misc",
-    "difficulty": "Medium",
+    "subject": [
+      "Bangla",
+      "Science"
+    ],
+    "topic": [
+      "asds"
+    ],
+    "class": [
+      "Misc"
+    ],
+    "difficulty": "Hard",
     "bloomsTaxonomyLevel": "Remembering",
-    "vertical": "K-12",
-    "program": "HSC 23 Business Studies",
-    "paper": "2nd Paper",
-    "chapter": "Chapter 4",
+    "vertical": [
+      "K-12",
+      "English"
+    ],
+    "program": [
+      "HSC 23 Business Studies",
+      "HSC 26 Online Batch"
+    ],
+    "paper": [
+      "2nd Paper"
+    ],
+    "chapter": [
+      "Chapter 4"
+    ],
     "explanation": "অ্যালকাইল হ্যালাইড ধাতুর সাথে বিক্রিয়া দেয়।",
     "marks": 1,
     "id": "import-1757872811038-1",
-    "createdAt": "2025-09-14T18:00:11.038Z"
+    "createdAt": "2025-09-14T18:00:11.038Z",
+    "exam_set": [],
+    "board": [
+      "Board: Dhaka"
+    ],
+    "category": [],
+    "modules": []
   },
   {
     "text": "চোখের ড্রপ এবং স্কিনের বিভিন্ন ক্রিম তৈরিতে কোন অ্যালকোহল ব্যবহৃত হয়?",
@@ -121,7 +168,8 @@ export const allQuestions: Question[] = [
       "K-12"
     ],
     "program": [
-      "HSC 23 Business Studies"
+      "HSC 23 Business Studies",
+      "HSC 26 Online Batch"
     ],
     "paper": [
       "2nd Paper"
@@ -130,7 +178,9 @@ export const allQuestions: Question[] = [
       "Chapter 4"
     ],
     "exam_set": [],
-    "board": [],
+    "board": [
+      "Board: Dhaka"
+    ],
     "explanation": "Polyhydric Alcohol সমূহ Moisturising Agent রূপে চোখের ড্রপ ও স্কিনের বিভিন্ন ক্রিম তৈরিতে ব্যবহৃত হয়।",
     "category": [],
     "modules": [],
