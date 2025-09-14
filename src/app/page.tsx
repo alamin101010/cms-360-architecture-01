@@ -13,7 +13,7 @@ import useLocalStorage from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
 
 export default function Home() {
-  const [questions, setQuestions] = useLocalStorage<Question[]>('allQuestions', allQuestions);
+  const [questions, setQuestions] = useState<Question[]>(allQuestions);
   const [currentExamQuestions, setCurrentExamQuestions] = useState<Question[]>([]);
   const [examDetails, setExamDetails] = useState({
     name: 'New Exam',
