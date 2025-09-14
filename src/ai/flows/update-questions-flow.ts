@@ -47,10 +47,16 @@ export type UpdateQuestionsInput = z.infer<typeof UpdateQuestionsInputSchema>;
 export async function updateQuestions(questions: UpdateQuestionsInput): Promise<void> {
   const filePath = path.join(process.cwd(), 'src', 'data', 'mock-data.ts');
   
+  // Ensure every question has a valid bloomsTaxonomyLevel
+  const questionsWithDefaults = questions.map(q => ({
+    ...q,
+    bloomsTaxonomyLevel: q.bloomsTaxonomyLevel || 'Remembering'
+  }));
+  
   // To prevent circular dependencies or complex regeneration, we'll just store the JSON data.
   const fileContent = `import type { Question } from '@/types';
 
-export const allQuestions: Question[] = ${JSON.stringify(questions, null, 2)};
+export const allQuestions: Question[] = ${JSON.stringify(questionsWithDefaults, null, 2)};
 `;
 
   try {

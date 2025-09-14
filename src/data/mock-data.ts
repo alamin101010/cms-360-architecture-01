@@ -61,19 +61,39 @@ export const allQuestions: Question[] = [
       }
     ],
     "answer": "ডায়াস্টেজ",
-    "subject": "Higher Math",
-    "topic": "অধ্যায় ২: জৈব রসায়ন",
-    "class": "Misc",
+    "subject": [
+      "Higher Math"
+    ],
+    "topic": [
+      "83",
+      "অধ্যায় ২: জৈব রসায়ন"
+    ],
+    "class": [
+      "Misc"
+    ],
     "difficulty": "Hard",
     "bloomsTaxonomyLevel": "Remembering",
-    "vertical": "K-12",
-    "program": "10MS Townhall",
-    "paper": "1st Paper",
-    "chapter": "Chapter 4",
+    "vertical": [
+      "K-12"
+    ],
+    "program": [
+      "10MS Townhall",
+      "Bank Jobs Question Solve & Model Test"
+    ],
+    "paper": [
+      "1st Paper"
+    ],
+    "chapter": [
+      "Chapter 4"
+    ],
     "explanation": "স্টার্চ + nH_2 O→ 40°-50° ডায়াস্টেজ মল্টোজ।",
     "marks": 1,
     "id": "import-1757869130484-1",
-    "createdAt": "2025-09-14T16:58:50.484Z"
+    "createdAt": "2025-09-14T16:58:50.484Z",
+    "exam_set": [],
+    "board": [],
+    "category": [],
+    "modules": []
   },
   {
     "text": "লঘু তেলের পাতিত তলের তরলের প্রধান উপাদান নয় কোনটি?",
@@ -159,6 +179,7 @@ export const allQuestions: Question[] = [
       "Higher Math"
     ],
     "topic": [
+      "Test duplicate",
       "অধ্যায় ২: জৈব রসায়ন"
     ],
     "class": [
@@ -171,6 +192,7 @@ export const allQuestions: Question[] = [
     ],
     "program": [
       "10MS Townhall",
+      "Bank Jobs Question Solve & Model Test",
       "College Admission Course - 2022"
     ],
     "paper": [
