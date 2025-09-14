@@ -35,7 +35,7 @@ export function QuestionSetDetailsDialog({ questionSet, allQuestions, isOpen, on
             {questionSet.description}
           </DialogDescription>
         </DialogHeader>
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-auto">
           <ScrollArea className="h-full pr-6">
               <div className="space-y-4">
                   {questionsInSet.map(question => (
