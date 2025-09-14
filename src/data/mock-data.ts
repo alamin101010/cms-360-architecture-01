@@ -176,7 +176,8 @@ export const allQuestions: Question[] = [
       "Physics"
     ],
     "topic": [
-      "test physics topic"
+      "test physics topic",
+      "test physics topic 1"
     ],
     "class": [
       "Misc"
@@ -188,6 +189,7 @@ export const allQuestions: Question[] = [
     ],
     "program": [
       "B Unit সেকেন্ড টাইমার এডমিশন কোর্স (HSC'23)",
+      "Ghore Boshe English Grammar",
       "Online Batch 25"
     ],
     "paper": [
