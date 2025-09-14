@@ -103,7 +103,8 @@ export const allQuestions: Question[] = [
     ],
     "topic": [
       "asds",
-      "asds 1"
+      "asds 1",
+      "test topic physics"
     ],
     "class": [
       "Misc"

@@ -247,15 +247,15 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
   }
 
   const handleParse = () => {
-    if (file) {
-      parseData(file);
-    } else if (textData) {
+    if (textData) {
       parseData(textData);
+    } else if (file) {
+      parseData(file);
     } else {
       toast({
         variant: 'destructive',
         title: 'No data selected',
-        description: 'Please select a CSV file or paste CSV data to parse.',
+        description: 'Please paste CSV data or select a file to parse.',
       });
     }
   };
@@ -398,22 +398,22 @@ export function CsvUploader({ children, addImportedQuestions, updateQuestion, ad
         <DialogHeader>
           <DialogTitle>Upload Questions via CSV</DialogTitle>
           <DialogDescription>
-            Select a CSV file or paste data. New attributes for duplicate questions will be merged.
+            Paste data or select a CSV file. New attributes for duplicate questions will be merged.
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid md:grid-cols-2 gap-6 flex-1 min-h-0">
             <div className="space-y-4">
-                <Tabs defaultValue="file" className='w-full'>
+                <Tabs defaultValue="paste" className='w-full'>
                     <TabsList className='grid w-full grid-cols-2'>
-                        <TabsTrigger value="file">Upload File</TabsTrigger>
                         <TabsTrigger value="paste">Paste Text</TabsTrigger>
+                        <TabsTrigger value="file">Upload File</TabsTrigger>
                     </TabsList>
+                     <TabsContent value="paste" className="py-4">
+                        <Textarea placeholder='Paste your CSV data here...' className='h-32' value={textData} onChange={handleTextChange}/>
+                    </TabsContent>
                     <TabsContent value="file" className="py-4">
                         <Input type="file" accept=".csv" onChange={handleFileChange} ref={fileInputRef} className="flex-1" />
-                    </TabsContent>
-                    <TabsContent value="paste" className="py-4">
-                        <Textarea placeholder='Paste your CSV data here...' className='h-32' value={textData} onChange={handleTextChange}/>
                     </TabsContent>
                 </Tabs>
                 <div className="grid grid-cols-2 gap-4">
