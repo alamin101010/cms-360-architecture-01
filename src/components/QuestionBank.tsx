@@ -35,7 +35,6 @@ import { EditQuestionDialog } from './EditQuestionDialog';
 
 type QuestionBankProps = {
   questions: Question[];
-  addSuggestedQuestions: (newQuestions: Omit<Question, 'id'>[]) => Question[];
   addImportedQuestions: (newQuestions: Omit<Question, 'id'>[]) => void;
   addMultipleQuestionsToExam: (questionIds: string[]) => void;
   addQuestionsToExam: (questions: Question[]) => void;
@@ -48,7 +47,7 @@ type QuestionBankProps = {
 type FilterValue = string | null;
 
 
-export function QuestionBank({ questions, addSuggestedQuestions, addImportedQuestions, addMultipleQuestionsToExam, addQuestionsToExam, deleteQuestion, deleteMultipleQuestions, updateQuestion, updateMultipleQuestions }: QuestionBankProps) {
+export function QuestionBank({ questions, addImportedQuestions, addMultipleQuestionsToExam, addQuestionsToExam, deleteQuestion, deleteMultipleQuestions, updateQuestion, updateMultipleQuestions }: QuestionBankProps) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -261,7 +260,7 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
                 Import CSV
               </Button>
           </CsvUploader>
-          <AiQuestionSuggester addSuggestedQuestions={addSuggestedQuestions} existingQuestions={questions}>
+          <AiQuestionSuggester addImportedQuestions={addImportedQuestions} existingQuestions={questions}>
             <Button variant="outline" size="sm">
               <Bot className="mr-2 h-4 w-4" />
               AI Suggestions

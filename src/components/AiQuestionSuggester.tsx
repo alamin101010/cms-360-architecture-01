@@ -33,11 +33,11 @@ const formSchema = z.object({
 
 type AiQuestionSuggesterProps = {
   children: React.ReactNode;
-  addSuggestedQuestions: (newQuestions: Omit<Question, 'id'>[]) => Question[];
+  addImportedQuestions: (newQuestions: Omit<Question, 'id'>[]) => void;
   existingQuestions: Question[];
 };
 
-export function AiQuestionSuggester({ children, addSuggestedQuestions, existingQuestions }: AiQuestionSuggesterProps) {
+export function AiQuestionSuggester({ children, addImportedQuestions, existingQuestions }: AiQuestionSuggesterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<any[]>([]);
@@ -85,7 +85,7 @@ export function AiQuestionSuggester({ children, addSuggestedQuestions, existingQ
       difficulty: 'Medium' as const,
       type: 'm1',
     }));
-    addSuggestedQuestions(questionsToAdd);
+    addImportedQuestions(questionsToAdd);
     setIsOpen(false);
     form.reset();
     setSuggestions([]);

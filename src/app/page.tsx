@@ -64,15 +64,6 @@ export default function Home() {
     setQuestions(updatedQuestions);
   }
 
-  const addSuggestedQuestions = (newQuestions: Omit<Question, 'id'>[]) => {
-    const uniqueNewQuestions = newQuestions.filter(nq => !questions.some(q => q.text === nq.text));
-    const questionsWithIds: Question[] = uniqueNewQuestions.map((q, i) => ({ ...q, id: `ai-${Date.now()}-${i}`, createdAt: new Date().toISOString() }));
-    const updatedQuestions = [...questionsWithIds, ...questions];
-    persistQuestions(updatedQuestions);
-    toast({ title: `${questionsWithIds.length} AI-suggested questions added to the bank.` });
-    return questionsWithIds;
-  };
-
   const addImportedQuestions = (newQuestions: Omit<Question, 'id'>[]) => {
     const uniqueNewQuestions = newQuestions.filter(nq => !questions.some(q => q.text === nq.text));
     const questionsWithIds: Question[] = uniqueNewQuestions.map((q, i) => ({...q, id: `import-${Date.now()}-${i}`, createdAt: new Date().toISOString()}));
@@ -182,7 +173,6 @@ export default function Home() {
       <main className="flex-1 grid lg:grid-cols-2 gap-6 p-4 md:p-6 overflow-hidden">
         <QuestionBank
           questions={questions}
-          addSuggestedQuestions={addSuggestedQuestions}
           addImportedQuestions={addImportedQuestions}
           addMultipleQuestionsToExam={addMultipleQuestionsToExam}
           addQuestionsToExam={addQuestionsToExam}
