@@ -21,7 +21,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { suggestBalancedQuestionSet, SuggestBalancedQuestionSetOutput } from '@/ai/flows/suggest-balanced-question-set';
 import type { Question } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -40,7 +39,7 @@ type AiQuestionSuggesterProps = {
 export function AiQuestionSuggester({ children, addSuggestedQuestions, existingQuestions }: AiQuestionSuggesterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [suggestions, setSuggestions] = useState<SuggestBalancedQuestionSetOutput['suggestedQuestions']>([]);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -56,11 +55,17 @@ export function AiQuestionSuggester({ children, addSuggestedQuestions, existingQ
     setIsLoading(true);
     setSuggestions([]);
     try {
-      const result = await suggestBalancedQuestionSet({
-        ...values,
-        existingQuestions: existingQuestions.slice(0, 20) // Pass a subset of questions for context
+      // NOTE: AI suggestions are disabled as they rely on a server-side flow.
+      toast({
+        variant: 'destructive',
+        title: 'AI Suggestions Disabled',
+        description: 'This feature is not available in the current deployment environment.',
       });
-      setSuggestions(result.suggestedQuestions);
+      // const result = await suggestBalancedQuestionSet({
+      //   ...values,
+      //   existingQuestions: existingQuestions.slice(0, 20) // Pass a subset of questions for context
+      // });
+      // setSuggestions(result.suggestedQuestions);
     } catch (error) {
       console.error('AI suggestion failed:', error);
       toast({

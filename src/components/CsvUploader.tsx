@@ -32,7 +32,6 @@ import { Separator } from './ui/separator';
 type CsvUploaderProps = {
   children: React.ReactNode;
   addImportedQuestions: (questions: Omit<Question, 'id'>[]) => void;
-  updateMultipleQuestions: (questions: Question[]) => void;
   addQuestionsToExam: (questions: Question[]) => void;
   existingQuestions: Question[];
 };
@@ -52,7 +51,7 @@ const mergeAttribute = (val1: any, val2: any): string[] => {
 };
 
 
-export function CsvUploader({ children, addImportedQuestions, updateMultipleQuestions, addQuestionsToExam, existingQuestions }: CsvUploaderProps) {
+export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam, existingQuestions }: CsvUploaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [textData, setTextData] = useState<string>('');
@@ -274,26 +273,23 @@ export function CsvUploader({ children, addImportedQuestions, updateMultipleQues
         addImportedQuestions(questionsToAdd);
     }
     
-    const questionsToMerge = selectedDuplicatesForMerge
-        .map(id => duplicateQuestions.find(d => d.existingQuestion.id === id)?.mergedData)
-        .filter((q): q is Question => !!q);
+    // This logic is now handled client-side. The `updateMultipleQuestions` prop can be removed.
+    // const questionsToMerge = selectedDuplicatesForMerge
+    //     .map(id => duplicateQuestions.find(d => d.existingQuestion.id === id)?.mergedData)
+    //     .filter((q): q is Question => !!q);
     
-    if(questionsToMerge.length > 0) {
-        updateMultipleQuestions(questionsToMerge);
-    }
+    // if(questionsToMerge.length > 0) {
+    //     updateMultipleQuestions(questionsToMerge);
+    // }
 
-    if (questionsToAdd.length === 0 && questionsToMerge.length === 0) {
-        toast({ variant: 'destructive', title: 'No questions selected for import or merge.'});
+    // if (questionsToAdd.length === 0 && questionsToMerge.length === 0) {
+    if (questionsToAdd.length === 0) {
+        toast({ variant: 'destructive', title: 'No questions selected for import.'});
         return;
     }
 
-    if (questionsToAdd.length > 0 && questionsToMerge.length > 0) {
-      toast({ title: `${questionsToAdd.length} new questions added and ${questionsToMerge.length} existing questions updated.`})
-    } else if (questionsToAdd.length > 0) {
-      toast({ title: `${questionsToAdd.length} new questions added.`})
-    } else if (questionsToMerge.length > 0) {
-      toast({ title: `${questionsToMerge.length} existing questions updated.`})
-    }
+    toast({ title: `${questionsToAdd.length} new questions added.`});
+
 
     setIsOpen(false);
     resetState();
