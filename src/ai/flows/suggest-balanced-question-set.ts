@@ -61,14 +61,26 @@ export async function suggestBalancedQuestionSet(
       ...q,
       // Ensure array fields are handled correctly for the prompt.
       topic: Array.isArray(q.topic) ? q.topic.join(', ') : q.topic,
+      subject: Array.isArray(q.subject) ? q.subject.join(', ') : q.subject,
+      class: Array.isArray(q.class) ? q.class.join(', ') : q.class,
     }))
   };
   return suggestBalancedQuestionSetFlow(mappedInput);
 }
 
+// Define a schema for the prompt that expects string versions of the array fields
+const PromptInputSchema = SuggestBalancedQuestionSetInputSchema.extend({
+  existingQuestions: z.array(QuestionSchema.extend({
+    subject: z.string(),
+    topic: z.string(),
+    class: z.string(),
+  })).optional(),
+});
+
+
 const prompt = ai.definePrompt({
   name: 'suggestBalancedQuestionSetPrompt',
-  input: {schema: SuggestBalancedQuestionSetInputSchema},
+  input: {schema: PromptInputSchema},
   output: {schema: SuggestBalancedQuestionSetOutputSchema},
   prompt: `You are an AI-powered exam creation assistant. Your task is to suggest a balanced, multiple-choice question set for a teacher based on the given parameters.
 
@@ -105,7 +117,7 @@ Make sure that the number of suggested questions matches the number of questions
 const suggestBalancedQuestionSetFlow = ai.defineFlow(
   {
     name: 'suggestBalancedQuestionSetFlow',
-    inputSchema: SuggestBalancedQuestionSetInputSchema,
+    inputSchema: PromptInputSchema,
     outputSchema: SuggestBalancedQuestionSetOutputSchema,
   },
   async input => {

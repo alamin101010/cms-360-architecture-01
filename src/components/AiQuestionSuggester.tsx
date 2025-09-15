@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Question } from '@/types';
 import { useToast } from '@/hooks/use-toast';
+import { suggestBalancedQuestionSet } from '@/ai/flows/suggest-balanced-question-set';
 
 const formSchema = z.object({
   topic: z.string().min(3, 'Topic must be at least 3 characters long.'),
@@ -55,23 +56,20 @@ export function AiQuestionSuggester({ children, addSuggestedQuestions, existingQ
     setIsLoading(true);
     setSuggestions([]);
     try {
-      // NOTE: AI suggestions are disabled as they rely on a server-side flow.
-      toast({
-        variant: 'destructive',
-        title: 'AI Suggestions Disabled',
-        description: 'This feature is not available in the current deployment environment.',
+      // This feature is disabled in environments that don't support server-side Genkit flows.
+      // If you are running locally with `genkit start`, this should work.
+      // On a read-only filesystem like Vercel, this will not work.
+      const result = await suggestBalancedQuestionSet({
+        ...values,
+        existingQuestions: existingQuestions.slice(0, 20) // Pass a subset of questions for context
       });
-      // const result = await suggestBalancedQuestionSet({
-      //   ...values,
-      //   existingQuestions: existingQuestions.slice(0, 20) // Pass a subset of questions for context
-      // });
-      // setSuggestions(result.suggestedQuestions);
+      setSuggestions(result.suggestedQuestions);
     } catch (error) {
       console.error('AI suggestion failed:', error);
       toast({
         variant: 'destructive',
-        title: 'An error occurred',
-        description: 'Could not fetch AI suggestions. Please try again.',
+        title: 'AI Suggestions Currently Unavailable',
+        description: 'This feature could not connect to the backend AI service. If you are running locally, ensure your Genkit flows are active.',
       });
     }
     setIsLoading(false);
