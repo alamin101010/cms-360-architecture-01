@@ -24,14 +24,18 @@ type QuestionDetailsDialogProps = {
 export function QuestionDetailsDialog({ question, isOpen, onOpenChange, onEditClick }: QuestionDetailsDialogProps) {
   if (!question) return null;
 
-  const getAttributeBadge = (label: string, value: string | string[] | undefined | null | number) => {
+  const getAttributeBadges = (label: string, value: string | string[] | undefined | null | number) => {
     if (!value || (Array.isArray(value) && value.length === 0)) return null;
-    
-    const displayValue = Array.isArray(value) ? value.join(', ') : String(value);
+
+    const values = Array.isArray(value) ? value : [String(value)];
 
     return (
-        <Badge variant="outline">{label}: {displayValue}</Badge>
-    )
+      <>
+        {values.map((val, index) => (
+            <Badge key={`${label}-${index}`} variant="outline">{label}: {val}</Badge>
+        ))}
+      </>
+    );
   };
   
   return (
@@ -74,20 +78,20 @@ export function QuestionDetailsDialog({ question, isOpen, onOpenChange, onEditCl
                 <div>
                     <h3 className="font-semibold mb-2">Attributes</h3>
                     <div className="flex flex-wrap gap-2">
-                        {getAttributeBadge('Class', question.class)}
-                        {getAttributeBadge('Subject', question.subject)}
-                        {getAttributeBadge('Topic', question.topic)}
-                        {getAttributeBadge('Difficulty', question.difficulty)}
-                        {getAttributeBadge('Program', question.program)}
-                        {getAttributeBadge('Paper', question.paper)}
-                        {getAttributeBadge('Chapter', question.chapter)}
-                        {getAttributeBadge('Exam Set', question.exam_set)}
-                        {getAttributeBadge('Board', question.board)}
-                        {getAttributeBadge('Category', question.category)}
-                        {getAttributeBadge('Modules', question.modules)}
-                        {getAttributeBadge('Group Type', question.group_type)}
-                        {getAttributeBadge('Marks', question.marks?.toString())}
-                        {getAttributeBadge('Vertical', question.vertical)}
+                        {getAttributeBadges('Class', question.class)}
+                        {getAttributeBadges('Subject', question.subject)}
+                        {getAttributeBadges('Topic', question.topic)}
+                        {getAttributeBadges('Difficulty', question.difficulty)}
+                        {getAttributeBadges('Program', question.program)}
+                        {getAttributeBadges('Paper', question.paper)}
+                        {getAttributeBadges('Chapter', question.chapter)}
+                        {getAttributeBadges('Exam Set', question.exam_set)}
+                        {getAttributeBadges('Board', question.board)}
+                        {getAttributeBadges('Category', question.category)}
+                        {getAttributeBadges('Modules', question.modules)}
+                        {getAttributeBadges('Group Type', question.group_type)}
+                        {getAttributeBadges('Marks', question.marks?.toString())}
+                        {getAttributeBadges('Vertical', question.vertical)}
                     </div>
                 </div>
 

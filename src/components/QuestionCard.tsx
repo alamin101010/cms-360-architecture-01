@@ -15,13 +15,13 @@ type QuestionCardProps = {
   isSelected: boolean;
 };
 
-const AttributeBadge = ({ value }: { value: string | string[] | undefined }) => {
+const AttributeBadge = ({ value, variant }: { value: string | string[] | undefined, variant?: "default" | "secondary" | "destructive" | "outline" | null | undefined }) => {
   if (!value) return null;
   const values = Array.isArray(value) ? value : [value];
   return (
     <>
       {values.map((val, index) => (
-        <Badge key={index} variant="secondary">{val}</Badge>
+        <Badge key={index} variant={variant || 'secondary'}>{val}</Badge>
       ))}
     </>
   );
@@ -70,7 +70,7 @@ export function QuestionCard({ question, onCardClick, onDeleteClick, onSelectTog
               {question.difficulty}
             </Badge>}
             {question.bloomsTaxonomyLevel && <Badge variant="outline">{question.bloomsTaxonomyLevel}</Badge>}
-            <AttributeBadge value={question.topic} />
+            <AttributeBadge value={question.topic} variant="outline" />
           </div>
         </div>
       </div>

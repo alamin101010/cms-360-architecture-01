@@ -2,6 +2,214 @@ import type { Question } from '@/types';
 
 export const allQuestions: Question[] = [
   {
+    "text": "ডারউইন-এর মতে জীবনে কয়টি পর্যায়ে সংগ্রাম করতে হয়?",
+    "type": "M1",
+    "image": "",
+    "options": [
+      {
+        "text": "২",
+        "isCorrect": false
+      },
+      {
+        "text": "৩",
+        "isCorrect": true
+      },
+      {
+        "text": "৪",
+        "isCorrect": false
+      },
+      {
+        "text": "৫",
+        "isCorrect": false
+      }
+    ],
+    "answer": "৩",
+    "subject": [
+      "Biology",
+      "Higher Math"
+    ],
+    "topic": [
+      "জৈব অভিব্যক্তি তত্ত্ব, জীবনের আবির্ভাব, ডারউইনের মতবাদ, ডারউইনের দৃষ্টিতে প্রকৃতিতে সংঘটিত সাধারণ সত্যসমূহ"
+    ],
+    "class": [
+      "Class 9"
+    ],
+    "difficulty": "Medium",
+    "bloomsTaxonomyLevel": "Remembering",
+    "vertical": [
+      "K-12",
+      "English"
+    ],
+    "program": [
+      "Online Batch 25"
+    ],
+    "paper": [],
+    "chapter": [
+      "Chapter 11"
+    ],
+    "exam_set": [
+      "Set 1"
+    ],
+    "board": [],
+    "explanation": "",
+    "category": [],
+    "modules": [],
+    "marks": 1,
+    "id": "import-1757911012561-0",
+    "createdAt": "2025-09-15T04:36:52.561Z"
+  },
+  {
+    "text": "প্রোটিন ও নিউক্লিক এসিড সহযোগে কোনটি সৃষ্টি হয়?",
+    "type": "M1",
+    "image": "",
+    "options": [
+      {
+        "text": "ব্যাকটেরিয়া",
+        "isCorrect": false
+      },
+      {
+        "text": "আদি কোষ",
+        "isCorrect": false
+      },
+      {
+        "text": "নিউক্লিও প্রোটিন",
+        "isCorrect": true
+      },
+      {
+        "text": "প্রোটোজোয়া",
+        "isCorrect": false
+      }
+    ],
+    "answer": "নিউক্লিও প্রোটিন",
+    "subject": [
+      "Biology",
+      "Higher Math"
+    ],
+    "topic": [
+      "জৈব অভিব্যক্তি তত্ত্ব, জীবনের আবির্ভাব, ডারউইনের মতবাদ, ডারউইনের দৃষ্টিতে প্রকৃতিতে সংঘটিত সাধারণ সত্যসমূহ"
+    ],
+    "class": [
+      "Class 9"
+    ],
+    "difficulty": "Medium",
+    "bloomsTaxonomyLevel": "Remembering",
+    "vertical": [
+      "K-12",
+      "English"
+    ],
+    "program": [
+      "Online Batch 25"
+    ],
+    "paper": [],
+    "chapter": [
+      "Chapter 11"
+    ],
+    "exam_set": [
+      "Set 1"
+    ],
+    "board": [],
+    "explanation": "",
+    "category": [],
+    "modules": [],
+    "marks": 1,
+    "id": "import-1757911012561-1",
+    "createdAt": "2025-09-15T04:36:52.561Z"
+  },
+  {
+    "text": "প্রাকৃতিক নির্বাচনের দ্বারা প্রজাতির উদ্ভব বইটির লেখক কে?",
+    "type": "M1",
+    "image": "",
+    "options": [
+      {
+        "text": "চার্লস ডারউইন",
+        "isCorrect": true
+      },
+      {
+        "text": "হাবার্ট স্পেনসার",
+        "isCorrect": false
+      },
+      {
+        "text": "আলফ্রেড ওয়ালেস",
+        "isCorrect": false
+      },
+      {
+        "text": "এরিস্টটল",
+        "isCorrect": false
+      }
+    ],
+    "answer": "চার্লস ডারউইন",
+    "subject": [
+      "Biology",
+      "Higher Math"
+    ],
+    "topic": [
+      "জৈব অভিব্যক্তি তত্ত্ব, জীবনের আবির্ভাব, ডারউইনের মতবাদ, ডারউইনের দৃষ্টিতে প্রকৃতিতে সংঘটিত সাধারণ সত্যসমূহ"
+    ],
+    "class": [
+      "Class 9"
+    ],
+    "difficulty": "Medium",
+    "bloomsTaxonomyLevel": "Remembering",
+    "vertical": [
+      "K-12",
+      "English"
+    ],
+    "program": [
+      "Online Batch 25"
+    ],
+    "paper": [],
+    "chapter": [
+      "Chapter 11"
+    ],
+    "exam_set": [
+      "Set 1"
+    ],
+    "board": [],
+    "explanation": "",
+    "category": [],
+    "modules": [],
+    "marks": 1,
+    "id": "import-1757911012561-2",
+    "createdAt": "2025-09-15T04:36:52.561Z"
+  },
+  {
+    "text": "কয়টি উপায়ে নতুন প্রজাতি সৃষ্টি হতে পারে?",
+    "type": "M1",
+    "image": "",
+    "options": [
+      {
+        "text": "২",
+        "isCorrect": false
+      },
+      {
+        "text": "৩",
+        "isCorrect": true
+      },
+      {
+        "text": "৪",
+        "isCorrect": false
+      },
+      {
+        "text": "৫",
+        "isCorrect": false
+      }
+    ],
+    "answer": "৩",
+    "subject": "Biology",
+    "topic": "জৈব অভিব্যক্তি তত্ত্ব, জীবনের আবির্ভাব, ডারউইনের মতবাদ, ডারউইনের দৃষ্টিতে প্রকৃতিতে সংঘটিত সাধারণ সত্যসমূহ",
+    "class": "Class 9",
+    "difficulty": "Medium",
+    "bloomsTaxonomyLevel": "Remembering",
+    "vertical": "K-12",
+    "program": "Online Batch 25",
+    "chapter": "Chapter 11",
+    "exam_set": "Set 1",
+    "explanation": "",
+    "marks": 1,
+    "id": "import-1757911012561-3",
+    "createdAt": "2025-09-15T04:36:52.561Z"
+  },
+  {
     "text": "শারীরবৃত্তীয় ভ্রূণ গঠনে অংশগ্রহণ করে কোনটি?",
     "type": "M1",
     "image": "",
