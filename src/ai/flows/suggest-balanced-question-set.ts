@@ -16,9 +16,9 @@ import type { Question } from '@/types';
 const QuestionSchema = z.object({
   id: z.string(),
   text: z.string(),
-  subject: z.string(),
-  topic: z.string(),
-  class: z.string(),
+  subject: z.union([z.string(), z.array(z.string())]),
+  topic: z.union([z.string(), z.array(z.string())]),
+  class: z.union([z.string(), z.array(z.string())]),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']),
   createdAt: z.string().optional(),
 });
@@ -58,7 +58,9 @@ export async function suggestBalancedQuestionSet(
   const mappedInput = {
     ...input,
     existingQuestions: input.existingQuestions?.map(q => ({
-      ...q
+      ...q,
+      // Ensure array fields are handled correctly for the prompt.
+      topic: Array.isArray(q.topic) ? q.topic.join(', ') : q.topic,
     }))
   };
   return suggestBalancedQuestionSetFlow(mappedInput);

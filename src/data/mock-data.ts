@@ -1,7 +1,226 @@
-
 import type { Question } from '@/types';
 
 export const allQuestions: Question[] = [
+  {
+    "text": "10 𝑁 বল প্রয়োগে একটি গাড়িকে 100 𝑚 সরাতে কত কাজ করতে হবে? বল ও সরণের মধ্যবর্তী কোণ 60°।",
+    "type": "M1",
+    "image": "",
+    "options": [
+      {
+        "text": "500 𝐽",
+        "isCorrect": true
+      },
+      {
+        "text": "1000 𝐽",
+        "isCorrect": false
+      },
+      {
+        "text": "100 𝐽",
+        "isCorrect": false
+      },
+      {
+        "text": "50 𝐽",
+        "isCorrect": false
+      }
+    ],
+    "answer": "500 𝐽",
+    "subject": [
+      "Physics"
+    ],
+    "topic": [
+      "অধ্যায় ৫: কাজ, শক্তি ও ক্ষমতা Topic 1",
+      "test topic 1"
+    ],
+    "class": [
+      "Misc"
+    ],
+    "difficulty": "Medium",
+    "vertical": [
+      "K-12",
+      "English"
+    ],
+    "program": [
+      "HSC 25 SMP",
+      "Online Batch 25"
+    ],
+    "paper": [
+      "1st Paper",
+      "2nd Paper"
+    ],
+    "chapter": [
+      "Chapter 5"
+    ],
+    "exam_set": [
+      "Set 1",
+      "Set 2"
+    ],
+    "board": [],
+    "explanation": "",
+    "category": [],
+    "modules": [],
+    "marks": 1,
+    "id": "import-1757913236008-0",
+    "createdAt": "2025-09-15T05:13:56.008Z"
+  },
+  {
+    "text": "10 𝑘𝑔 ভরের একটি বস্তুকে স্প্রিং থেকে ঝুলানো হলো যার স্প্রিং ধ্রুবক 200 𝑁/𝑚। স্প্রিং-এর দৈর্ঘ্য বৃদ্ধি হবে-",
+    "type": "M1",
+    "image": "",
+    "options": [
+      {
+        "text": "0.05 𝑚",
+        "isCorrect": false
+      },
+      {
+        "text": "20.0 𝑚",
+        "isCorrect": false
+      },
+      {
+        "text": "2.4 𝑚",
+        "isCorrect": false
+      },
+      {
+        "text": "0.49 𝑚",
+        "isCorrect": true
+      }
+    ],
+    "answer": "0.49 𝑚",
+    "subject": [
+      "Physics"
+    ],
+    "topic": [
+      "অধ্যায় ৫: কাজ, শক্তি ও ক্ষমতা Topic 1",
+      "test topic 1"
+    ],
+    "class": [
+      "Misc"
+    ],
+    "difficulty": "Medium",
+    "vertical": [
+      "K-12",
+      "English"
+    ],
+    "program": [
+      "HSC 25 SMP",
+      "Online Batch 25"
+    ],
+    "paper": [
+      "1st Paper",
+      "2nd Paper"
+    ],
+    "chapter": [
+      "Chapter 5"
+    ],
+    "exam_set": [
+      "Set 1",
+      "Set 2"
+    ],
+    "board": [],
+    "explanation": "",
+    "category": [],
+    "modules": [],
+    "marks": 1,
+    "id": "import-1757913236008-1",
+    "createdAt": "2025-09-15T05:13:56.008Z"
+  },
+  {
+    "text": "কাজের মান শূন্য হবে যদি প্রযুক্ত বল ও সরণের মধ্যবর্তী কোণ-",
+    "type": "M1",
+    "image": "",
+    "options": [
+      {
+        "text": "90°",
+        "isCorrect": true
+      },
+      {
+        "text": "180°",
+        "isCorrect": false
+      },
+      {
+        "text": "0°",
+        "isCorrect": false
+      },
+      {
+        "text": "360°",
+        "isCorrect": false
+      }
+    ],
+    "answer": "90°",
+    "subject": [
+      "Physics"
+    ],
+    "topic": [
+      "অধ্যায় ৫: কাজ, শক্তি ও ক্ষমতা Topic 1",
+      "test topic 1"
+    ],
+    "class": [
+      "Misc"
+    ],
+    "difficulty": "Medium",
+    "vertical": [
+      "K-12",
+      "English"
+    ],
+    "program": [
+      "HSC 25 SMP",
+      "Online Batch 25"
+    ],
+    "paper": [
+      "1st Paper",
+      "2nd Paper"
+    ],
+    "chapter": [
+      "Chapter 5"
+    ],
+    "exam_set": [
+      "Set 1",
+      "Set 2"
+    ],
+    "board": [],
+    "explanation": "",
+    "category": [],
+    "modules": [],
+    "marks": 1,
+    "id": "import-1757913236008-2",
+    "createdAt": "2025-09-15T05:13:56.008Z"
+  },
+  {
+    "text": "বল, সরণ ও কাজের মধ্যে সম্পর্ক হলো-",
+    "type": "M1",
+    "image": "",
+    "options": [
+      {
+        "text": "𝑊=[[$$\\overrightarrow{F}$$]].[[$$\\overrightarrow{S}$$]]",
+        "isCorrect": true
+      },
+      {
+        "text": "𝑊=[[$$\\overrightarrow{F}$$]]×[[$$\\overrightarrow{S}$$]]",
+        "isCorrect": false
+      },
+      {
+        "text": "𝑊=𝐹𝑠 sin⁡[[$$theta$$]]",
+        "isCorrect": false
+      },
+      {
+        "text": "𝑊=[[$$\\overrightarrow{F}$$]]×[[$$\\overrightarrow{S}$$]] cos⁡[[$$theta$$]]",
+        "isCorrect": false
+      }
+    ],
+    "answer": "𝑊=[[$$\\overrightarrow{F}$$]].[[$$\\overrightarrow{S}$$]]",
+    "subject": "Physics",
+    "topic": "অধ্যায় ৫: কাজ, শক্তি ও ক্ষমতা Topic 1",
+    "class": "Misc",
+    "difficulty": "Medium",
+    "vertical": "K-12",
+    "program": "HSC 25 SMP",
+    "paper": "1st Paper",
+    "chapter": "Chapter 5",
+    "exam_set": "Set 1",
+    "explanation": "",
+    "marks": 1,
+    "id": "import-1757913236008-3",
+    "createdAt": "2025-09-15T05:13:56.008Z"
+  },
   {
     "text": "ডারউইন-এর মতে জীবনে কয়টি পর্যায়ে সংগ্রাম করতে হয়?",
     "type": "M1",
