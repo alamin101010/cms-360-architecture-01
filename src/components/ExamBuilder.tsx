@@ -1,3 +1,4 @@
+
 'use client';
 import type { DragEvent } from 'react';
 import type { Question } from '@/types';
@@ -149,7 +150,6 @@ export function ExamBuilder({
                     <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
                       <Badge variant="secondary">{q.subject}</Badge>
                       <Badge variant="outline">{q.difficulty}</Badge>
-                       <Badge variant="outline">{q.bloomsTaxonomyLevel}</Badge>
                     </div>
                   </div>
                   <Button variant="ghost" size="icon" className="h-7 w-7 opacity-50 group-hover:opacity-100" onClick={() => removeQuestionFromExam(q.id)}>

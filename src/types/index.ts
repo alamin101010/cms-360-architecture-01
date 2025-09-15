@@ -6,7 +6,6 @@ export type Question = {
   topic: string | string[];
   class: string | string[];
   difficulty: 'Easy' | 'Medium' | 'Hard';
-  bloomsTaxonomyLevel: 'Remembering' | 'Understanding' | 'Applying' | 'Analyzing' | 'Evaluating' | 'Creating' | 'Knowledge' | 'Aptitude and Attitude' | string;
   type?: 'm1' | 'True / False' | 'Fill in the Blanks' | string; // m1 is MCQ
   image?: string;
   options?: { text: string; isCorrect: boolean }[];

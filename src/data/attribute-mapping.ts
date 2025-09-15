@@ -1,3 +1,4 @@
+
 // This file contains the mapping from CSV attribute IDs to human-readable values.
 
 const attributeIdToName: { [key: string]: string } = {
@@ -8,7 +9,6 @@ const attributeIdToName: { [key: string]: string } = {
     '5': 'paper',
     '6': 'exam_set',
     '7': 'chapter',
-    '8': 'learning_outcome',
     '9': 'topics',
     '10': 'category',
     '11': 'question_types',
@@ -67,9 +67,6 @@ const attributeValueMap: { [key: string]: { [key: string]: string } } = {
         '32': 'Chapter 1', '33': 'Chapter 2', '34': 'Chapter 3', '35': 'Chapter 4', '36': 'Chapter 5',
         '37': 'Chapter 6', '38': 'Chapter 7', '39': 'Chapter 8', '40': 'Chapter 9', '41': 'Chapter 10',
         '42': 'Chapter 11', '43': 'Chapter 12', '44': 'Chapter 13', '45': 'Chapter 14', '46': 'Chapter 15'
-    },
-    learning_outcome: {
-        '51': 'Knowledge', '52': 'Understanding', '53': 'Application', '54': 'Aptitude and Attitude'
     },
     topics: {
         '55': 'Spoken English', '56': 'Email Writing', '57': 'Presentation Skills', '58': 'MS Word',

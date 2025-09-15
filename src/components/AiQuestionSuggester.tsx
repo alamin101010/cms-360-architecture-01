@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -18,21 +19,15 @@ import {
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { suggestBalancedQuestionSet, SuggestBalancedQuestionSetOutput } from '@/ai/flows/suggest-balanced-question-set';
 import type { Question } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 
-const bloomsLevels = ['Remembering', 'Understanding', 'Applying', 'Analyzing', 'Evaluating', 'Creating'] as const;
-
 const formSchema = z.object({
   topic: z.string().min(3, 'Topic must be at least 3 characters long.'),
   numberOfQuestions: z.coerce.number().int().min(1, 'Must be at least 1.').max(10, 'Cannot exceed 10.'),
-  bloomsTaxonomyLevels: z.array(z.string()).refine(value => value.some(item => item), {
-    message: 'You have to select at least one level.',
-  }),
   prompt: z.string().optional(),
 });
 
@@ -53,7 +48,6 @@ export function AiQuestionSuggester({ children, addSuggestedQuestions, existingQ
     defaultValues: {
       topic: '',
       numberOfQuestions: 5,
-      bloomsTaxonomyLevels: ['Remembering', 'Understanding', 'Applying'],
       prompt: '',
     },
   });
@@ -81,7 +75,6 @@ export function AiQuestionSuggester({ children, addSuggestedQuestions, existingQ
   const handleAddAllToBank = () => {
     const questionsToAdd = suggestions.map(s => ({
       text: s.question,
-      bloomsTaxonomyLevel: s.bloomsTaxonomyLevel as Question['bloomsTaxonomyLevel'],
       options: s.options,
       subject: form.getValues('topic'),
       topic: form.getValues('topic'),
@@ -149,40 +142,6 @@ export function AiQuestionSuggester({ children, addSuggestedQuestions, existingQ
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="bloomsTaxonomyLevels"
-                  render={() => (
-                    <FormItem>
-                      <FormLabel>Bloom's Taxonomy Levels</FormLabel>
-                      <div className="grid grid-cols-3 gap-2">
-                      {bloomsLevels.map((item) => (
-                        <FormField
-                          key={item}
-                          control={form.control}
-                          name="bloomsTaxonomyLevels"
-                          render={({ field }) => (
-                            <FormItem key={item} className="flex flex-row items-start space-x-3 space-y-0">
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(item)}
-                                  onCheckedChange={(checked) => {
-                                    return checked
-                                      ? field.onChange([...field.value, item])
-                                      : field.onChange(field.value?.filter((value) => value !== item));
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal">{item}</FormLabel>
-                            </FormItem>
-                          )}
-                        />
-                      ))}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 <Button type="submit" disabled={isLoading} className="w-full">
                   {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
                   Generate Questions
@@ -217,7 +176,6 @@ export function AiQuestionSuggester({ children, addSuggestedQuestions, existingQ
                            </div>
                         ))}
                       </div>
-                      <Badge variant="outline" className="mt-2">{s.bloomsTaxonomyLevel}</Badge>
                     </div>
                   ))}
                 </div>

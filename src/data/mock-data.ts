@@ -1,3 +1,4 @@
+
 import type { Question } from '@/types';
 
 export const allQuestions: Question[] = [
@@ -26,16 +27,17 @@ export const allQuestions: Question[] = [
     "answer": "৩",
     "subject": [
       "Biology",
-      "Higher Math"
+      "Higher Math",
+      "Business Entrepreneurship"
     ],
     "topic": [
-      "জৈব অভিব্যক্তি তত্ত্ব, জীবনের আবির্ভাব, ডারউইনের মতবাদ, ডারউইনের দৃষ্টিতে প্রকৃতিতে সংঘটিত সাধারণ সত্যসমূহ"
+      "জৈব অভিব্যক্তি তত্ত্ব, জীবনের আবির্ভাব, ডারউইনের মতবাদ, ডারউইনের দৃষ্টিতে প্রকৃতিতে সংঘটিত সাধারণ সত্যসমূহ",
+      "জীবের বংশগতি, বংশগতিবস্তু, ক্রোমোজোম, DNA এর গঠন"
     ],
     "class": [
       "Class 9"
     ],
     "difficulty": "Medium",
-    "bloomsTaxonomyLevel": "Remembering",
     "vertical": [
       "K-12",
       "English"
@@ -93,7 +95,6 @@ export const allQuestions: Question[] = [
       "Class 9"
     ],
     "difficulty": "Medium",
-    "bloomsTaxonomyLevel": "Remembering",
     "vertical": [
       "K-12",
       "English"
@@ -142,16 +143,17 @@ export const allQuestions: Question[] = [
     "answer": "চার্লস ডারউইন",
     "subject": [
       "Biology",
-      "Higher Math"
+      "Higher Math",
+      "Business Entrepreneurship"
     ],
     "topic": [
-      "জৈব অভিব্যক্তি তত্ত্ব, জীবনের আবির্ভাব, ডারউইনের মতবাদ, ডারউইনের দৃষ্টিতে প্রকৃতিতে সংঘটিত সাধারণ সত্যসমূহ"
+      "জৈব অভিব্যক্তি তত্ত্ব, জীবনের আবির্ভাব, ডারউইনের মতবাদ, ডারউইনের দৃষ্টিতে প্রকৃতিতে সংঘটিত সাধারণ সত্যসমূহ",
+      "জীবের বংশগতি, বংশগতিবস্তু, ক্রোমোজোম, DNA এর গঠন"
     ],
     "class": [
       "Class 9"
     ],
     "difficulty": "Medium",
-    "bloomsTaxonomyLevel": "Remembering",
     "vertical": [
       "K-12",
       "English"
@@ -199,16 +201,17 @@ export const allQuestions: Question[] = [
     ],
     "answer": "৩",
     "subject": [
-      "Biology"
+      "Biology",
+      "Business Entrepreneurship"
     ],
     "topic": [
-      "জৈব অভিব্যক্তি তত্ত্ব, জীবনের আবির্ভাব, ডারউইনের মতবাদ, ডারউইনের দৃষ্টিতে প্রকৃতিতে সংঘটিত সাধারণ সত্যসমূহ"
+      "জৈব অভিব্যক্তি তত্ত্ব, জীবনের আবির্ভাব, ডারউইনের মতবাদ, ডারউইনের দৃষ্টিতে প্রকৃতিতে সংঘটিত সাধারণ সত্যসমূহ",
+      "জীবের বংশগতি, বংশগতিবস্তু, ক্রোমোজোম, DNA এর গঠন"
     ],
     "class": [
       "Class 9"
     ],
     "difficulty": "Medium",
-    "bloomsTaxonomyLevel": "Remembering",
     "vertical": [
       "K-12",
       "English"
@@ -269,7 +272,6 @@ export const allQuestions: Question[] = [
       "Class 9"
     ],
     "difficulty": "Medium",
-    "bloomsTaxonomyLevel": "Remembering",
     "vertical": [
       "K-12"
     ],
@@ -329,7 +331,6 @@ export const allQuestions: Question[] = [
       "Class 9"
     ],
     "difficulty": "Medium",
-    "bloomsTaxonomyLevel": "Remembering",
     "vertical": [
       "K-12"
     ],
@@ -391,7 +392,6 @@ export const allQuestions: Question[] = [
       "Class 10"
     ],
     "difficulty": "Medium",
-    "bloomsTaxonomyLevel": "Remembering",
     "vertical": [
       "K-12"
     ],
@@ -452,7 +452,6 @@ export const allQuestions: Question[] = [
       "Class 9"
     ],
     "difficulty": "Medium",
-    "bloomsTaxonomyLevel": "Remembering",
     "vertical": [
       "K-12"
     ],
@@ -512,7 +511,6 @@ export const allQuestions: Question[] = [
       "Class 11 - 12"
     ],
     "difficulty": "Medium",
-    "bloomsTaxonomyLevel": "Remembering",
     "vertical": [
       "K-12"
     ],
@@ -571,7 +569,6 @@ export const allQuestions: Question[] = [
       "Class 10"
     ],
     "difficulty": "Medium",
-    "bloomsTaxonomyLevel": "Remembering",
     "vertical": [
       "K-12",
       "English"
@@ -638,7 +635,6 @@ export const allQuestions: Question[] = [
       "Class 11 - 12"
     ],
     "difficulty": "Medium",
-    "bloomsTaxonomyLevel": "Remembering",
     "vertical": [
       "K-12",
       "English"
@@ -699,7 +695,6 @@ export const allQuestions: Question[] = [
         "isCorrect": false
       }
     ],
-    "bloomsTaxonomyLevel": "Remembering",
     "createdAt": "2025-09-14T16:00:12.067Z"
   },
   {
@@ -717,7 +712,6 @@ export const allQuestions: Question[] = [
     ],
     "difficulty": "Medium",
     "options": [],
-    "bloomsTaxonomyLevel": "Understanding",
     "createdAt": "2025-09-14T16:00:12.067Z"
   },
   {
@@ -752,7 +746,6 @@ export const allQuestions: Question[] = [
         "isCorrect": false
       }
     ],
-    "bloomsTaxonomyLevel": "Applying",
     "createdAt": "2025-09-14T16:00:12.067Z"
   },
   {
@@ -773,7 +766,6 @@ export const allQuestions: Question[] = [
     ],
     "difficulty": "Hard",
     "options": [],
-    "bloomsTaxonomyLevel": "Evaluating",
     "createdAt": "2025-09-14T16:00:12.067Z"
   },
   {
@@ -809,7 +801,6 @@ export const allQuestions: Question[] = [
         "isCorrect": false
       }
     ],
-    "bloomsTaxonomyLevel": "Remembering",
     "createdAt": "2025-09-14T16:00:12.067Z"
   },
   {
@@ -828,7 +819,6 @@ export const allQuestions: Question[] = [
     ],
     "difficulty": "Easy",
     "options": [],
-    "bloomsTaxonomyLevel": "Understanding",
     "createdAt": "2025-09-14T16:00:12.067Z"
   },
   {
@@ -862,7 +852,6 @@ export const allQuestions: Question[] = [
         "isCorrect": false
       }
     ],
-    "bloomsTaxonomyLevel": "Applying",
     "createdAt": "2025-09-14T16:00:12.067Z"
   },
   {
@@ -882,7 +871,6 @@ export const allQuestions: Question[] = [
     ],
     "difficulty": "Medium",
     "options": [],
-    "bloomsTaxonomyLevel": "Analyzing",
     "createdAt": "2025-09-14T16:00:12.067Z"
   },
   {
@@ -902,7 +890,6 @@ export const allQuestions: Question[] = [
     ],
     "difficulty": "Hard",
     "options": [],
-    "bloomsTaxonomyLevel": "Evaluating",
     "createdAt": "2025-09-14T16:00:12.067Z"
   },
   {
@@ -922,7 +909,6 @@ export const allQuestions: Question[] = [
     ],
     "difficulty": "Medium",
     "options": [],
-    "bloomsTaxonomyLevel": "Creating",
     "createdAt": "2025-09-14T16:00:12.067Z"
   }
 ];

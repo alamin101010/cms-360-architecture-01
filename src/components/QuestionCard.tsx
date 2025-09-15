@@ -69,7 +69,6 @@ export function QuestionCard({ question, onCardClick, onDeleteClick, onSelectTog
             >
               {question.difficulty}
             </Badge>}
-            {question.bloomsTaxonomyLevel && <Badge variant="outline">{question.bloomsTaxonomyLevel}</Badge>}
             <AttributeBadge value={question.topic} variant="outline" />
           </div>
         </div>

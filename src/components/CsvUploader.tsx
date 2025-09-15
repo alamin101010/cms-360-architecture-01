@@ -153,7 +153,6 @@ export function CsvUploader({ children, addImportedQuestions, updateMultipleQues
               topic: manualTopic || decodedAttrs.topics || 'Misc',
               class: decodedAttrs.class || 'Misc',
               difficulty: (decodedAttrs.difficulty as Question['difficulty']) || 'Medium',
-              bloomsTaxonomyLevel: (decodedAttrs.learning_outcome as Question['bloomsTaxonomyLevel']) || 'Remembering',
               vertical: manualVertical || decodedAttrs.vertical,
               program: decodedAttrs.program,
               paper: decodedAttrs.paper,
@@ -199,7 +198,6 @@ export function CsvUploader({ children, addImportedQuestions, updateMultipleQues
 
                     // Overwrite single-value fields only if they are new
                     difficulty: newQuestionData.difficulty || baseQuestion.difficulty,
-                    bloomsTaxonomyLevel: newQuestionData.bloomsTaxonomyLevel || baseQuestion.bloomsTaxonomyLevel,
                     explanation: newQuestionData.explanation || baseQuestion.explanation,
                     marks: newQuestionData.marks || baseQuestion.marks,
                     options: (newQuestionData.options && newQuestionData.options.length > 0) ? newQuestionData.options : baseQuestion.options,
@@ -591,5 +589,3 @@ export function CsvUploader({ children, addImportedQuestions, updateMultipleQues
     </Dialog>
   );
 }
-
-    

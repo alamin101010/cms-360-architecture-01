@@ -87,7 +87,6 @@ export function QuestionDetailsDialog({ question, isOpen, onOpenChange, onEditCl
                         <AttributeSection label="Subject" value={question.subject} />
                         <AttributeSection label="Topic" value={question.topic} />
                         <AttributeSection label="Difficulty" value={question.difficulty} />
-                        <AttributeSection label="Bloom's Taxonomy" value={question.bloomsTaxonomyLevel} />
                         <AttributeSection label="Program" value={question.program} />
                         <AttributeSection label="Paper" value={question.paper} />
                         <AttributeSection label="Chapter" value={question.chapter} />
