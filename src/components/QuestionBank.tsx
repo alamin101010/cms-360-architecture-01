@@ -310,7 +310,7 @@ export function QuestionBank({ questions, addImportedQuestions, addMultipleQuest
                 <div className="flex items-center justify-between bg-muted p-2 rounded-md">
                     <span className="text-sm font-medium">{selectedQuestions.length} questions selected</span>
                     <div className="flex gap-2">
-                      <Button size="sm" onClick={handleAddSelectedToExam}><PlusCircle/> Add to Exam</Button>
+                      <Button size="sm" variant="success" onClick={handleAddSelectedToExam}><PlusCircle/> Add to Exam</Button>
                       <Button size="sm" variant="destructive" onClick={handleDeleteSelected}><Trash2/> Delete Selected</Button>
                     </div>
                 </div>

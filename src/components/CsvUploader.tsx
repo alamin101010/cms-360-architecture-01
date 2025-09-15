@@ -566,7 +566,7 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
           </DialogClose>
           {hasPreview && (
             <>
-                <Button onClick={handleAddToBank} disabled={totalSelectedForBank === 0}>
+                <Button onClick={handleAddToBank} disabled={totalSelectedForBank === 0} variant="success">
                     <GitMerge className="mr-2" />
                     {selectedDuplicatesForMerge.length > 0 ? `Merge ${selectedDuplicatesForMerge.length} & ` : ''}
                     Add {selectedNew.length > 0 ? `${selectedNew.length} New` : ''}

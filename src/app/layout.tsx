@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from '@/components/ThemeProvider';
 
 export const metadata: Metadata = {
-  title: 'CMS360 Architecture',
+  title: 'CMS360 Architectures',
   description: 'A flexible exam creation tool for educators.',
 };
 

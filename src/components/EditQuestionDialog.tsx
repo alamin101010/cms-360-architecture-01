@@ -182,8 +182,8 @@ export function EditQuestionDialog({ question, isOpen, onOpenChange, onSave }: E
                                     <RadioGroupItem value={index.toString()} id={`correct-opt-${index}`} />
                                 </FormControl>
                                 <FormLabel htmlFor={`correct-opt-${index}`} className="text-sm">Correct</FormLabel>
-                                <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} disabled={fields.length <= 2}>
-                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)} disabled={fields.length <= 2}>
+                                    <Trash2 className="h-4 w-4" />
                                 </Button>
                                 </div>
                             ))}
@@ -239,7 +239,7 @@ export function EditQuestionDialog({ question, isOpen, onOpenChange, onSave }: E
             </ScrollArea>
             <DialogFooter className="mt-4 shrink-0">
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-                <Button type="submit">Save Changes</Button>
+                <Button type="submit" variant="success">Save Changes</Button>
             </DialogFooter>
           </form>
         </Form>

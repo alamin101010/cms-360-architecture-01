@@ -163,8 +163,8 @@ export function ExamBuilder({
         </div>
       </CardContent>
       <CardFooter className="justify-end gap-2">
-        <Button variant="ghost" onClick={clearExam}><Trash2 /> Clear</Button>
-        <Button onClick={saveExam}><Save /> Save Exam</Button>
+        <Button variant="destructive" onClick={clearExam}><Trash2 /> Clear</Button>
+        <Button variant="success" onClick={saveExam}><Save /> Save Exam</Button>
       </CardFooter>
     </Card>
   );
