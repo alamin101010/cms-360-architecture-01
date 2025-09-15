@@ -45,7 +45,8 @@ export const allQuestions: Question[] = [
     ],
     "paper": [],
     "chapter": [
-      "Chapter 11"
+      "Chapter 11",
+      "Chapter 12"
     ],
     "exam_set": [
       "Set 1"
@@ -102,7 +103,8 @@ export const allQuestions: Question[] = [
     ],
     "paper": [],
     "chapter": [
-      "Chapter 11"
+      "Chapter 11",
+      "Chapter 12"
     ],
     "exam_set": [
       "Set 1"
@@ -159,7 +161,8 @@ export const allQuestions: Question[] = [
     ],
     "paper": [],
     "chapter": [
-      "Chapter 11"
+      "Chapter 11",
+      "Chapter 12"
     ],
     "exam_set": [
       "Set 1"
@@ -195,19 +198,38 @@ export const allQuestions: Question[] = [
       }
     ],
     "answer": "৩",
-    "subject": "Biology",
-    "topic": "জৈব অভিব্যক্তি তত্ত্ব, জীবনের আবির্ভাব, ডারউইনের মতবাদ, ডারউইনের দৃষ্টিতে প্রকৃতিতে সংঘটিত সাধারণ সত্যসমূহ",
-    "class": "Class 9",
+    "subject": [
+      "Biology"
+    ],
+    "topic": [
+      "জৈব অভিব্যক্তি তত্ত্ব, জীবনের আবির্ভাব, ডারউইনের মতবাদ, ডারউইনের দৃষ্টিতে প্রকৃতিতে সংঘটিত সাধারণ সত্যসমূহ"
+    ],
+    "class": [
+      "Class 9"
+    ],
     "difficulty": "Medium",
     "bloomsTaxonomyLevel": "Remembering",
-    "vertical": "K-12",
-    "program": "Online Batch 25",
-    "chapter": "Chapter 11",
-    "exam_set": "Set 1",
+    "vertical": [
+      "K-12",
+      "English"
+    ],
+    "program": [
+      "Online Batch 25"
+    ],
+    "chapter": [
+      "Chapter 11"
+    ],
+    "exam_set": [
+      "Set 1"
+    ],
     "explanation": "",
     "marks": 1,
     "id": "import-1757911012561-3",
-    "createdAt": "2025-09-15T04:36:52.561Z"
+    "createdAt": "2025-09-15T04:36:52.561Z",
+    "paper": [],
+    "board": [],
+    "category": [],
+    "modules": []
   },
   {
     "text": "শারীরবৃত্তীয় ভ্রূণ গঠনে অংশগ্রহণ করে কোনটি?",

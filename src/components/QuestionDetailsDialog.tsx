@@ -11,8 +11,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 import type { Question } from '@/types';
 import { ScrollArea } from './ui/scroll-area';
-import { CheckCircle, XCircle, Pencil } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 import { Button } from './ui/button';
+import { CheckCircle, XCircle } from 'lucide-react';
 
 type QuestionDetailsDialogProps = {
   question: Question;
@@ -21,22 +22,26 @@ type QuestionDetailsDialogProps = {
   onEditClick: (question: Question) => void;
 };
 
-export function QuestionDetailsDialog({ question, isOpen, onOpenChange, onEditClick }: QuestionDetailsDialogProps) {
-  if (!question) return null;
-
-  const getAttributeBadges = (label: string, value: string | string[] | undefined | null | number) => {
+const AttributeSection = ({ label, value }: { label: string, value: string | string[] | number | undefined | null }) => {
     if (!value || (Array.isArray(value) && value.length === 0)) return null;
 
     const values = Array.isArray(value) ? value : [String(value)];
 
     return (
-      <>
-        {values.map((val, index) => (
-            <Badge key={`${label}-${index}`} variant="outline">{label}: {val}</Badge>
-        ))}
-      </>
+        <div>
+            <h4 className="font-semibold text-sm text-muted-foreground mb-2">{label}</h4>
+            <div className="flex flex-wrap gap-2">
+                {values.map((val, index) => (
+                    <Badge key={index} variant="outline">{val}</Badge>
+                ))}
+            </div>
+        </div>
     );
-  };
+};
+
+
+export function QuestionDetailsDialog({ question, isOpen, onOpenChange, onEditClick }: QuestionDetailsDialogProps) {
+  if (!question) return null;
   
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -77,21 +82,22 @@ export function QuestionDetailsDialog({ question, isOpen, onOpenChange, onEditCl
 
                 <div>
                     <h3 className="font-semibold mb-2">Attributes</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {getAttributeBadges('Class', question.class)}
-                        {getAttributeBadges('Subject', question.subject)}
-                        {getAttributeBadges('Topic', question.topic)}
-                        {getAttributeBadges('Difficulty', question.difficulty)}
-                        {getAttributeBadges('Program', question.program)}
-                        {getAttributeBadges('Paper', question.paper)}
-                        {getAttributeBadges('Chapter', question.chapter)}
-                        {getAttributeBadges('Exam Set', question.exam_set)}
-                        {getAttributeBadges('Board', question.board)}
-                        {getAttributeBadges('Category', question.category)}
-                        {getAttributeBadges('Modules', question.modules)}
-                        {getAttributeBadges('Group Type', question.group_type)}
-                        {getAttributeBadges('Marks', question.marks?.toString())}
-                        {getAttributeBadges('Vertical', question.vertical)}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <AttributeSection label="Class" value={question.class} />
+                        <AttributeSection label="Subject" value={question.subject} />
+                        <AttributeSection label="Topic" value={question.topic} />
+                        <AttributeSection label="Difficulty" value={question.difficulty} />
+                        <AttributeSection label="Bloom's Taxonomy" value={question.bloomsTaxonomyLevel} />
+                        <AttributeSection label="Program" value={question.program} />
+                        <AttributeSection label="Paper" value={question.paper} />
+                        <AttributeSection label="Chapter" value={question.chapter} />
+                        <AttributeSection label="Exam Set" value={question.exam_set} />
+                        <AttributeSection label="Board" value={question.board} />
+                        <AttributeSection label="Category" value={question.category} />
+                        <AttributeSection label="Modules" value={question.modules} />
+                        <AttributeSection label="Group Type" value={question.group_type} />
+                        <AttributeSection label="Marks" value={question.marks} />
+                        <AttributeSection label="Vertical" value={question.vertical} />
                     </div>
                 </div>
 
