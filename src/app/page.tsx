@@ -5,17 +5,16 @@ import type { DragEvent } from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Question, QuestionSet, Exam } from '@/types';
-import { allQuestions } from '@/data/mock-data';
+import { allQuestions as initialQuestions } from '@/data/mock-data';
 import { Header } from '@/components/Header';
 import { QuestionBank } from '@/components/QuestionBank';
 import { ExamBuilder } from '@/components/ExamBuilder';
 import { useToast } from '@/hooks/use-toast';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
-import { updateQuestions as saveQuestionsToFile } from '@/ai/flows/update-questions-flow';
 
 export default function Home() {
-  const [questions, setQuestions] = useState<Question[]>(allQuestions);
+  const [questions, setQuestions] = useLocalStorage<Question[]>('allQuestions', initialQuestions);
   const [currentExamQuestions, setCurrentExamQuestions] = useState<Question[]>([]);
   const [examDetails, setExamDetails] = useState({
     name: 'New Exam',
@@ -61,17 +60,8 @@ export default function Home() {
     e.preventDefault();
   };
   
-  const persistQuestions = async (updatedQuestions: Question[]) => {
-    try {
-      await saveQuestionsToFile(updatedQuestions);
-      setQuestions(updatedQuestions);
-    } catch (e) {
-      toast({
-          variant: 'destructive',
-          title: 'Failed to save questions',
-          description: 'There was an error saving your questions. Please try again.',
-      });
-    }
+  const persistQuestions = (updatedQuestions: Question[]) => {
+    setQuestions(updatedQuestions);
   }
 
   const addSuggestedQuestions = (newQuestions: Omit<Question, 'id'>[]) => {
