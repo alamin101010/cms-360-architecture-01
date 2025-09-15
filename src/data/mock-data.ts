@@ -31,7 +31,9 @@ export const allQuestions: Question[] = [
     "topic": [
       "test topic 2",
       "test topic 1",
-      "test topic 3"
+      "test topic 3",
+      "Attribute Set check",
+      "Attribute Set check 1"
     ],
     "class": [
       "Class 9"
@@ -48,7 +50,8 @@ export const allQuestions: Question[] = [
       "Chapter 7"
     ],
     "exam_set": [
-      "Set 1"
+      "Set 1",
+      "Set 2"
     ],
     "explanation": "",
     "marks": 1,
@@ -88,7 +91,9 @@ export const allQuestions: Question[] = [
     ],
     "topic": [
       "Genetics",
-      "Cell Division"
+      "Cell Division",
+      "Attribute Set check",
+      "Attribute Set check 1"
     ],
     "class": [
       "Class 9"
@@ -142,11 +147,14 @@ export const allQuestions: Question[] = [
     ],
     "answer": "মিয়োসিস",
     "subject": [
-      "Biology"
+      "Biology",
+      "Higher Math"
     ],
     "topic": [
       "Cell Division",
-      "Reproduction"
+      "Reproduction",
+      "Attribute Set check",
+      "Attribute Set check 1"
     ],
     "class": [
       "Class 9",
@@ -165,7 +173,8 @@ export const allQuestions: Question[] = [
       "Chapter 7"
     ],
     "exam_set": [
-      "Set 1"
+      "Set 1",
+      "Set 2"
     ],
     "explanation": "",
     "marks": 1,
@@ -205,7 +214,9 @@ export const allQuestions: Question[] = [
     ],
     "topic": [
       "Genetics",
-      "Human Body"
+      "Human Body",
+      "Attribute Set check",
+      "Attribute Set check 1"
     ],
     "class": [
       "Class 9"
@@ -262,7 +273,9 @@ export const allQuestions: Question[] = [
     ],
     "topic": [
       "Pharmacology",
-      "Genetics"
+      "Genetics",
+      "Attribute Set check",
+      "Attribute Set check 1"
     ],
     "class": [
       "Class 9",
@@ -439,10 +452,22 @@ export const allQuestions: Question[] = [
     ],
     "difficulty": "Easy",
     "options": [
-      { "text": "Nucleus", "isCorrect": false },
-      { "text": "Mitochondria", "isCorrect": true },
-      { "text": "Ribosome", "isCorrect": false },
-      { "text": "Endoplasmic Reticulum", "isCorrect": false }
+      {
+        "text": "Nucleus",
+        "isCorrect": false
+      },
+      {
+        "text": "Mitochondria",
+        "isCorrect": true
+      },
+      {
+        "text": "Ribosome",
+        "isCorrect": false
+      },
+      {
+        "text": "Endoplasmic Reticulum",
+        "isCorrect": false
+      }
     ],
     "bloomsTaxonomyLevel": "Remembering",
     "createdAt": "2025-09-14T16:00:12.067Z"
@@ -450,12 +475,16 @@ export const allQuestions: Question[] = [
   {
     "id": "q2",
     "text": "Explain the process of photosynthesis in your own words.",
-    "subject": ["Biology"],
+    "subject": [
+      "Biology"
+    ],
     "topic": [
       "Plant Biology",
       "Photosynthesis"
     ],
-    "class": ["10th Grade"],
+    "class": [
+      "10th Grade"
+    ],
     "difficulty": "Medium",
     "options": [],
     "bloomsTaxonomyLevel": "Understanding",
@@ -464,15 +493,34 @@ export const allQuestions: Question[] = [
   {
     "id": "q3",
     "text": "Solve for x: 2x + 5 = 15",
-    "subject": ["Mathematics"],
-    "topic": ["Algebra", "Linear Equations"],
-    "class": ["8th Grade"],
+    "subject": [
+      "Mathematics"
+    ],
+    "topic": [
+      "Algebra",
+      "Linear Equations"
+    ],
+    "class": [
+      "8th Grade"
+    ],
     "difficulty": "Easy",
     "options": [
-      { "text": "x = 5", "isCorrect": true },
-      { "text": "x = 10", "isCorrect": false },
-      { "text": "x = 2.5", "isCorrect": false },
-      { "text": "x = 7.5", "isCorrect": false }
+      {
+        "text": "x = 5",
+        "isCorrect": true
+      },
+      {
+        "text": "x = 10",
+        "isCorrect": false
+      },
+      {
+        "text": "x = 2.5",
+        "isCorrect": false
+      },
+      {
+        "text": "x = 7.5",
+        "isCorrect": false
+      }
     ],
     "bloomsTaxonomyLevel": "Applying",
     "createdAt": "2025-09-14T16:00:12.067Z"
@@ -489,7 +537,10 @@ export const allQuestions: Question[] = [
       "Digital Age",
       "Globalization"
     ],
-    "class": ["11th Grade", "12th Grade"],
+    "class": [
+      "11th Grade",
+      "12th Grade"
+    ],
     "difficulty": "Hard",
     "options": [],
     "bloomsTaxonomyLevel": "Evaluating",
@@ -498,15 +549,35 @@ export const allQuestions: Question[] = [
   {
     "id": "q10",
     "text": "What are the three branches of the U.S. government?",
-    "subject": ["Civics", "US History"],
-    "topic": ["US Government", "Separation of Powers"],
-    "class": ["8th Grade"],
+    "subject": [
+      "Civics",
+      "US History"
+    ],
+    "topic": [
+      "US Government",
+      "Separation of Powers"
+    ],
+    "class": [
+      "8th Grade"
+    ],
     "difficulty": "Easy",
-     "options": [
-      { "text": "Legislative, Executive, Judicial", "isCorrect": true },
-      { "text": "Federal, State, Local", "isCorrect": false },
-      { "text": "President, Senate, House", "isCorrect": false },
-      { "text": "Democratic, Republican, Independent", "isCorrect": false }
+    "options": [
+      {
+        "text": "Legislative, Executive, Judicial",
+        "isCorrect": true
+      },
+      {
+        "text": "Federal, State, Local",
+        "isCorrect": false
+      },
+      {
+        "text": "President, Senate, House",
+        "isCorrect": false
+      },
+      {
+        "text": "Democratic, Republican, Independent",
+        "isCorrect": false
+      }
     ],
     "bloomsTaxonomyLevel": "Remembering",
     "createdAt": "2025-09-14T16:00:12.067Z"
@@ -514,9 +585,17 @@ export const allQuestions: Question[] = [
   {
     "id": "q11",
     "text": "Explain the water cycle.",
-    "subject": ["Science", "Earth Science"],
-    "topic": ["Ecology", "Hydrology"],
-    "class": ["7th Grade"],
+    "subject": [
+      "Science",
+      "Earth Science"
+    ],
+    "topic": [
+      "Ecology",
+      "Hydrology"
+    ],
+    "class": [
+      "7th Grade"
+    ],
     "difficulty": "Easy",
     "options": [],
     "bloomsTaxonomyLevel": "Understanding",
@@ -525,15 +604,33 @@ export const allQuestions: Question[] = [
   {
     "id": "q12",
     "text": "Calculate the perimeter of a rectangle with length 8cm and width 5cm.",
-    "subject": ["Mathematics"],
-    "topic": ["Geometry"],
-    "class": ["7th Grade"],
+    "subject": [
+      "Mathematics"
+    ],
+    "topic": [
+      "Geometry"
+    ],
+    "class": [
+      "7th Grade"
+    ],
     "difficulty": "Easy",
     "options": [
-      { "text": "13 cm", "isCorrect": false },
-      { "text": "26 cm", "isCorrect": true },
-      { "text": "40 cm", "isCorrect": false },
-      { "text": "21 cm", "isCorrect": false }
+      {
+        "text": "13 cm",
+        "isCorrect": false
+      },
+      {
+        "text": "26 cm",
+        "isCorrect": true
+      },
+      {
+        "text": "40 cm",
+        "isCorrect": false
+      },
+      {
+        "text": "21 cm",
+        "isCorrect": false
+      }
     ],
     "bloomsTaxonomyLevel": "Applying",
     "createdAt": "2025-09-14T16:00:12.067Z"
@@ -545,8 +642,14 @@ export const allQuestions: Question[] = [
       "History",
       "Law"
     ],
-    "topic": ["Medieval History", "Constitutional Law"],
-    "class": ["9th Grade", "10th Grade"],
+    "topic": [
+      "Medieval History",
+      "Constitutional Law"
+    ],
+    "class": [
+      "9th Grade",
+      "10th Grade"
+    ],
     "difficulty": "Medium",
     "options": [],
     "bloomsTaxonomyLevel": "Analyzing",
@@ -555,9 +658,18 @@ export const allQuestions: Question[] = [
   {
     "id": "q14",
     "text": "Critique the use of fossil fuels as a primary energy source.",
-    "subject": ["Environmental Science", "Economics"],
-    "topic": ["Energy", "Climate Change"],
-    "class": ["11th Grade", "University"],
+    "subject": [
+      "Environmental Science",
+      "Economics"
+    ],
+    "topic": [
+      "Energy",
+      "Climate Change"
+    ],
+    "class": [
+      "11th Grade",
+      "University"
+    ],
     "difficulty": "Hard",
     "options": [],
     "bloomsTaxonomyLevel": "Evaluating",
@@ -566,9 +678,18 @@ export const allQuestions: Question[] = [
   {
     "id": "q15",
     "text": "Write a short story with a moral.",
-    "subject": ["English", "Creative Writing"],
-    "topic": ["Creative Writing", "Literature"],
-    "class": ["8th Grade", "9th Grade"],
+    "subject": [
+      "English",
+      "Creative Writing"
+    ],
+    "topic": [
+      "Creative Writing",
+      "Literature"
+    ],
+    "class": [
+      "8th Grade",
+      "9th Grade"
+    ],
     "difficulty": "Medium",
     "options": [],
     "bloomsTaxonomyLevel": "Creating",

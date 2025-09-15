@@ -367,30 +367,32 @@ export function CsvUploader({ children, addImportedQuestions, updateMultipleQues
 
   const AttributeBadge = ({label, value}: {label: string, value: any}) => {
     if (!value || (Array.isArray(value) && value.length === 0)) return null;
-    const displayValue = Array.isArray(value) ? value.join(', ') : String(value);
-    return <Badge variant="outline">{label}: {displayValue}</Badge>
+    const values = Array.isArray(value) ? value : [value];
+    return (
+      <>
+        {values.map((val, i) => (
+          <Badge key={i} variant="outline">{label}: {val}</Badge>
+        ))}
+      </>
+    )
   }
 
   const AttributeDiff = ({ label, oldVal, newVal, mergedVal }: { label: string, oldVal: any, newVal: any, mergedVal: any }) => {
-    const oldArr = Array.isArray(oldVal) ? oldVal.filter(Boolean).sort() : (oldVal ? [String(oldVal)] : []);
-    const mergedArr = Array.isArray(mergedVal) ? mergedVal.filter(Boolean).sort() : (mergedVal ? [String(mergedVal)] : []);
+    const oldArr = useMemo(() => Array.isArray(oldVal) ? oldVal.filter(Boolean) : (oldVal ? [String(oldVal)] : []), [oldVal]);
+    const newArr = useMemo(() => Array.isArray(newVal) ? newVal.filter(Boolean) : (newVal ? [String(newVal)] : []), [newVal]);
     
-    if (JSON.stringify(oldArr) === JSON.stringify(mergedArr)) {
-        return <AttributeBadge label={label} value={oldArr} />;
-    }
+    const allValues = [...new Set([...oldArr, ...newArr])];
 
-    const added = mergedArr.filter(v => !oldArr.includes(v));
-
-    if (added.length === 0) {
-        return <AttributeBadge label={label} value={oldArr} />;
+    if (allValues.length <= 1 && oldArr.join(',') === newArr.join(',')) {
+      return <AttributeBadge label={label} value={oldArr} />;
     }
     
     return (
-        <div className="flex items-center gap-2 text-xs border rounded-full px-2 py-0.5 bg-green-50 text-green-800 border-green-200">
-            <span>{label}:</span>
-            <div className="flex flex-col">
-              {oldArr.map((val, i) => <span key={i}><Badge variant="secondary" className="mr-1">Set {i+1}</Badge>{val}</span>)}
-              {added.map((val, i) => <span key={i}><Badge variant="secondary" className="mr-1">Set {oldArr.length + i + 1}</Badge>{val}</span>)}
+        <div className="flex flex-col items-start gap-1 text-xs p-2 border rounded-md bg-muted/50 w-full">
+            <span className="font-semibold">{label}</span>
+            <div className="flex flex-col gap-1">
+              {oldArr.map((val, i) => <span key={`old-${i}`}><Badge variant="secondary" className="mr-1">Set 1</Badge>{val}</span>)}
+              {newArr.filter(v => !oldArr.includes(v)).map((val, i) => <span key={`new-${i}`}><Badge variant="default" className="mr-1 bg-green-100 text-green-800">Set 2</Badge>{val}</span>)}
             </div>
         </div>
     );
@@ -542,6 +544,11 @@ export function CsvUploader({ children, addImportedQuestions, updateMultipleQues
                                                             <AttributeDiff label="Program" oldVal={d.existingQuestion.program} newVal={d.newQuestionData.program} mergedVal={d.mergedData.program} />
                                                             <AttributeDiff label="Vertical" oldVal={d.existingQuestion.vertical} newVal={d.newQuestionData.vertical} mergedVal={d.mergedData.vertical} />
                                                             <AttributeDiff label="Paper" oldVal={d.existingQuestion.paper} newVal={d.newQuestionData.paper} mergedVal={d.mergedData.paper} />
+                                                            <AttributeDiff label="Board" oldVal={d.existingQuestion.board} newVal={d.newQuestionData.board} mergedVal={d.mergedData.board} />
+                                                            <AttributeDiff label="Chapter" oldVal={d.existingQuestion.chapter} newVal={d.newQuestionData.chapter} mergedVal={d.mergedData.chapter} />
+                                                            <AttributeDiff label="Exam Set" oldVal={d.existingQuestion.exam_set} newVal={d.newQuestionData.exam_set} mergedVal={d.mergedData.exam_set} />
+                                                            <AttributeDiff label="Category" oldVal={d.existingQuestion.category} newVal={d.newQuestionData.category} mergedVal={d.mergedData.category} />
+                                                            <AttributeDiff label="Modules" oldVal={d.existingQuestion.modules} newVal={d.newQuestionData.modules} mergedVal={d.mergedData.modules} />
                                                         </div>
                                                     </TableCell>
                                                 </TableRow>
@@ -584,3 +591,5 @@ export function CsvUploader({ children, addImportedQuestions, updateMultipleQues
     </Dialog>
   );
 }
+
+    
