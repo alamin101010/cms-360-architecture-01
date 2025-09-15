@@ -2,6 +2,281 @@ import type { Question } from '@/types';
 
 export const allQuestions: Question[] = [
   {
+    "text": "মাতা-পিতার বৈশিষ্ট্যাবলি কীভাবে সন্তান-সন্ততিতে সঞ্চারিত হয়?",
+    "type": "M1",
+    "image": "",
+    "options": [
+      {
+        "text": "বংশানুক্রমে",
+        "isCorrect": true
+      },
+      {
+        "text": "প্রকৃতিগতভাবে",
+        "isCorrect": false
+      },
+      {
+        "text": "প্রযুক্তিগতভাবে",
+        "isCorrect": false
+      },
+      {
+        "text": "অনুসরণের মাধ্যমে",
+        "isCorrect": false
+      }
+    ],
+    "answer": "বংশানুক্রমে",
+    "subject": [
+      "Biology"
+    ],
+    "topic": [
+      "জীবের বংশগতি, বংশগতিবস্তু, ক্রোমোজোম, DNA এর গঠন"
+    ],
+    "class": [
+      "Class 9"
+    ],
+    "difficulty": "Medium",
+    "bloomsTaxonomyLevel": "Remembering",
+    "vertical": [
+      "English"
+    ],
+    "program": [
+      "Online Batch 25"
+    ],
+    "paper": [],
+    "chapter": [
+      "Chapter 12"
+    ],
+    "exam_set": [
+      "Set 1"
+    ],
+    "board": [],
+    "explanation": "",
+    "category": [],
+    "modules": [],
+    "marks": 1,
+    "id": "import-1757909734256-0",
+    "createdAt": "2025-09-15T04:15:34.256Z"
+  },
+  {
+    "text": "মানবদেহে কত সেট ক্রোমোজোম থাকে?",
+    "type": "M1",
+    "image": "",
+    "options": [
+      {
+        "text": "এক",
+        "isCorrect": false
+      },
+      {
+        "text": "দুই",
+        "isCorrect": true
+      },
+      {
+        "text": "তিন",
+        "isCorrect": false
+      },
+      {
+        "text": "চার",
+        "isCorrect": false
+      }
+    ],
+    "answer": "দুই",
+    "subject": [
+      "Biology"
+    ],
+    "topic": [
+      "জীবের বংশগতি, বংশগতিবস্তু, ক্রোমোজোম, DNA এর গঠন"
+    ],
+    "class": [
+      "Class 9"
+    ],
+    "difficulty": "Medium",
+    "bloomsTaxonomyLevel": "Remembering",
+    "vertical": [
+      "English"
+    ],
+    "program": [
+      "Online Batch 25"
+    ],
+    "paper": [],
+    "chapter": [
+      "Chapter 12"
+    ],
+    "exam_set": [
+      "Set 1"
+    ],
+    "board": [],
+    "explanation": "",
+    "category": [],
+    "modules": [],
+    "marks": 1,
+    "id": "import-1757909734256-1",
+    "createdAt": "2025-09-15T04:15:34.256Z"
+  },
+  {
+    "text": "DNA-এর পূর্ণ ঘূর্ণনের মধ্যে কতটি নিউক্লিওটাইড জোড়া থাকে?",
+    "type": "M1",
+    "image": "",
+    "options": [
+      {
+        "text": "৮",
+        "isCorrect": false
+      },
+      {
+        "text": "১০",
+        "isCorrect": true
+      },
+      {
+        "text": "১৩",
+        "isCorrect": false
+      },
+      {
+        "text": "১৪",
+        "isCorrect": false
+      }
+    ],
+    "answer": "১০",
+    "subject": [
+      "Biology"
+    ],
+    "topic": [
+      "জীবের বংশগতি, বংশগতিবস্তু, ক্রোমোজোম, DNA এর গঠন"
+    ],
+    "class": [
+      "Class 9"
+    ],
+    "difficulty": "Medium",
+    "bloomsTaxonomyLevel": "Remembering",
+    "vertical": [
+      "English"
+    ],
+    "program": [
+      "Online Batch 25"
+    ],
+    "paper": [],
+    "chapter": [
+      "Chapter 12"
+    ],
+    "exam_set": [
+      "Set 1"
+    ],
+    "board": [],
+    "explanation": "",
+    "category": [],
+    "modules": [],
+    "marks": 1,
+    "id": "import-1757909734256-2",
+    "createdAt": "2025-09-15T04:15:34.256Z"
+  },
+  {
+    "text": "DNA-তে মোট কতগুলো নাইট্রোজেন বেস থাকে?",
+    "type": "M1",
+    "image": "",
+    "options": [
+      {
+        "text": "এক",
+        "isCorrect": false
+      },
+      {
+        "text": "দুই",
+        "isCorrect": false
+      },
+      {
+        "text": "তিন",
+        "isCorrect": false
+      },
+      {
+        "text": "চার",
+        "isCorrect": true
+      }
+    ],
+    "answer": "চার",
+    "subject": [
+      "Biology"
+    ],
+    "topic": [
+      "জীবের বংশগতি, বংশগতিবস্তু, ক্রোমোজোম, DNA এর গঠন"
+    ],
+    "class": [
+      "Class 9"
+    ],
+    "difficulty": "Medium",
+    "bloomsTaxonomyLevel": "Remembering",
+    "vertical": [
+      "English"
+    ],
+    "program": [
+      "Online Batch 25"
+    ],
+    "paper": [],
+    "chapter": [
+      "Chapter 12"
+    ],
+    "exam_set": [
+      "Set 1"
+    ],
+    "board": [],
+    "explanation": "",
+    "category": [],
+    "modules": [],
+    "marks": 1,
+    "id": "import-1757909734256-3",
+    "createdAt": "2025-09-15T04:15:34.256Z"
+  },
+  {
+    "text": "DNA অণু কীরূপ?",
+    "type": "M1",
+    "image": "",
+    "options": [
+      {
+        "text": "দ্বি-সূত্রক এবং সর্পিল",
+        "isCorrect": true
+      },
+      {
+        "text": "দ্বি-সূত্রক এবং সোজাকৃতি",
+        "isCorrect": false
+      },
+      {
+        "text": "একসূত্রক এবং সোজাকৃতি",
+        "isCorrect": false
+      },
+      {
+        "text": "একসূত্রক এবং সৰ্পিল",
+        "isCorrect": false
+      }
+    ],
+    "answer": "দ্বি-সূত্রক এবং সর্পিল",
+    "subject": [
+      "Biology"
+    ],
+    "topic": [
+      "জীবের বংশগতি, বংশগতিবস্তু, ক্রোমোজোম, DNA এর গঠন"
+    ],
+    "class": [
+      "Class 9"
+    ],
+    "difficulty": "Medium",
+    "bloomsTaxonomyLevel": "Remembering",
+    "vertical": [
+      "English"
+    ],
+    "program": [
+      "Online Batch 25"
+    ],
+    "paper": [],
+    "chapter": [
+      "Chapter 12"
+    ],
+    "exam_set": [
+      "Set 1"
+    ],
+    "board": [],
+    "explanation": "",
+    "category": [],
+    "modules": [],
+    "marks": 1,
+    "id": "import-1757909734256-4",
+    "createdAt": "2025-09-15T04:15:34.256Z"
+  },
+  {
     "text": "ভার্নিস, পেইন্ট, তৈল ও চর্বির দ্রাবকরূপে ব্যবহৃত হয়-",
     "type": "M1",
     "image": "",
