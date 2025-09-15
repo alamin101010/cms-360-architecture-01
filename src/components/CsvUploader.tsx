@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import Papa from 'papaparse';
 import { Button } from '@/components/ui/button';
 import {
@@ -70,6 +70,11 @@ export function CsvUploader({ children, addImportedQuestions, updateMultipleQues
   
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -375,17 +380,18 @@ export function CsvUploader({ children, addImportedQuestions, updateMultipleQues
     }
 
     const added = mergedArr.filter(v => !oldArr.includes(v));
-    const removed = oldArr.filter(v => !mergedArr.includes(v)); // Should be empty with current logic, but good for future
 
-    if (added.length === 0 && removed.length === 0) {
+    if (added.length === 0) {
         return <AttributeBadge label={label} value={oldArr} />;
     }
     
     return (
-        <div className="flex items-center gap-1 text-xs border rounded-full px-2 py-0.5 bg-green-50 text-green-800 border-green-200">
+        <div className="flex items-center gap-2 text-xs border rounded-full px-2 py-0.5 bg-green-50 text-green-800 border-green-200">
             <span>{label}:</span>
-            {oldArr.length > 0 && <span className="text-muted-foreground line-through">{oldArr.join(', ')}</span>}
-            <span className="font-semibold">{mergedArr.join(', ')}</span>
+            <div className="flex flex-col">
+              {oldArr.map((val, i) => <span key={i}><Badge variant="secondary" className="mr-1">Set {i+1}</Badge>{val}</span>)}
+              {added.map((val, i) => <span key={i}><Badge variant="secondary" className="mr-1">Set {oldArr.length + i + 1}</Badge>{val}</span>)}
+            </div>
         </div>
     );
   };
@@ -402,6 +408,10 @@ export function CsvUploader({ children, addImportedQuestions, updateMultipleQues
         ))}
       </ul>
     )
+  }
+
+  if (!mounted) {
+    return null;
   }
 
   return (
