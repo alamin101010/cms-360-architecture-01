@@ -33,6 +33,7 @@ type CsvUploaderProps = {
   children: React.ReactNode;
   addImportedQuestions: (questions: Omit<Question, 'id'>[]) => void;
   addQuestionsToExam: (questions: Question[]) => void;
+  updateMultipleQuestions: (questions: Question[]) => void;
   existingQuestions: Question[];
 };
 
@@ -51,7 +52,7 @@ const mergeAttribute = (val1: any, val2: any): string[] => {
 };
 
 
-export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam, existingQuestions }: CsvUploaderProps) {
+export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam, updateMultipleQuestions, existingQuestions }: CsvUploaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [textData, setTextData] = useState<string>('');
@@ -269,27 +270,24 @@ export function CsvUploader({ children, addImportedQuestions, addQuestionsToExam
 
   const handleAddToBank = () => {
     const questionsToAdd = selectedNew.map(index => newQuestions[index]);
-    if (questionsToAdd.length > 0) {
-        addImportedQuestions(questionsToAdd);
-    }
+    const questionsToMerge = selectedDuplicatesForMerge
+        .map(id => duplicateQuestions.find(d => d.existingQuestion.id === id)?.mergedData)
+        .filter((q): q is Question => !!q);
     
-    // This logic is now handled client-side. The `updateMultipleQuestions` prop can be removed.
-    // const questionsToMerge = selectedDuplicatesForMerge
-    //     .map(id => duplicateQuestions.find(d => d.existingQuestion.id === id)?.mergedData)
-    //     .filter((q): q is Question => !!q);
-    
-    // if(questionsToMerge.length > 0) {
-    //     updateMultipleQuestions(questionsToMerge);
-    // }
-
-    // if (questionsToAdd.length === 0 && questionsToMerge.length === 0) {
-    if (questionsToAdd.length === 0) {
+    if (questionsToAdd.length === 0 && questionsToMerge.length === 0) {
         toast({ variant: 'destructive', title: 'No questions selected for import.'});
         return;
     }
 
-    toast({ title: `${questionsToAdd.length} new questions added.`});
+    if (questionsToAdd.length > 0) {
+        addImportedQuestions(questionsToAdd);
+    }
+    
+    if(questionsToMerge.length > 0) {
+        updateMultipleQuestions(questionsToMerge);
+    }
 
+    toast({ title: `${questionsToAdd.length} new questions added and ${questionsToMerge.length} questions updated.`});
 
     setIsOpen(false);
     resetState();

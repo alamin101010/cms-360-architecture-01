@@ -42,12 +42,13 @@ type QuestionBankProps = {
   deleteQuestion: (questionId: string) => void;
   deleteMultipleQuestions: (questionIds: string[]) => void;
   updateQuestion: (question: Question) => void;
+  updateMultipleQuestions: (questions: Question[]) => void;
 };
 
 type FilterValue = string | null;
 
 
-export function QuestionBank({ questions, addSuggestedQuestions, addImportedQuestions, addMultipleQuestionsToExam, addQuestionsToExam, deleteQuestion, deleteMultipleQuestions, updateQuestion }: QuestionBankProps) {
+export function QuestionBank({ questions, addSuggestedQuestions, addImportedQuestions, addMultipleQuestionsToExam, addQuestionsToExam, deleteQuestion, deleteMultipleQuestions, updateQuestion, updateMultipleQuestions }: QuestionBankProps) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -254,7 +255,7 @@ export function QuestionBank({ questions, addSuggestedQuestions, addImportedQues
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Question Bank</CardTitle>
         <div className="flex gap-2">
-          <CsvUploader addImportedQuestions={addImportedQuestions} addQuestionsToExam={addQuestionsToExam} existingQuestions={questions}>
+          <CsvUploader addImportedQuestions={addImportedQuestions} addQuestionsToExam={addQuestionsToExam} existingQuestions={questions} updateMultipleQuestions={updateMultipleQuestions}>
              <Button variant="outline" size="sm">
                 <Upload className="mr-2 h-4 w-4" />
                 Import CSV
