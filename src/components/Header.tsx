@@ -14,7 +14,7 @@ export function Header({ savedExams }: HeaderProps) {
       <Link href="/" className="flex items-center">
         <BookMarked className="h-8 w-8 text-primary" />
         <h1 className="ml-3 text-xl sm:text-2xl font-bold text-foreground">
-          CMS360 Architectures
+          CMS Combined
         </h1>
       </Link>
       <div className="flex items-center gap-4">
